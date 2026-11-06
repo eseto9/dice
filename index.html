@@ -359,18 +359,18 @@ const ENEMY_TYPES = {
     pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 5 }, { k: 'snipe', v: 5 }, { k: 'guard', v: 3, dmg: 4 }] },
   king: { name: 'The Bandit King', boss: true, hp: 36, loot: 12, blurb: 'Every bandit on the flats answers to the King.',
     pattern: [{ k: 'guard', v: 5, dmg: 4 }, { k: 'atk', v: 8 }, { k: 'snipe', v: 6 }, { k: 'atk', v: 10 }] },
-  wraith: { name: 'Sand Wraith', hp: 30, loot: 5, blurb: 'A storm with a face. It drinks the water you carry.',
-    pattern: [{ k: 'atk', v: 7 }, { k: 'drain', v: 2, dmg: 4 }, { k: 'snipe', v: 6 }, { k: 'atk', v: 10 }] },
-  siege: { name: 'Raider Siege Tower', hp: 32, loot: 5, blurb: 'A rolling tower full of archers. Slow, but it hits hard.',
-    pattern: [{ k: 'guard', v: 8, dmg: 5 }, { k: 'atk', v: 12 }, { k: 'atk', v: 6 }, { k: 'snipe', v: 7 }] },
-  storm: { name: 'The Storm Mother', boss: true, hp: 52, loot: 12, blurb: 'Every sandstorm on this road is one of her children.',
+  wraith: { name: 'Sand Wraith', hp: 34, loot: 6, blurb: 'A storm with a face. It drinks the water you carry.',
+    pattern: [{ k: 'atk', v: 8 }, { k: 'drain', v: 2, dmg: 5 }, { k: 'snipe', v: 7 }, { k: 'atk', v: 11 }] },
+  siege: { name: 'Raider Siege Tower', hp: 36, loot: 6, blurb: 'A rolling tower full of archers. Slow, but it hits hard.',
+    pattern: [{ k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 13 }, { k: 'atk', v: 7 }, { k: 'snipe', v: 8 }] },
+  storm: { name: 'The Storm Mother', boss: true, hp: 62, loot: 12, blurb: 'Every sandstorm on this road is one of her children.',
     pattern: [{ k: 'drain', v: 3, dmg: 6 }, { k: 'atk', v: 11 }, { k: 'snipe', v: 9 }, { k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 14 }] },
-  sentinel: { name: 'Brass Sentinel', hp: 36, loot: 6, blurb: 'A smaller cousin of the Gate Warden, still on patrol.',
-    pattern: [{ k: 'atk', v: 9 }, { k: 'guard', v: 7, dmg: 5 }, { k: 'snipe', v: 9 }, { k: 'atk', v: 12 }] },
-  legion: { name: 'Tomb Legion', hp: 34, loot: 6, blurb: 'A whole buried garrison, marching again.',
-    pattern: [{ k: 'atk', v: 8 }, { k: 'atk', v: 8 }, { k: 'snipe', v: 9 }, { k: 'guard', v: 6, dmg: 6 }] },
-  warden: { name: 'The Gate Warden', boss: true, hp: 60, loot: 0, blurb: 'A brass colossus at the city gate. Get past it and the road is yours.',
-    pattern: [{ k: 'guard', v: 8, dmg: 5 }, { k: 'atk', v: 12 }, { k: 'snipe', v: 10 }, { k: 'atk', v: 16 }, { k: 'drain', v: 3, dmg: 6 }] },
+  sentinel: { name: 'Brass Sentinel', hp: 42, loot: 7, blurb: 'A smaller cousin of the Gate Warden, still on patrol.',
+    pattern: [{ k: 'atk', v: 11 }, { k: 'guard', v: 7, dmg: 7 }, { k: 'snipe', v: 10 }, { k: 'atk', v: 14 }] },
+  legion: { name: 'Tomb Legion', hp: 40, loot: 7, blurb: 'A whole buried garrison, marching again.',
+    pattern: [{ k: 'atk', v: 10 }, { k: 'atk', v: 10 }, { k: 'snipe', v: 10 }, { k: 'guard', v: 6, dmg: 8 }] },
+  warden: { name: 'The Gate Warden', boss: true, hp: 75, loot: 0, blurb: 'A brass colossus at the city gate. Get past it and the road is yours.',
+    pattern: [{ k: 'guard', v: 9, dmg: 6 }, { k: 'atk', v: 14 }, { k: 'snipe', v: 11 }, { k: 'atk', v: 18 }, { k: 'drain', v: 3, dmg: 8 }] },
 };
 
 const LEGS = [
@@ -1033,10 +1033,11 @@ const Scene = (() => {
   ];
   const M = {};
   let loaded = false;
+  const MODEL_EXT = 'glb'; // the published copy uses JSON glTF files instead
   const loader = new T.GLTFLoader();
   let done = 0;
   const loads = MODEL_FILES.map((file) => new Promise((res) => {
-    loader.load(`models/${file}.glb`, (g) => {
+    loader.load(`models/${file}.${MODEL_EXT}`, (g) => {
       g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const box = new T.Box3().setFromObject(g.scene);
       M[file.split('/')[1]] = { g, size: box.getSize(new T.Vector3()) };
