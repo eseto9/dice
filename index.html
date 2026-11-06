@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Caravan Dice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Rakkas&display=swap">
+<style>
+/* Layout: one column read like a road — enemy ahead, caravan in the middle, dice tray, crew roster, sticky action bar at the bottom. Dark-first: caravans travel by night. */
+:root {
+  --bg: #15162b;
+  --surface: #1f2142;
+  --surface-2: #2a2d57;
+  --line: #3b3e70;
+  --ink: #f1e8d4;
+  --muted: #a9a5c4;
+  --accent: #eba63d;
+  --accent-ink: #1b1428;
+  --atk: #f2775f;
+  --shd: #74abf3;
+  --coin: #f2cb52;
+  --water: #4fd3c6;
+  --heal: #80da93;
+  --rr: #c6a0f6;
+  --font-display: 'Rakkas', 'Georgia', serif;
+  --font-body: 'Alegreya Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #e7e2ee; --surface: #f8f6fb; --surface-2: #eee9f5; --line: #cec5dc;
+    --ink: #1f1b37; --muted: #5f597a; --accent: #a95f12; --accent-ink: #fff9ef;
+    --atk: #c13b25; --shd: #2a60b6; --coin: #8f6200; --water: #0d7d73; --heal: #2c8543; --rr: #7547bd;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #e7e2ee; --surface: #f8f6fb; --surface-2: #eee9f5; --line: #cec5dc;
+  --ink: #1f1b37; --muted: #5f597a; --accent: #a95f12; --accent-ink: #fff9ef;
+  --atk: #c13b25; --shd: #2a60b6; --coin: #8f6200; --water: #0d7d73; --heal: #2c8543; --rr: #7547bd;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.num { font-variant-numeric: tabular-nums; }
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.02em; color: var(--accent); line-height: 1; }
+.res { display: flex; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-weight: 700; font-variant-numeric: tabular-nums; }
+.chip.water { color: var(--water); }
+.chip.coin { color: var(--coin); }
+.chip.shd { color: var(--shd); }
+.road { display: flex; align-items: center; gap: 6px; width: 100%; font-size: 0.8rem; color: var(--muted); }
+.road .leg { flex: 1; height: 2px; background: var(--line); }
+.road .leg.done { background: var(--accent); }
+.road .stop { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.road .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line); }
+.road .stop.done .dot { background: var(--accent); border-color: var(--accent); }
+.road .stop.here { color: var(--ink); font-weight: 700; }
+.road .stop.here .dot { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+@media (max-width: 420px) { .road .stop:not(.here) .label { display: none; } }
+
+/* Enemy */
+.enemy { display: flex; flex-direction: column; gap: 8px; }
+.enemy-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.enemy h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; margin: 0; line-height: 1.05; text-wrap: balance; }
+.hpnum { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--atk); white-space: nowrap; }
+.blurb { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.bar { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--atk); transition: width 300ms ease; }
+.bar.fill-acc > span { background: var(--accent); }
+.intent { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--atk) 45%, var(--line)); }
+.intent .big { grid-row: span 3; font-size: 1.9rem; color: var(--atk); display: flex; }
+.intent .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.intent strong { font-size: 1.1rem; }
+.intent .detail { font-size: 0.9rem; color: var(--muted); }
+.intent.cancelled { border-color: var(--line); opacity: 0.6; }
+.intent.cancelled strong { text-decoration: line-through; }
+
+/* Caravan */
+.caravan { display: flex; flex-direction: column; gap: 6px; }
+.section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.wagons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wagon { padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.wagon .wname { font-weight: 800; display: flex; justify-content: space-between; gap: 6px; }
+.wagon .perk { font-size: 0.82rem; color: var(--muted); }
+.wagon.rear { border-color: color-mix(in srgb, var(--atk) 55%, var(--line)); }
+.tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 6px; border-radius: 4px; white-space: nowrap; align-self: center; }
+.tag.target { color: var(--atk); background: color-mix(in srgb, var(--atk) 16%, transparent); }
+.tag.out { color: var(--muted); background: var(--surface-2); }
+.wagon.dead { opacity: 0.45; }
+
+/* Dice tray */
+.tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.slot { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.die {
+  aspect-ratio: 1; max-width: 100%; width: 100%;
+  border-radius: 16px; border: 2px solid var(--line); background: var(--surface-2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  cursor: pointer; position: relative; padding: 4px;
+  box-shadow: 0 3px 0 var(--line);
+}
+.die .face { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: clamp(1.6rem, 7vw, 2.3rem); line-height: 1; }
+.die .face .ic { font-size: 0.8em; }
+.die .who { font-size: 0.72rem; color: var(--muted); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.die.held { border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
+.die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; }
+.die.empty { cursor: default; border-style: dashed; box-shadow: none; background: transparent; color: var(--muted); }
+.die.empty .who { color: var(--ink); font-size: 0.85rem; }
+.die.ready { border-style: solid; background: var(--surface); }
+.die.ready .face { font-size: 1.3rem; color: var(--muted); }
+.t-atk { color: var(--atk); } .t-shd { color: var(--shd); } .t-coin { color: var(--coin); }
+.t-water { color: var(--water); } .t-heal { color: var(--heal); } .t-rr { color: var(--rr); } .t-blank { color: var(--muted); }
+.pour { border: 1px solid var(--line); background: var(--surface); color: var(--water); border-radius: 8px; padding: 4px 0; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
+.pour:disabled { opacity: 0.35; cursor: default; }
+.pour.done { color: var(--accent-ink); background: var(--water); border-color: var(--water); opacity: 1; }
+.tumble { animation: tumble 420ms cubic-bezier(.3,1.4,.5,1); }
+@keyframes tumble { 0% { transform: rotate(-200deg) scale(.6); opacity: 0.2; } 100% { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tumble { animation: none; } .bar > span { transition: none; } }
+
+.preview { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 700; font-size: 0.95rem; min-height: 1.4em; }
+.preview span { display: inline-flex; align-items: center; gap: 4px; }
+.preview .hint { font-weight: 400; color: var(--muted); }
+
+.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 0.88rem; color: var(--muted); }
+.log li:first-child { color: var(--ink); }
+
+/* Roster */
+.roster { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (min-width: 540px) { .roster { grid-template-columns: repeat(3, 1fr); } }
+.crew { text-align: left; padding: 10px; border-radius: 12px; background: var(--surface); border: 2px solid var(--line); display: flex; flex-direction: column; gap: 6px; cursor: pointer; min-width: 0; }
+.crew .cname { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.crew .cname b { font-size: 1.05rem; }
+.crew .role { font-size: 0.78rem; color: var(--muted); }
+.crew.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.crew.ko { opacity: 0.45; cursor: not-allowed; }
+.crew:disabled { cursor: default; }
+.faces { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
+.mini { aspect-ratio: 1; max-width: 100%; border-radius: 5px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.72rem; font-weight: 800; }
+.mini .ic { font-size: 0.8rem; }
+
+/* Action bar */
+.actions {
+  position: sticky; bottom: 0; z-index: 5;
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--line);
+  display: flex; gap: 8px;
+}
+.btn { flex: 1; min-height: 50px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-weight: 800; font-size: 1rem; cursor: pointer; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.btn small { font-weight: 500; font-size: 0.75rem; color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); flex: 1.4; }
+.btn.primary small { color: inherit; opacity: 0.8; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+details.help { font-size: 0.92rem; color: var(--muted); }
+details.help summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+details.help ol { padding-left: 20px; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
+
+/* Between-stop screens */
+.panel { display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+.panel h1 { font-family: var(--font-display); font-weight: 400; font-size: 2.2rem; margin: 0; line-height: 1.05; text-wrap: balance; }
+.panel p { margin: 0; color: var(--muted); max-width: 60ch; }
+.choices { display: grid; gap: 10px; }
+.choice { text-align: left; padding: 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; }
+.choice .big { grid-row: span 2; font-size: 1.6rem; display: flex; }
+.choice b { font-size: 1.05rem; }
+.choice span { color: var(--muted); font-size: 0.9rem; }
+.choice:hover { border-color: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { padding: 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; }
+.stat span { font-size: 0.8rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+'use strict';
+
+/* ---------- Data ---------- */
+const ICONS = {
+  atk: '<path d="M19 4l-9.5 9.5M19 4h-4.5M19 4v4.5M7 13.5l3.5 3.5M5 19l3.2-3.2"/>',
+  shd: '<path d="M12 3.5l7 2.8v5c0 4.6-3 7.8-7 9.7-4-1.9-7-5.1-7-9.7v-5z"/>',
+  coin: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+  rr: '<path d="M19.5 12a7.5 7.5 0 1 1-2.6-5.7M19.5 4v4.6h-4.6"/>',
+  heal: '<path d="M12 5v14M5 12h14"/>',
+  water: '<path d="M12 3.5c3 4.6 6 7.6 6 11.5a6 6 0 0 1-12 0c0-3.9 3-6.9 6-11.5z"/>',
+  blank: '<path d="M7 12h10"/>',
+  bribe: '<path d="M4 8h16v10H4zM4 12h16M9 8V6h6v2"/>',
+};
+const icon = (t) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[t]}</svg>`;
+const FACE_NAME = { atk: 'Attack', shd: 'Block', coin: 'Coin', rr: 'Reroll', heal: 'Mend', water: 'Water', blank: 'Blank' };
+
+function parseFace(s) {
+  if (s === '-') return { t: 'blank', v: 0 };
+  if (s === 'r') return { t: 'rr', v: 0 };
+  if (s === 'h') return { t: 'heal', v: 0 };
+  return { t: { a: 'atk', s: 'shd', c: 'coin', w: 'water' }[s[0]], v: Number(s.slice(1)) };
+}
+
+const CREW_DEFS = [
+  { id: 'amir', name: 'Amir', role: 'Guard', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
+  { id: 'lena', name: 'Lena', role: 'Guard', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
+  { id: 'tavi', name: 'Tavi', role: 'Scout', faces: ['r', 'r', 'a2', 's2', 'a1', 'w1'] },
+  { id: 'oskar', name: 'Oskar', role: 'Trader', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 'w1'] },
+  { id: 'noor', name: 'Noor', role: 'Medic', faces: ['h', 'h', 's3', 's2', 'w2', 'a1'] },
+  { id: 'zane', name: 'Zane', role: 'Fire-eater', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
+];
+
+const ENEMIES = [
+  { name: 'Dune Bandits', blurb: 'Raiders on sand-skiffs. They hit the back of the line first.', hp: 28,
+    pattern: [{ k: 'atk', v: 6 }, { k: 'snipe', v: 5 }, { k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 3 }] },
+  { name: 'Sand Wraith', blurb: 'A storm with a face. It drinks whatever water you carry.', hp: 36,
+    pattern: [{ k: 'atk', v: 7 }, { k: 'drain', v: 2, dmg: 4 }, { k: 'snipe', v: 6 }, { k: 'atk', v: 10 }] },
+  { name: 'The Gate Warden', blurb: 'A brass colossus at the city gate. Get past it and the road is yours.', hp: 44,
+    pattern: [{ k: 'guard', v: 6, dmg: 4 }, { k: 'atk', v: 9 }, { k: 'snipe', v: 8 }, { k: 'atk', v: 13 }] },
+];
+
+const WAGON_DEFS = [
+  { id: 'water', name: 'Water Cart', max: 14, perk: 'Lets you pour water on a die for +2.' },
+  { id: 'armory', name: 'Armoury', max: 14, perk: 'Guards get +1 on Attack faces.' },
+];
+
+const DICE_PER_TURN = 4;
+const BASE_REROLLS = 2;
+const ROAD_WATER = 2;
+
+/* ---------- State ---------- */
+let S;
+const rand = (n) => Math.floor(Math.random() * n);
+const crewById = (id) => S.crew.find((c) => c.id === id);
+const wagonAlive = (id) => S.wagons.some((w) => w.id === id && w.hp > 0);
+const rearWagon = () => [...S.wagons].reverse().find((w) => w.hp > 0);
+function log(msg) { S.log.unshift(msg); S.log.length = Math.min(S.log.length, 30); }
+
+function newRun() {
+  S = {
+    crew: CREW_DEFS.map((c) => ({ ...c, faces: c.faces.map(parseFace) })),
+    wagons: WAGON_DEFS.map((w) => ({ ...w, hp: w.max })),
+    water: 5, coin: 0, stop: 0, screen: 'fight', log: [], fight: null,
+    stats: { dmg: 0, turns: 0, coinEarned: 0 },
+  };
+  startFight();
+}
+
+function startFight() {
+  const e = ENEMIES[S.stop];
+  S.fight = {
+    enemy: { name: e.name, blurb: e.blurb, hp: e.hp, max: e.hp, block: 0, pattern: e.pattern, step: 0 },
+    intent: null, knocked: [], selected: ['amir', 'lena', 'noor', 'zane'], dice: [],
+    rerolls: 0, phase: 'pick', bribeCost: 6, turn: 1,
+  };
+  S.screen = 'fight';
+  log(`${e.name} block the road.`);
+  nextIntent();
+}
+
+function nextIntent() {
+  const f = S.fight, e = f.enemy, len = e.pattern.length;
+  const base = e.pattern[e.step % len];
+  const bump = Math.floor(e.step / len) * 2; // enemies get meaner each time their pattern loops
+  e.step++;
+  const it = { k: base.k, v: base.k === 'drain' ? base.v : base.v + bump, dmg: base.dmg != null ? base.dmg + bump : 0 };
+  if (it.k === 'snipe') {
+    const pool = S.crew.filter((c) => !f.knocked.includes(c.id));
+    it.target = pool[rand(pool.length)].id;
+  }
+  e.block = it.k === 'guard' ? it.v : 0;
+  f.intent = it;
+}
+
+function intentInfo(it) {
+  const rear = rearWagon();
+  const rn = rear ? rear.name : 'caravan';
+  switch (it.k) {
+    case 'atk': return { icon: 'atk', title: `Attack the ${rn} for ${it.v}`, detail: 'Block reduces the damage.' };
+    case 'guard': return { icon: 'shd', title: `Brace, then hit the ${rn} for ${it.dmg}`, detail: `Blocks ${it.v} of your damage this turn.` };
+    case 'drain': return { icon: 'water', title: `Steal ${it.v} water, hit the ${rn} for ${it.dmg}`, detail: 'Spend water now or lose it.' };
+    case 'snipe': {
+      const n = crewById(it.target).name;
+      return { icon: 'atk', title: `Snipe ${n} for ${it.v}`, detail: `If ${n} rolls and you block less than ${it.v}, ${n} is knocked out. If ${n} stays back, the ${rn} takes it.` };
+    }
+  }
+}
+
+/* ---------- Turn actions ---------- */
+const rollFace = (id) => ({ ...crewById(id).faces[rand(6)] });
+
+function gainRerolls(dice) {
+  const n = dice.filter((d) => d.face.t === 'rr').length;
+  if (n) { S.fight.rerolls += n; log(`Tavi found an opening: +${n} reroll${n > 1 ? 's' : ''}.`); }
+}
+
+function totals() {
+  const f = S.fight, armoury = wagonAlive('armory');
+  const t = { atk: 0, shd: 0, coin: 0, water: 0, heal: 0 };
+  for (const d of f.dice) {
+    const v = d.face.v + (d.poured ? 2 : 0);
+    const c = crewById(d.crew);
+    if (d.face.t === 'atk') t.atk += v + (armoury && c.role === 'Guard' ? 1 : 0);
+    else if (d.face.t === 'shd') t.shd += v;
+    else if (d.face.t === 'coin') t.coin += v;
+    else if (d.face.t === 'water') t.water += v;
+    else if (d.face.t === 'heal') t.heal += 1;
+  }
+  return t;
+}
+
+const canPour = (d) => wagonAlive('water') && S.water > 0 && !d.poured && ['atk', 'shd', 'coin'].includes(d.face.t);
+
+const A = {
+  pick(id) {
+    const f = S.fight;
+    if (f.phase !== 'pick' || f.knocked.includes(id)) return;
+    const i = f.selected.indexOf(id);
+    if (i >= 0) f.selected.splice(i, 1);
+    else if (f.selected.length < DICE_PER_TURN) f.selected.push(id);
+    else { f.selected.shift(); f.selected.push(id); }
+  },
+  roll() {
+    const f = S.fight;
+    if (f.phase !== 'pick' || !f.selected.length) return;
+    f.dice = f.selected.map((id) => ({ crew: id, face: rollFace(id), held: false, poured: false, fresh: true }));
+    f.rerolls = BASE_REROLLS;
+    f.phase = 'roll';
+    gainRerolls(f.dice);
+  },
+  hold(i) {
+    const d = S.fight.dice[+i];
+    if (d && !d.poured) d.held = !d.held;
+  },
+  reroll() {
+    const f = S.fight;
+    const free = f.dice.filter((d) => !d.held);
+    if (f.phase !== 'roll' || f.rerolls < 1 || !free.length) return;
+    f.rerolls--;
+    for (const d of free) { d.face = rollFace(d.crew); d.fresh = true; }
+    gainRerolls(free);
+  },
+  pour(i) {
+    const d = S.fight.dice[+i];
+    if (!d || !canPour(d)) return;
+    S.water--; d.poured = true; d.held = true;
+  },
+  bribe() {
+    const f = S.fight;
+    if (S.coin < f.bribeCost || f.intent.cancelled) return;
+    S.coin -= f.bribeCost;
+    log(`Paid ${f.bribeCost} coin. The enemy skips its move.`);
+    f.bribeCost += 3;
+    f.intent.cancelled = true;
+  },
+  end() { if (S.fight.phase === 'roll') resolveTurn(); },
+  reward(kind) {
+    if (kind === 'repair') { for (const w of S.wagons) w.hp = Math.min(w.max, Math.max(w.hp, 0) + 7); log('Wagons repaired.'); }
+    if (kind === 'water') { S.water += 4; log('Filled the water skins.'); }
+    if (kind === 'train') { S.screen = 'train'; return; }
+    travel();
+  },
+  train(id) {
+    const c = crewById(id);
+    const score = (f) => (f.t === 'blank' ? -1 : f.t === 'rr' || f.t === 'heal' ? 3 : f.v);
+    let worst = 0;
+    c.faces.forEach((f, i) => { if (score(f) < score(c.faces[worst])) worst = i; });
+    const f = c.faces[worst];
+    const before = faceLabel(f);
+    if (f.t === 'blank') { f.t = 'atk'; f.v = 3; }
+    else if (f.t === 'rr' || f.t === 'heal') { c.faces[worst] = { t: 'atk', v: 4 }; }
+    else f.v += 2;
+    log(`${c.name} trained: ${before} became ${faceLabel(c.faces[worst])}.`);
+    travel();
+  },
+  swap() { S.wagons.reverse(); },
+  again() { newRun(); },
+};
+
+function faceLabel(f) { return f.t === 'blank' || f.t === 'rr' || f.t === 'heal' ? FACE_NAME[f.t] : `${FACE_NAME[f.t]} ${f.v}`; }
+
+function travel() {
+  if (S.water >= ROAD_WATER) { S.water -= ROAD_WATER; log(`The road cost ${ROAD_WATER} water.`); }
+  else {
+    S.water = 0;
+    for (const w of S.wagons) if (w.hp > 0) w.hp = Math.max(1, w.hp - 4);
+    log('Out of water on the road. Every wagon took 4 damage.');
+  }
+  S.stop++;
+  startFight();
+}
+
+function hitCaravan(dmg, state) {
+  const blocked = Math.min(state.shield, dmg);
+  state.shield -= blocked;
+  let rem = dmg - blocked;
+  const parts = [];
+  if (blocked) parts.push(`${blocked} blocked`);
+  while (rem > 0) {
+    const w = rearWagon();
+    if (!w) break;
+    const take = Math.min(rem, w.hp);
+    w.hp -= take; rem -= take;
+    parts.push(`${w.name} −${take}`);
+    if (w.hp === 0) parts.push(`${w.name} destroyed`);
+  }
+  return parts.join(', ');
+}
+
+function resolveTurn() {
+  const f = S.fight, e = f.enemy, it = f.intent;
+  const t = totals();
+  const dealt = Math.max(0, t.atk - e.block);
+  e.hp = Math.max(0, e.hp - dealt);
+  S.stats.dmg += dealt; S.stats.turns++;
+  S.coin += t.coin; S.stats.coinEarned += t.coin;
+  S.water += t.water;
+  const state = { shield: t.shd };
+  for (let i = 0; i < t.heal; i++) {
+    if (f.knocked.length) { const id = f.knocked.pop(); log(`Noor patched up ${crewById(id).name}.`); }
+    else state.shield += 2;
+  }
+  const bits = [`Hit for ${dealt}`];
+  if (e.block && t.atk) bits.push(`${Math.min(e.block, t.atk)} absorbed`);
+  if (t.coin) bits.push(`+${t.coin} coin`);
+  if (t.water) bits.push(`+${t.water} water`);
+  log(bits.join(', ') + '.');
+
+  if (e.hp <= 0) { win(); return; }
+
+  if (!it.cancelled) {
+    if (it.k === 'atk') log(`${e.name} attack: ${hitCaravan(it.v, state)}.`);
+    if (it.k === 'guard') log(`${e.name} strike: ${hitCaravan(it.dmg, state)}.`);
+    if (it.k === 'drain') {
+      const lost = Math.min(S.water, it.v); S.water -= lost;
+      log(`Lost ${lost} water. ${hitCaravan(it.dmg, state)}.`);
+    }
+    if (it.k === 'snipe') {
+      const c = crewById(it.target);
+      if (f.dice.some((d) => d.crew === it.target)) {
+        if (state.shield >= it.v) log(`The shot at ${c.name} was blocked.`);
+        else { f.knocked.push(c.id); log(`${c.name} was knocked out for this fight.`); }
+      } else log(`${c.name} stayed back. ${hitCaravan(it.v, state)}.`);
+    }
+  }
+
+  if (!rearWagon()) { lose('Every wagon was destroyed.'); return; }
+  if (f.knocked.length >= S.crew.length) { lose('The whole crew was knocked out.'); return; }
+
+  f.dice = [];
+  f.phase = 'pick';
+  f.turn++;
+  f.selected = f.selected.filter((id) => !f.knocked.includes(id));
+  nextIntent();
+}
+
+function win() {
+  log(`${S.fight.enemy.name} defeated.`);
+  S.screen = S.stop === ENEMIES.length - 1 ? 'victory' : 'reward';
+}
+function lose(why) { S.screen = 'defeat'; S.loseReason = why; }
+
+/* ---------- Rendering ---------- */
+function header() {
+  const stops = ENEMIES.map((e, i) => {
+    const cls = i < S.stop ? 'done' : i === S.stop ? 'here' : '';
+    return `<span class="stop ${cls}"><span class="dot"></span><span class="label">${e.name}</span></span>`;
+  }).join('<span class="leg"></span>');
+  return `<header class="top">
+    <div class="brand">Caravan</div>
+    <div class="res">
+      <span class="chip water" title="Water">${icon('water')}<span class="num">${S.water}</span></span>
+      <span class="chip coin" title="Coin">${icon('coin')}<span class="num">${S.coin}</span></span>
+    </div>
+    <div class="road">${stops}</div>
+  </header>`;
+}
+
+function wagonsHtml() {
+  const rear = rearWagon();
+  // Shown back-to-front: the rear wagon on the left, the caravan heading right toward the city.
+  return [...S.wagons].reverse().map((w) => {
+    const dead = w.hp <= 0;
+    const tag = dead ? '<span class="tag out">Wrecked</span>' : w === rear ? '<span class="tag target">Rear</span>' : '';
+    return `<div class="wagon ${dead ? 'dead' : ''} ${w === rear ? 'rear' : ''}">
+      <div class="wname"><span>${w.name}</span>${tag}</div>
+      <div class="bar fill-acc"><span style="width:${(100 * Math.max(0, w.hp)) / w.max}%"></span></div>
+      <div class="perk"><span class="num">${Math.max(0, w.hp)}/${w.max}</span> · ${w.perk}</div>
+    </div>`;
+  }).join('');
+}
+
+function faceHtml(f, bonus = 0) {
+  const showV = f.t !== 'blank' && f.t !== 'rr' && f.t !== 'heal';
+  return `<span class="face t-${f.t}">${icon(f.t)}${showV ? `<span class="num">${f.v + bonus}</span>` : ''}</span>`;
+}
+
+function trayHtml() {
+  const f = S.fight;
+  if (f.phase === 'pick') {
+    const slots = [];
+    for (let i = 0; i < DICE_PER_TURN; i++) {
+      const id = f.selected[i];
+      slots.push(id
+        ? `<div class="slot"><div class="die empty ready"><span class="face">?</span><span class="who">${crewById(id).name}</span></div></div>`
+        : `<div class="slot"><div class="die empty"><span class="who">Empty</span></div></div>`);
+    }
+    return slots.join('');
+  }
+  return f.dice.map((d, i) => {
+    const c = crewById(d.crew);
+    const bonus = (d.poured ? 2 : 0) + (d.face.t === 'atk' && c.role === 'Guard' && wagonAlive('armory') ? 1 : 0);
+    return `<div class="slot">
+      <button class="die ${d.held ? 'held' : ''} ${d.fresh ? 'tumble' : ''}" data-act="hold" data-arg="${i}" aria-pressed="${d.held}" aria-label="${c.name}: ${faceLabel(d.face)}${d.held ? ', held' : ''}">
+        ${d.held ? '<span class="held-tag">Held</span>' : ''}
+        ${faceHtml(d.face, bonus)}
+        <span class="who">${c.name}</span>
+      </button>
+      <button class="pour ${d.poured ? 'done' : ''}" data-act="pour" data-arg="${i}" ${canPour(d) ? '' : 'disabled'} aria-label="Pour water on ${c.name} for +2">${icon('water')}+2</button>
+    </div>`;
+  }).join('');
+}
+
+function previewHtml() {
+  const f = S.fight;
+  if (f.phase === 'pick') {
+    return `<span class="hint">Choose up to ${DICE_PER_TURN} crew below, then roll. Tap a crew member again to bench them.</span>`;
+  }
+  const t = totals();
+  const out = [];
+  const net = Math.max(0, t.atk - f.enemy.block);
+  out.push(`<span class="t-atk">${icon('atk')}<span class="num">${net}</span>&nbsp;damage${f.enemy.block && t.atk ? ` (${Math.min(f.enemy.block, t.atk)} absorbed)` : ''}</span>`);
+  out.push(`<span class="t-shd">${icon('shd')}<span class="num">${t.shd}</span>&nbsp;block</span>`);
+  if (t.coin) out.push(`<span class="t-coin">${icon('coin')}+${t.coin}</span>`);
+  if (t.water) out.push(`<span class="t-water">${icon('water')}+${t.water}</span>`);
+  if (t.heal) out.push(`<span class="t-heal">${icon('heal')}${t.heal} mend</span>`);
+  return out.join('');
+}
+
+function rosterHtml() {
+  const f = S.fight;
+  return S.crew.map((c) => {
+    const ko = f.knocked.includes(c.id);
+    const sel = f.selected.includes(c.id);
+    const targeted = f.intent && f.intent.k === 'snipe' && f.intent.target === c.id && !f.intent.cancelled;
+    const tag = ko ? '<span class="tag out">Out</span>' : targeted ? '<span class="tag target">Targeted</span>' : sel ? '<span class="tag" style="color:var(--accent)">Rolling</span>' : '';
+    const faces = c.faces.map((fc) => {
+      const showV = fc.t !== 'blank' && fc.t !== 'rr' && fc.t !== 'heal';
+      return `<span class="mini t-${fc.t}" title="${faceLabel(fc)}">${icon(fc.t)}${showV ? fc.v : ''}</span>`;
+    }).join('');
+    return `<button class="crew ${sel ? 'sel' : ''} ${ko ? 'ko' : ''}" data-act="pick" data-arg="${c.id}" ${f.phase !== 'pick' || ko ? 'disabled' : ''} aria-pressed="${sel}">
+      <span class="cname"><b>${c.name}</b>${tag}</span>
+      <span class="role">${c.role}</span>
+      <span class="faces">${faces}</span>
+    </button>`;
+  }).join('');
+}
+
+function actionsHtml() {
+  const f = S.fight;
+  const canBribe = S.coin >= f.bribeCost && !f.intent.cancelled;
+  const bribe = `<button class="btn" data-act="bribe" ${canBribe ? '' : 'disabled'}>Bribe<small>${f.bribeCost} coin</small></button>`;
+  if (f.phase === 'pick') {
+    return `${bribe}<button class="btn primary" data-act="roll" ${f.selected.length ? '' : 'disabled'}>Roll ${f.selected.length} crew<small>Turn ${f.turn}</small></button>`;
+  }
+  const free = f.dice.some((d) => !d.held);
+  return `${bribe}
+    <button class="btn" data-act="reroll" ${f.rerolls > 0 && free ? '' : 'disabled'}>Reroll<small>${f.rerolls} left</small></button>
+    <button class="btn primary" data-act="end">End turn<small>Enemy moves</small></button>`;
+}
+
+function fightHtml() {
+  const f = S.fight, e = f.enemy, info = intentInfo(f.intent);
+  return `${header()}
+  <section class="enemy" aria-label="Enemy">
+    <div class="enemy-head"><h1>${e.name}</h1><span class="hpnum">${e.hp}/${e.max}</span></div>
+    <div class="bar"><span style="width:${(100 * e.hp) / e.max}%"></span></div>
+    <p class="blurb">${e.blurb}</p>
+    <div class="intent ${f.intent.cancelled ? 'cancelled' : ''}">
+      <span class="big">${icon(info.icon)}</span>
+      <span class="label">${f.intent.cancelled ? 'Bribed — skipping this move' : 'Next move'}</span>
+      <strong>${info.title}</strong>
+      <span class="detail">${info.detail}</span>
+    </div>
+  </section>
+  <section class="caravan" aria-label="Your caravan">
+    <div class="section-label"><span>Your caravan</span><span>Rear ← → Front</span></div>
+    <div class="wagons">${wagonsHtml()}</div>
+  </section>
+  <section aria-label="Dice">
+    <div class="section-label" style="margin-bottom:8px"><span>${f.phase === 'pick' ? 'Who rolls this turn' : 'Tap a die to hold it'}</span><span>${f.phase === 'roll' ? `${f.dice.filter((d) => d.held).length} held` : `${f.selected.length}/${DICE_PER_TURN}`}</span></div>
+    <div class="tray">${trayHtml()}</div>
+  </section>
+  <div class="preview">${previewHtml()}</div>
+  <ul class="log" aria-live="polite">${S.log.slice(0, 3).map((l) => `<li>${l}</li>`).join('')}</ul>
+  <section aria-label="Crew">
+    <div class="section-label" style="margin-bottom:8px"><span>Crew</span><span>${S.crew.length - f.knocked.length} standing</span></div>
+    <div class="roster">${rosterHtml()}</div>
+  </section>
+  <details class="help">
+    <summary>How a turn works</summary>
+    <ol>
+      <li>Read the enemy's next move at the top.</li>
+      <li>Pick up to ${DICE_PER_TURN} crew. Each crew member is a die with their own six faces, shown on their card.</li>
+      <li>Roll. Tap dice to hold them, then reroll the rest. You get ${BASE_REROLLS} rerolls a turn, plus one for each Reroll face.</li>
+      <li>Pour water on an Attack, Block or Coin die for +2. The Water Cart has to be standing.</li>
+      <li>End the turn. Your attacks land first, then the enemy moves. Enemies hit the rear wagon.</li>
+      <li>Coin can bribe an enemy to skip its next move. Crew who are knocked out return after the fight.</li>
+    </ol>
+  </details>
+  <div class="actions">${actionsHtml()}</div>`;
+}
+
+function rewardHtml() {
+  const next = ENEMIES[S.stop + 1];
+  const order = [...S.wagons].reverse().map((w) => w.name).join(' → ');
+  return `${header()}
+  <section class="panel">
+    <h1>${ENEMIES[S.stop].name} defeated</h1>
+    <p>Your crew is back on their feet. The road to ${next.name} costs ${ROAD_WATER} water. Without it, every wagon takes damage. Choose one thing to do at camp.</p>
+    <div class="choices">
+      <button class="choice" data-act="reward" data-arg="repair"><span class="big t-shd">${icon('shd')}</span><b>Repair the wagons</b><span>+7 health to each wagon, including wrecked ones.</span></button>
+      <button class="choice" data-act="reward" data-arg="water"><span class="big t-water">${icon('water')}</span><b>Find a well</b><span>+4 water. You have ${S.water}.</span></button>
+      <button class="choice" data-act="reward" data-arg="train"><span class="big t-atk">${icon('atk')}</span><b>Train a crew member</b><span>Their weakest face gets better.</span></button>
+    </div>
+    <div class="section-label"><span>Wagon order (rear → front): ${order}</span></div>
+    <div class="wagons">${wagonsHtml()}</div>
+    <button class="btn" data-act="swap" style="flex:none">Swap wagon order<small>The rear wagon takes hits first</small></button>
+  </section>`;
+}
+
+function trainHtml() {
+  return `${header()}
+  <section class="panel">
+    <h1>Who trains?</h1>
+    <p>Their weakest face is upgraded: a blank becomes Attack 3, a Reroll or Mend becomes Attack 4, and anything else gets +2.</p>
+    <div class="roster">${S.crew.map((c) => `<button class="crew" data-act="train" data-arg="${c.id}">
+      <span class="cname"><b>${c.name}</b></span><span class="role">${c.role}</span>
+      <span class="faces">${c.faces.map((fc) => `<span class="mini t-${fc.t}">${icon(fc.t)}${['blank', 'rr', 'heal'].includes(fc.t) ? '' : fc.v}</span>`).join('')}</span>
+    </button>`).join('')}</div>
+  </section>`;
+}
+
+function endHtml(won) {
+  return `${header()}
+  <section class="panel">
+    <h1>${won ? 'You reached the city' : `Lost on the road to ${ENEMIES[S.stop].name}`}</h1>
+    <p>${won ? 'The Gate Warden fell and the caravan rolled through. Every run starts from one cart again, so try a different crew next time.' : S.loseReason + ' The caravan scatters back into the sand.'}</p>
+    <div class="stats">
+      <div class="stat"><b class="num">${S.stats.turns}</b><span>turns</span></div>
+      <div class="stat"><b class="num">${S.stats.dmg}</b><span>damage dealt</span></div>
+      <div class="stat"><b class="num">${S.stats.coinEarned}</b><span>coin earned</span></div>
+    </div>
+    <ul class="log">${S.log.slice(0, 5).map((l) => `<li>${l}</li>`).join('')}</ul>
+    <button class="btn primary" data-act="again" style="flex:none">Ride again</button>
+  </section>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  const views = { fight: fightHtml, reward: rewardHtml, train: trainHtml, victory: () => endHtml(true), defeat: () => endHtml(false) };
+  app.innerHTML = views[S.screen]();
+  if (S.fight) for (const d of S.fight.dice) d.fresh = false;
+}
+
+document.getElementById('app').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-act]');
+  if (!b || b.disabled) return;
+  const prevScreen = S.screen;
+  A[b.dataset.act](b.dataset.arg);
+  render();
+  if (S.screen !== prevScreen) window.scrollTo(0, 0);
+});
+
+function start(saved) {
+  if (saved && saved.S) S = saved.S; else newRun();
+  render();
+}
+window.claude?.hot?.snapshot?.(() => ({ S }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
