@@ -12,30 +12,25 @@ python3 -m http.server 8000
 
 Then open http://localhost:8000. It works on a phone. A web server is needed (rather than opening the file directly) because the browser loads the 3D models from the `models/` folder. Everything the game needs is in this repository, so it works offline.
 
-## A run
+## How to play
 
-- **Three legs**, each with a branching route map: ambushes, oases, markets, ruins and sandstorms. Each step on the road costs 1 water.
-- **A boss at the end of each leg**: The Bandit King, The Storm Mother, then The Gate Warden at the city gate. The map shows a scout report of the boss's moves.
-- **Markets** sell new crew, new wagons, face upgrades, water and repairs.
-- **Progress saves** after every step, so you can close the page and continue later.
-
-## A fight
-
-- The enemy shows its next move ahead of time.
-- Choose up to 4 crew to roll, on their cards or by tapping them on the island. Each crew member is a die with six faces.
-- Hold dice and reroll the rest (2 rerolls a turn). Pour water on a die for +2. Coin can bribe the enemy to skip a move.
-- Your attacks land, then the enemy moves. Enemies hit the rear wagon first; snipes knock out the crew member they target.
+- **The route:** three legs, each a small branching map of Fights, Markets and Camps (heal 10), ending in a boss: The Bandit King, The Storm Mother, then The Gate Warden at the city gate.
+- **Fights:** the enemy shows its next move. Choose up to 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn.
+- **Faces:** Attack hurts the enemy, Block stops its next hit, Coin buys things at markets, Mend repairs the caravan by 3.
+- **Health:** the caravan has one health bar. Each wagon adds health and a perk.
+- **Markets:** hire crew, buy wagons, upgrade faces and pay for repairs.
+- **Saving:** progress saves after every step, so you can close the page and continue later.
 
 ## Wagons
 
-| Wagon | Perk |
-|---|---|
-| Water Cart | Pour water on a die for +2 |
-| Armoury | Guards get +1 on Attack |
-| Cook Wagon | After each fight, every wagon heals 3 |
-| Bell Wagon | Each matching pair of faces deals +3 damage |
-| Spice Wagon | Coin faces give +1 coin |
-| Bulwark | Start every turn with 2 block |
+| Wagon | Health | Perk |
+|---|---|---|
+| Supply Cart | 20 | None |
+| Armoury | 20 | Guards get +1 on Attack |
+| Bulwark | 18 | Start every turn with 2 block |
+| Bell Wagon | 12 | Each matching pair of faces deals +3 damage |
+| Cook Wagon | 12 | Heal 4 after every fight |
+| Spice Wagon | 12 | Coin faces give +1 coin |
 
 ## Credits
 

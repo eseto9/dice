@@ -23,9 +23,7 @@
   --atk: #d4532d;
   --shd: #477b9b;
   --coin: #b9860c;
-  --water: #2f8ea6;
   --heal: #5f9334;
-  --rr: #8466ad;
   --shadow: 0 1px 0 rgba(70, 50, 20, 0.05), 0 6px 18px rgba(70, 50, 20, 0.08);
   --font-display: 'Poppins', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -66,7 +64,6 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .brand::after { content: ""; width: 34px; height: 4px; border-radius: 3px; background: var(--accent); }
 .res { display: flex; gap: 6px; align-items: center; }
 .chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-weight: 700; font-variant-numeric: tabular-nums; }
-.chip.water .ic { color: var(--water); }
 .chip.coin .ic { color: var(--coin); }
 .iconbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--card); box-shadow: var(--shadow); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 1.05rem; }
 .road { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 0.8rem; color: var(--muted); }
@@ -110,7 +107,6 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   transform: translate(-50%, -50%);
   animation: floatUp 1.1s ease-out forwards;
 }
-.float.small { font-size: 0.9rem; }
 @keyframes floatUp {
   0% { opacity: 0; transform: translate(-50%, -20%) scale(0.6); }
   15% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
@@ -135,11 +131,9 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .intent.cancelled { opacity: 0.55; }
 .intent.cancelled strong { text-decoration: line-through; }
 .intent.acting { box-shadow: 0 0 0 3px var(--atk), var(--shadow); }
-.intent.storm .tile { color: var(--shd); }
 
 /* Dice tray */
 .tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.slot { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .die {
   aspect-ratio: 1.15; width: 100%; max-width: 100%;
   border-radius: 16px; border: 0; background: var(--card);
@@ -154,10 +148,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.64rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
 .die:disabled { cursor: default; }
 .t-atk { color: var(--atk); } .t-shd { color: var(--shd); } .t-coin { color: var(--coin); }
-.t-water { color: var(--water); } .t-heal { color: var(--heal); } .t-rr { color: var(--rr); } .t-blank { color: #b9b2a6; }
-.pour { border: 0; background: var(--card); box-shadow: var(--shadow); color: var(--water); border-radius: 10px; padding: 5px 0; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
-.pour:disabled { opacity: 0.35; cursor: default; box-shadow: none; background: transparent; }
-.pour.done { color: #fff; background: var(--water); opacity: 1; }
+.t-heal { color: var(--heal); } .t-blank { color: #b9b2a6; }
 .tumble { animation: tumble 420ms cubic-bezier(.3,1.4,.5,1); }
 @keyframes tumble { 0% { transform: rotate(-160deg) scale(.6); opacity: 0.2; } 100% { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .tumble, .float { animation-duration: 1ms; } .bar > span { transition: none; } }
@@ -165,8 +156,6 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .preview { display: flex; flex-wrap: wrap; gap: 4px 12px; font-weight: 700; font-size: 0.92rem; min-height: 1.3em; }
 .preview span { display: inline-flex; align-items: center; gap: 4px; }
 .preview .hint { font-weight: 400; color: var(--muted); }
-.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 0.86rem; color: var(--muted); }
-.log li:first-child { color: var(--ink); font-weight: 500; }
 
 /* Crew (compact) */
 .roster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -179,11 +168,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .crew .nm b { font-family: var(--font-display); font-weight: 600; font-size: 0.88rem; line-height: 1.15; }
 .crew .role { font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .crew .badge { position: absolute; top: -8px; right: 6px; font-size: 0.62rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--accent); color: #fff; }
-.crew .badge.red { background: var(--atk); }
-.crew .badge.grey { background: #9a958c; }
 .crew.sel { border-color: var(--accent); }
-.crew.targeted { border-color: var(--atk); }
-.crew.ko { opacity: 0.45; cursor: not-allowed; }
 .crew:disabled { cursor: default; }
 .faces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .mini { height: 22px; border-radius: 6px; background: var(--tile); display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.7rem; font-weight: 700; border: 0; padding: 0; }
@@ -211,9 +196,6 @@ button.mini:not(:disabled):hover { box-shadow: 0 0 0 2px var(--accent); }
 .btn:not(:disabled):active { transform: translateY(2px); }
 .btn.solo { flex: none; }
 
-details.help { font-size: 0.9rem; color: var(--muted); padding-bottom: 6px; }
-details.help summary { cursor: pointer; font-weight: 700; color: var(--ink); }
-details.help ol, details.help ul { padding-left: 20px; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
 
 /* Panels (map, market, camp...) */
 .panel { display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; }
@@ -248,23 +230,11 @@ details.help ol, details.help ul { padding-left: 20px; margin: 8px 0 0; display:
 .node.far { opacity: 0.5; }
 .node.boss .disc { width: 60px; height: 60px; border-radius: 18px; color: var(--atk); }
 .node.boss.reach .disc { color: var(--atk); }
-.node[data-t="ambush"] .disc { color: var(--atk); } .node[data-t="oasis"] .disc { color: var(--water); }
-.node[data-t="market"] .disc { color: var(--coin); } .node[data-t="ruins"] .disc { color: #8a7a5c; } .node[data-t="storm"] .disc { color: var(--shd); }
+.node[data-t="ambush"] .disc { color: var(--atk); } .node[data-t="camp"] .disc { color: var(--accent); }
+.node[data-t="market"] .disc { color: var(--coin); }
 .node.visited .disc, .node.here .disc { color: inherit; }
 @keyframes pulse { 50% { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .node.reach .disc { animation: none; } }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); }
-.legend span { display: inline-flex; align-items: center; gap: 5px; }
-.wlist { display: grid; gap: 8px; }
-.wrow { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
-.wrow .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.wrow b { font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; }
-.wrow .d { font-size: 0.8rem; color: var(--muted); }
-.wrow .pos { font-size: 0.7rem; font-weight: 700; color: var(--muted); width: 36px; text-align: center; }
-.small-btn { border: 0; background: var(--tile); border-radius: 10px; padding: 6px 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
-.small-btn:disabled { opacity: 0.35; cursor: default; }
-.scout { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-.scout ol { margin: 0; padding-left: 20px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 2px; }
 
 /* Title */
 .hero h1 { font-size: 2rem; }
@@ -294,124 +264,114 @@ const ICON_D = {
   atk: 'M19 4l-9.5 9.5M19 4h-4.5M19 4v4.5M7 13.5l3.5 3.5M5 19l3.2-3.2',
   shd: 'M12 3.5l7 2.8v5c0 4.6-3 7.8-7 9.7-4-1.9-7-5.1-7-9.7v-5z',
   coin: 'M20 12a8 8 0 1 1-16 0a8 8 0 1 1 16 0M15.5 12a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0',
-  rr: 'M19.5 12a7.5 7.5 0 1 1-2.6-5.7M19.5 4v4.6h-4.6',
   heal: 'M12 5v14M5 12h14',
-  water: 'M12 3.5c3 4.6 6 7.6 6 11.5a6 6 0 0 1-12 0c0-3.9 3-6.9 6-11.5z',
   blank: 'M7 12h10',
   bag: 'M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0',
-  ruin: 'M5 20V9M10 20V9M15 20v-5M19 20v-8M3 6.5h12M3 20h18',
-  wind: 'M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8',
+  fire: 'M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 2 1.5 3 2.5 3-1-3 0-6 0-8z',
   crown: 'M4 18l-1-10 5 4 4-7 4 7 5-4-1 10z',
   cart: 'M3 7h14v8H3zM17 10h4M7 19a1.5 1.5 0 1 0 0.1 0M14 19a1.5 1.5 0 1 0 0.1 0',
   flag: 'M5 21V4M5 4h11l-2 4 2 4H5',
   sound: 'M4 9h4l5-4v14l-5-4H4zM16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11',
   mute: 'M4 9h4l5-4v14l-5-4H4zM17 9l5 6M22 9l-5 6',
-  up: 'M12 19V5M6 11l6-6 6 6',
 };
 const icon = (t) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICON_D[t]}"/></svg>`;
-const FACE_NAME = { atk: 'Attack', shd: 'Block', coin: 'Coin', rr: 'Reroll', heal: 'Mend', water: 'Water', blank: 'Blank' };
-const FACE_COLOR = { atk: '#d4532d', shd: '#477b9b', coin: '#b9860c', rr: '#8466ad', heal: '#5f9334', water: '#2f8ea6', blank: '#b9b2a6' };
+const FACE_NAME = { atk: 'Attack', shd: 'Block', coin: 'Coin', heal: 'Mend', blank: 'Blank' };
+const FACE_COLOR = { atk: '#d4532d', shd: '#477b9b', coin: '#b9860c', heal: '#5f9334', blank: '#b9b2a6' };
 
 function parseFace(s) {
   if (s === '-') return { t: 'blank', v: 0 };
-  if (s === 'r') return { t: 'rr', v: 0 };
   if (s === 'h') return { t: 'heal', v: 0 };
-  return { t: { a: 'atk', s: 'shd', c: 'coin', w: 'water' }[s[0]], v: Number(s.slice(1)) };
+  return { t: { a: 'atk', s: 'shd', c: 'coin' }[s[0]], v: Number(s.slice(1)) };
 }
-const hasValue = (f) => f.t !== 'blank' && f.t !== 'rr' && f.t !== 'heal';
+const hasValue = (f) => f.t !== 'blank' && f.t !== 'heal';
 const faceLabel = (f) => (hasValue(f) ? `${FACE_NAME[f.t]} ${f.v}` : FACE_NAME[f.t]);
 
 /* =========================================================
    Game data
    ========================================================= */
+const MEND = 3; // health restored by each Mend face
+
 // Each crew member uses a Kenney mini-character model; colours tint the card portraits.
 const CREW_POOL = {
   amir: { name: 'Amir', role: 'Guard', model: 'char-male-a', color: '#4f7f9c', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
   lena: { name: 'Lena', role: 'Guard', model: 'char-female-b', color: '#3f6a86', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
-  tavi: { name: 'Tavi', role: 'Scout', model: 'char-male-c', color: '#7f9c45', faces: ['r', 'r', 'a2', 's2', 'a1', 'w1'] },
-  oskar: { name: 'Oskar', role: 'Trader', model: 'char-male-d', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 'w1'] },
-  noor: { name: 'Noor', role: 'Medic', model: 'char-female-c', color: '#c9c2b4', faces: ['h', 'h', 's3', 's2', 'w2', 'a1'] },
+  tavi: { name: 'Tavi', role: 'Scout', model: 'char-male-c', color: '#7f9c45', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
+  oskar: { name: 'Oskar', role: 'Trader', model: 'char-male-d', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
+  noor: { name: 'Noor', role: 'Medic', model: 'char-female-c', color: '#c9c2b4', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
   zane: { name: 'Zane', role: 'Fire-eater', model: 'char-male-e', color: '#d4532d', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
-  ilse: { name: 'Ilse', role: 'Archer', model: 'char-female-a', color: '#a0522d', faces: ['a3', 'a3', 'a4', 'a2', 's1', 'r'] },
+  ilse: { name: 'Ilse', role: 'Archer', model: 'char-female-a', color: '#a0522d', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
   bram: { name: 'Bram', role: 'Smith', model: 'char-male-f', color: '#6b6f73', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
-  rhea: { name: 'Rhea', role: 'Well-finder', model: 'char-female-d', color: '#2f8ea6', faces: ['w2', 'w2', 'w3', 's2', 'a2', 'h'] },
+  rhea: { name: 'Rhea', role: 'Healer', model: 'char-female-d', color: '#5f9334', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
   dov: { name: 'Dov', role: 'Brawler', model: 'char-male-b', color: '#8f3328', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
-  sela: { name: 'Sela', role: 'Fortune-teller', model: 'char-female-e', color: '#8466ad', faces: ['r', 'r', 'c3', 'a3', 's3', 'h'] },
-  kito: { name: 'Kito', role: 'Lookout', model: 'char-female-f', color: '#6f9a3d', faces: ['r', 'a2', 'a3', 's3', 's3', 'w1'] },
+  sela: { name: 'Sela', role: 'Fortune-teller', model: 'char-female-e', color: '#8466ad', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
+  kito: { name: 'Kito', role: 'Lookout', model: 'char-female-f', color: '#6f9a3d', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
 };
 const START_CREW = ['amir', 'lena', 'tavi', 'oskar', 'noor', 'zane'];
 const MAX_CREW = 8;
 const MAX_WAGONS = 4;
 
+// Each wagon adds to the caravan's health and may have a perk.
 const WAGON_TYPES = {
-  water: { name: 'Water Cart', max: 20, perk: 'Pour water on a die for +2.', model: 'cart', props: 'barrels' },
-  armory: { name: 'Armoury', max: 20, perk: 'Guards get +1 on Attack.', model: 'cart-high', props: 'none' },
-  cook: { name: 'Cook Wagon', max: 16, perk: 'After each fight, every wagon heals 3.', model: 'cart', props: 'fire' },
-  bell: { name: 'Bell Wagon', max: 16, perk: 'Each matching pair of faces deals +3 damage.', model: 'cart', props: 'lantern' },
-  spice: { name: 'Spice Wagon', max: 16, perk: 'Coin faces give +1 coin.', model: 'cart', props: 'crates' },
-  bulwark: { name: 'Bulwark', max: 28, perk: 'Start every turn with 2 block.', model: 'cart-high', props: 'banner' },
+  supply: { name: 'Supply Cart', hp: 20, perk: 'Carries the supplies. No perk.', model: 'cart', props: 'barrels' },
+  armory: { name: 'Armoury', hp: 20, perk: 'Guards get +1 on Attack.', model: 'cart-high', props: 'none' },
+  bulwark: { name: 'Bulwark', hp: 18, perk: 'Start every turn with 2 block.', model: 'cart-high', props: 'banner' },
+  bell: { name: 'Bell Wagon', hp: 12, perk: 'Each matching pair of faces deals +3 damage.', model: 'cart', props: 'lantern' },
+  cook: { name: 'Cook Wagon', hp: 12, perk: 'Heal 4 after every fight.', model: 'cart', props: 'fire' },
+  spice: { name: 'Spice Wagon', hp: 12, perk: 'Coin faces give +1 coin.', model: 'cart', props: 'crates' },
 };
 
+// Enemy moves: 'atk' hits the caravan; 'guard' absorbs some of your damage this turn, then hits.
 const ENEMY_TYPES = {
-  bandits: { name: 'Dune Bandits', hp: 20, loot: 5, blurb: 'Raiders off a beached sand-skiff.',
-    pattern: [{ k: 'atk', v: 5 }, { k: 'snipe', v: 4 }, { k: 'atk', v: 7 }, { k: 'guard', v: 4, dmg: 3 }] },
-  skeletons: { name: 'Tomb Guards', hp: 18, loot: 5, blurb: 'Old soldiers that never left their post.',
-    pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 5 }, { k: 'snipe', v: 5 }, { k: 'guard', v: 3, dmg: 4 }] },
-  king: { name: 'The Bandit King', boss: true, hp: 36, loot: 12, blurb: 'Every bandit on the flats answers to the King.',
-    pattern: [{ k: 'guard', v: 5, dmg: 4 }, { k: 'atk', v: 8 }, { k: 'snipe', v: 6 }, { k: 'atk', v: 10 }] },
-  wraith: { name: 'Sand Wraith', hp: 34, loot: 6, blurb: 'A storm with a face. It drinks the water you carry.',
-    pattern: [{ k: 'atk', v: 8 }, { k: 'drain', v: 2, dmg: 5 }, { k: 'snipe', v: 7 }, { k: 'atk', v: 11 }] },
-  siege: { name: 'Raider Siege Tower', hp: 36, loot: 6, blurb: 'A rolling tower full of archers. Slow, but it hits hard.',
-    pattern: [{ k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 13 }, { k: 'atk', v: 7 }, { k: 'snipe', v: 8 }] },
-  storm: { name: 'The Storm Mother', boss: true, hp: 62, loot: 12, blurb: 'Every sandstorm on this road is one of her children.',
-    pattern: [{ k: 'drain', v: 3, dmg: 6 }, { k: 'atk', v: 11 }, { k: 'snipe', v: 9 }, { k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 14 }] },
-  sentinel: { name: 'Brass Sentinel', hp: 42, loot: 7, blurb: 'A smaller cousin of the Gate Warden, still on patrol.',
-    pattern: [{ k: 'atk', v: 11 }, { k: 'guard', v: 7, dmg: 7 }, { k: 'snipe', v: 10 }, { k: 'atk', v: 14 }] },
-  legion: { name: 'Tomb Legion', hp: 40, loot: 7, blurb: 'A whole buried garrison, marching again.',
-    pattern: [{ k: 'atk', v: 10 }, { k: 'atk', v: 10 }, { k: 'snipe', v: 10 }, { k: 'guard', v: 6, dmg: 8 }] },
-  warden: { name: 'The Gate Warden', boss: true, hp: 75, loot: 0, blurb: 'A brass colossus at the city gate. Get past it and the road is yours.',
-    pattern: [{ k: 'guard', v: 9, dmg: 6 }, { k: 'atk', v: 14 }, { k: 'snipe', v: 11 }, { k: 'atk', v: 18 }, { k: 'drain', v: 3, dmg: 8 }] },
+  bandits: { name: 'Dune Bandits', hp: 20, loot: 5, pattern: [{ k: 'atk', v: 5 }, { k: 'atk', v: 7 }, { k: 'guard', v: 4, dmg: 3 }, { k: 'atk', v: 6 }] },
+  skeletons: { name: 'Tomb Guards', hp: 18, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 5 }, { k: 'guard', v: 3, dmg: 4 }, { k: 'atk', v: 5 }] },
+  king: { name: 'The Bandit King', boss: true, hp: 36, loot: 12, pattern: [{ k: 'guard', v: 5, dmg: 4 }, { k: 'atk', v: 8 }, { k: 'atk', v: 6 }, { k: 'atk', v: 10 }] },
+  wraith: { name: 'Sand Wraith', hp: 34, loot: 6, pattern: [{ k: 'atk', v: 8 }, { k: 'atk', v: 6 }, { k: 'atk', v: 11 }, { k: 'guard', v: 5, dmg: 5 }] },
+  siege: { name: 'Raider Siege Tower', hp: 36, loot: 6, pattern: [{ k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 13 }, { k: 'atk', v: 7 }, { k: 'atk', v: 8 }] },
+  storm: { name: 'The Storm Mother', boss: true, hp: 62, loot: 12, pattern: [{ k: 'atk', v: 9 }, { k: 'atk', v: 11 }, { k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 14 }] },
+  sentinel: { name: 'Brass Sentinel', hp: 42, loot: 7, pattern: [{ k: 'atk', v: 11 }, { k: 'guard', v: 7, dmg: 7 }, { k: 'atk', v: 10 }, { k: 'atk', v: 14 }] },
+  legion: { name: 'Tomb Legion', hp: 40, loot: 7, pattern: [{ k: 'atk', v: 10 }, { k: 'atk', v: 10 }, { k: 'guard', v: 6, dmg: 8 }, { k: 'atk', v: 10 }] },
+  warden: { name: 'The Gate Warden', boss: true, hp: 75, loot: 0, pattern: [{ k: 'guard', v: 9, dmg: 6 }, { k: 'atk', v: 14 }, { k: 'atk', v: 11 }, { k: 'atk', v: 18 }, { k: 'atk', v: 8 }] },
 };
 
 const LEGS = [
-  { name: 'The Salt Flats', normals: ['bandits', 'skeletons'], ruins: 'skeletons', boss: 'king', storm: 6 },
-  { name: 'The Shifting Sea', normals: ['wraith', 'siege'], ruins: 'skeletons', boss: 'storm', storm: 8 },
-  { name: 'The Brass Road', normals: ['sentinel', 'legion'], ruins: 'legion', boss: 'warden', storm: 10 },
+  { name: 'The Salt Flats', normals: ['bandits', 'skeletons'], boss: 'king' },
+  { name: 'The Shifting Sea', normals: ['wraith', 'siege'], boss: 'storm' },
+  { name: 'The Brass Road', normals: ['sentinel', 'legion'], boss: 'warden' },
 ];
 
 const NODE_INFO = {
-  ambush: { label: 'Ambush', icon: 'atk', desc: 'A fight. Win coin.' },
-  oasis: { label: 'Oasis', icon: 'water', desc: 'Water or rest.' },
-  market: { label: 'Market', icon: 'bag', desc: 'Hire, buy wagons, upgrade.' },
-  ruins: { label: 'Ruins', icon: 'ruin', desc: 'A gamble.' },
-  storm: { label: 'Storm', icon: 'wind', desc: 'Roll enough block to get through.' },
-  boss: { label: 'Boss', icon: 'crown', desc: 'End of the leg.' },
+  ambush: { label: 'Fight', icon: 'atk' },
+  camp: { label: 'Camp', icon: 'fire' },
+  market: { label: 'Market', icon: 'bag' },
+  boss: { label: 'Boss', icon: 'crown' },
 };
 
 const DICE_PER_TURN = 4;
-const BASE_REROLLS = 2;
-const PRICES = { hire: 9, wagon: 12, water: 3, repair: 4 };
+const REROLLS = 2;
+const CAMP_HEAL = 10;
+const PRICES = { hire: 9, wagon: 12, repair: 4 };
+const REPAIR = 8;
 
 /* =========================================================
    State, saving, helpers
    ========================================================= */
-const SAVE_KEY = 'caravan-dice-save-v2';
+const SAVE_KEY = 'caravan-dice-save-v3';
 let S = null;
 let pendingFx = [];
 const rand = (n) => Math.floor(Math.random() * n);
 const pick = (arr) => arr[rand(arr.length)];
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = rand(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const crewById = (id) => S.crew.find((c) => c.id === id);
-const has = (type) => S.wagons.some((w) => w.type === type && w.hp > 0);
-const rearWagon = () => [...S.wagons].reverse().find((w) => w.hp > 0);
-const wagonName = (w) => WAGON_TYPES[w.type].name;
-function log(msg) { S.log.unshift(msg); S.log.length = Math.min(S.log.length, 30); }
+const has = (type) => S.wagons.some((w) => w.type === type);
+const maxHp = () => S.wagons.reduce((s, w) => s + WAGON_TYPES[w.type].hp, 0);
+const heal = (n) => { const before = S.hp; S.hp = Math.min(maxHp(), S.hp + n); return S.hp - before; };
+function log(msg) { S.log.unshift(msg); S.log.length = Math.min(S.log.length, 20); }
 function fx(e) { pendingFx.push(e); }
 
 function save() {
   if (!S) return;
   try {
-    if ( !['victory', 'defeat'].includes(S.screen)) localStorage.setItem(SAVE_KEY, JSON.stringify(S));
+    if (!['victory', 'defeat'].includes(S.screen)) localStorage.setItem(SAVE_KEY, JSON.stringify(S));
     else localStorage.removeItem(SAVE_KEY);
   } catch (err) { /* storage unavailable: the run still works, it just won't resume */ }
 }
@@ -429,13 +389,10 @@ function mkCrew(id) {
   const d = CREW_POOL[id];
   return { id, name: d.name, role: d.role, model: d.model, color: d.color, faces: d.faces.map(parseFace) };
 }
-function mkWagon(type) { return { type, hp: WAGON_TYPES[type].max, max: WAGON_TYPES[type].max }; }
 
 function genLeg() {
-  const weights = (row) => (row === 0
-    ? [['ambush', 55], ['ruins', 15], ['oasis', 15], ['storm', 15]]
-    : [['ambush', 40], ['market', 20], ['oasis', 15], ['ruins', 15], ['storm', 10]]);
-  const roll = (row) => { const w = weights(row); let r = Math.random() * w.reduce((s, x) => s + x[1], 0); for (const [t, n] of w) { if ((r -= n) < 0) return t; } return 'ambush'; };
+  const weights = (row) => (row === 0 ? [['ambush', 70], ['camp', 30]] : [['ambush', 50], ['market', 25], ['camp', 25]]);
+  const roll = (row) => { const w = weights(row); let r = Math.random() * 100; for (const [t, n] of w) { if ((r -= n) < 0) return t; } return 'ambush'; };
   const rows = [];
   for (let r = 0; r < 3; r++) {
     const lanes = [1];
@@ -444,7 +401,7 @@ function genLeg() {
     if (lanes.length === 1) { lanes.push(Math.random() < 0.5 ? 0 : 2); lanes.sort(); }
     rows.push(lanes.map((lane) => ({ lane, type: roll(r) })));
   }
-  if (!rows.flat().some((n) => n.type === 'market')) { const row = rows[1 + rand(2)]; pick(row).type = 'market'; }
+  if (!rows.flat().some((n) => n.type === 'market')) pick(rows[1 + rand(2)]).type = 'market';
   if (!rows[0].some((n) => n.type === 'ambush')) rows[0][0].type = 'ambush';
   return { rows };
 }
@@ -453,13 +410,14 @@ function newRun() {
   S = {
     runId: Math.random(),
     crew: START_CREW.map(mkCrew),
-    wagons: [mkWagon('water'), mkWagon('armory')],
-    water: 6, coin: 4, leg: 0, pos: { row: -1, lane: 1 },
+    wagons: [{ type: 'supply' }, { type: 'armory' }],
+    hp: 0, coin: 4, leg: 0, pos: { row: -1, lane: 1 },
     map: LEGS.map(() => genLeg()), visited: [],
-    screen: 'map', log: [], fight: null, storm: null, market: null, upgrade: null, lastSel: null,
+    screen: 'map', log: [], fight: null, market: null, upgrade: null, lastSel: null,
     upgradeCost: 5,
     stats: { dmg: 0, turns: 0, coinEarned: 0, fights: 0 },
   };
+  S.hp = maxHp();
   log(`The caravan sets out across ${LEGS[0].name}.`);
 }
 
@@ -474,20 +432,16 @@ function reachable() {
     .map((n) => ({ key: `${p.row + 1}-${n.lane}`, row: p.row + 1, lane: n.lane, type: n.type }));
 }
 
-function travelCost() {
-  if (S.water >= 1) { S.water -= 1; return; }
-  for (const w of S.wagons) if (w.hp > 0) w.hp = Math.max(1, w.hp - 3);
-  log('No water for the road. Every wagon took 3 damage.');
-}
-
 function enterNode(type) {
   const leg = LEGS[S.leg];
   if (type === 'ambush') startFight(pick(leg.normals));
   else if (type === 'boss') startFight(leg.boss);
-  else if (type === 'oasis') { S.screen = 'oasis'; log('An oasis. Palms, shade and clean water.'); }
-  else if (type === 'market') { S.market = genMarket(); S.screen = 'market'; log('A market in the dunes.'); }
-  else if (type === 'ruins') { S.screen = 'ruins'; log('Half-buried ruins beside the road.'); }
-  else if (type === 'storm') startStorm();
+  else if (type === 'market') { S.market = genMarket(); S.screen = 'market'; }
+  else if (type === 'camp') {
+    const got = heal(CAMP_HEAL);
+    log(`Rested at camp: +${got} health.`);
+    fx({ k: 'gain', text: `+${got} health`, cls: 't-heal', sfx: 'block' });
+  }
 }
 
 function nextLeg() {
@@ -498,34 +452,25 @@ function nextLeg() {
 }
 
 /* =========================================================
-   Dice (shared by fights and storms)
+   Fights
    ========================================================= */
-const roller = () => (S.screen === 'storm' ? S.storm : S.screen === 'fight' ? S.fight : null);
 const rollFace = (id) => ({ ...pick(crewById(id).faces) });
-const canPour = (d) => has('water') && S.water > 0 && !d.poured && ['atk', 'shd', 'coin'].includes(d.face.t);
 function defaultSel() {
   const ids = S.crew.map((c) => c.id);
-  const prev = (S.lastSel || []).filter((id) => ids.includes(id));
-  for (const id of ids) if (prev.length < Math.min(DICE_PER_TURN, ids.length) && !prev.includes(id)) prev.push(id);
-  return prev.slice(0, DICE_PER_TURN);
-}
-function gainRerolls(R, dice) {
-  const n = dice.filter((d) => d.face.t === 'rr').length;
-  if (n) { R.rerolls += n; log(`A Reroll face: +${n} reroll${n > 1 ? 's' : ''}.`); }
+  const sel = (S.lastSel || []).filter((id) => ids.includes(id));
+  for (const id of ids) if (sel.length < DICE_PER_TURN && !sel.includes(id)) sel.push(id);
+  return sel.slice(0, DICE_PER_TURN);
 }
 
-function totals(R) {
-  const t = { atk: 0, shd: 0, coin: 0, water: 0, heal: 0, bell: 0 };
-  const armory = has('armory'), spice = has('spice');
+function totals(f) {
+  const t = { atk: 0, shd: 0, coin: 0, heal: 0, bell: 0 };
   const counts = {};
-  for (const d of R.dice) {
-    const v = d.face.v + (d.poured ? 2 : 0);
+  for (const d of f.dice) {
     const c = crewById(d.crew);
-    if (d.face.t === 'atk') t.atk += v + (armory && c.role === 'Guard' ? 1 : 0);
-    else if (d.face.t === 'shd') t.shd += v;
-    else if (d.face.t === 'coin') t.coin += v + (spice ? 1 : 0);
-    else if (d.face.t === 'water') t.water += v;
-    else if (d.face.t === 'heal') t.heal += 1;
+    if (d.face.t === 'atk') t.atk += d.face.v + (has('armory') && c.role === 'Guard' ? 1 : 0);
+    else if (d.face.t === 'shd') t.shd += d.face.v;
+    else if (d.face.t === 'coin') t.coin += d.face.v + (has('spice') ? 1 : 0);
+    else if (d.face.t === 'heal') t.heal += MEND;
     if (hasValue(d.face)) { const k = d.face.t + d.face.v; counts[k] = (counts[k] || 0) + 1; }
   }
   if (has('bell')) { for (const k in counts) t.bell += Math.floor(counts[k] / 2) * 3; t.atk += t.bell; }
@@ -533,68 +478,31 @@ function totals(R) {
   return t;
 }
 
-/* =========================================================
-   Fights
-   ========================================================= */
 function startFight(kind) {
   const e = ENEMY_TYPES[kind];
   S.fight = {
     id: Math.random(), kind,
-    enemy: { name: e.name, blurb: e.blurb, hp: e.hp, max: e.hp, block: 0, step: 0 },
-    intent: null, knocked: [], selected: defaultSel(), dice: [], rerolls: 0,
-    phase: 'pick', bribeCost: 6, turn: 1, shield: 0,
+    enemy: { name: e.name, hp: e.hp, max: e.hp, block: 0, step: 0 },
+    intent: null, selected: defaultSel(), dice: [], rerolls: 0, phase: 'pick', turn: 1, shield: 0,
   };
   S.screen = 'fight';
   S.stats.fights++;
-  log(e.boss ? `${e.name} stands in the road.` : `Ambush: ${e.name}!`);
   nextIntent();
 }
 
 function nextIntent() {
-  const f = S.fight, e = f.enemy, pattern = ENEMY_TYPES[f.kind].pattern, len = pattern.length;
-  const base = pattern[e.step % len];
-  const bump = Math.floor(e.step / len); // enemies get a little meaner each time their pattern loops
+  const f = S.fight, e = f.enemy, pattern = ENEMY_TYPES[f.kind].pattern;
+  const base = pattern[e.step % pattern.length];
+  const bump = Math.floor(e.step / pattern.length); // a little meaner each time the pattern repeats
   e.step++;
-  const it = { k: base.k, v: base.k === 'drain' ? base.v : base.v + bump, dmg: base.dmg != null ? base.dmg + bump : 0 };
-  if (it.k === 'snipe') {
-    const pool = S.crew.filter((c) => !f.knocked.includes(c.id));
-    it.target = pick(pool).id;
-  }
-  e.block = it.k === 'guard' ? it.v : 0;
-  f.intent = it;
+  f.intent = { k: base.k, v: base.v + bump, dmg: (base.dmg || 0) + bump };
+  e.block = f.intent.k === 'guard' ? f.intent.v : 0;
 }
 
-function intentInfo(it) {
-  const rear = rearWagon();
-  const rn = rear ? wagonName(rear) : 'caravan';
-  switch (it.k) {
-    case 'atk': return { icon: 'atk', title: `Attack the ${rn} for ${it.v}`, detail: 'Block reduces the damage.' };
-    case 'guard': return { icon: 'shd', title: `Brace, then hit the ${rn} for ${it.dmg}`, detail: `Absorbs ${it.v} of your damage this turn.` };
-    case 'drain': return { icon: 'water', title: `Steal ${it.v} water, hit the ${rn} for ${it.dmg}`, detail: 'Spend your water now or lose it.' };
-    case 'snipe': {
-      const n = crewById(it.target).name;
-      return { icon: 'atk', title: `Snipe ${n} for ${it.v}`, detail: `If ${n} rolls and you block less than ${it.v}, ${n} is knocked out. If ${n} stays back, the ${rn} takes it.` };
-    }
-  }
-}
-
-function hitCaravan(dmg, state, from) {
-  const target = rearWagon();
-  const blocked = Math.min(state.shield, dmg);
-  state.shield -= blocked;
-  let rem = dmg - blocked;
-  if (target) fx({ k: from === 'storm' ? 'stormhit' : 'eshot', to: 'wagon', id: target.type, dmg: rem, blocked: rem === 0 });
-  const parts = [];
-  if (blocked) parts.push(`${blocked} blocked`);
-  while (rem > 0) {
-    const w = rearWagon();
-    if (!w) break;
-    const take = Math.min(rem, w.hp);
-    w.hp -= take; rem -= take;
-    parts.push(`${wagonName(w)} −${take}`);
-    if (w.hp === 0) parts.push(`${wagonName(w)} wrecked`);
-  }
-  return parts.join(', ') || 'no damage';
+function intentText(it) {
+  return it.k === 'guard'
+    ? { icon: 'shd', title: `Brace, then attack for ${it.dmg}`, detail: `Absorbs ${it.v} of your damage this turn.` }
+    : { icon: 'atk', title: `Attack for ${it.v}`, detail: 'Your block reduces it.' };
 }
 
 function playerPhase() {
@@ -604,63 +512,26 @@ function playerPhase() {
   e.hp = Math.max(0, e.hp - dealt);
   S.stats.dmg += dealt; S.stats.turns++;
   S.coin += t.coin; S.stats.coinEarned += t.coin;
-  S.water += t.water;
   f.shield = t.shd;
-  for (const d of f.dice.filter((x) => x.face.t === 'heal')) {
-    if (f.knocked.length) {
-      const id = f.knocked.pop();
-      log(`${crewById(d.crew).name} patched up ${crewById(id).name}.`);
-      fx({ k: 'float', at: 'crew', id, text: 'Back up', cls: 't-heal' });
-    } else f.shield += 2;
-  }
+  const healed = t.heal ? heal(t.heal) : 0;
   if (t.atk) fx({ k: 'pshot', ids: f.dice.filter((d) => d.face.t === 'atk').map((d) => d.crew), dmg: dealt, absorbed: Math.min(e.block, t.atk) });
   if (t.coin) fx({ k: 'gain', text: `+${t.coin} coin`, cls: 't-coin', sfx: 'coin' });
-  if (t.water) fx({ k: 'gain', text: `+${t.water} water`, cls: 't-water', sfx: 'water', delay: 250 });
-  const bits = [`Hit for ${dealt}`];
-  if (e.block && t.atk) bits.push(`${Math.min(e.block, t.atk)} absorbed`);
-  if (t.bell) bits.push(`bell +${t.bell}`);
-  if (t.coin) bits.push(`+${t.coin} coin`);
-  if (t.water) bits.push(`+${t.water} water`);
-  log(bits.join(', ') + '.');
-
-  if (e.hp <= 0) {
-    f.phase = 'done';
-    fx({ k: 'edown' });
-    later(1700, winFight);
-    return;
-  }
+  if (healed) fx({ k: 'gain', text: `+${healed} health`, cls: 't-heal', delay: 250 });
+  if (e.hp <= 0) { f.phase = 'done'; fx({ k: 'edown' }); later(1700, winFight); return; }
   f.phase = 'enemy';
   later(1150, enemyPhase);
 }
 
 function enemyPhase() {
-  const f = S.fight, e = f.enemy, it = f.intent;
-  const state = { shield: f.shield };
-  if (it.cancelled) log(`${e.name} took the bribe and held back.`);
-  else {
-    if (it.k === 'atk') log(`${e.name}: ${hitCaravan(it.v, state)}.`);
-    if (it.k === 'guard') log(`${e.name}: ${hitCaravan(it.dmg, state)}.`);
-    if (it.k === 'drain') {
-      const lost = Math.min(S.water, it.v); S.water -= lost;
-      if (lost) fx({ k: 'gain', text: `−${lost} water`, cls: 't-water', delay: 500 });
-      log(`Lost ${lost} water. ${hitCaravan(it.dmg, state)}.`);
-    }
-    if (it.k === 'snipe') {
-      const c = crewById(it.target);
-      if (f.dice.some((d) => d.crew === it.target)) {
-        const blocked = state.shield >= it.v;
-        fx({ k: 'eshot', to: 'crew', id: c.id, dmg: it.v, blocked, ko: !blocked });
-        if (blocked) log(`The shot at ${c.name} was blocked.`);
-        else { f.knocked.push(c.id); log(`${c.name} was knocked out for this fight.`); }
-      } else log(`${c.name} stayed back. ${hitCaravan(it.v, state)}.`);
-    }
-  }
-  if (!rearWagon()) { f.phase = 'done'; later(1300, () => lose('Every wagon was wrecked.')); return; }
-  if (f.knocked.length >= S.crew.length) { f.phase = 'done'; later(1300, () => lose('The whole crew was knocked out.')); return; }
+  const f = S.fight, it = f.intent;
+  const dmg = it.k === 'guard' ? it.dmg : it.v;
+  const taken = Math.max(0, dmg - f.shield);
+  S.hp = Math.max(0, S.hp - taken);
+  fx({ k: 'eshot', to: 'wagon', id: S.wagons[S.wagons.length - 1].type, dmg: taken, blocked: taken === 0 });
+  if (S.hp <= 0) { f.phase = 'done'; later(1300, lose); return; }
   f.dice = [];
   f.phase = 'pick';
   f.turn++;
-  f.selected = f.selected.filter((id) => !f.knocked.includes(id));
   nextIntent();
 }
 
@@ -668,41 +539,29 @@ function winFight() {
   const f = S.fight, e = ENEMY_TYPES[f.kind];
   S.lastSel = f.selected.slice();
   S.coin += e.loot; S.stats.coinEarned += e.loot;
-  log(`${e.name} defeated.${e.loot ? ` +${e.loot} coin.` : ''}`);
-  for (const w of S.wagons) if (w.hp > 0) w.hp = Math.min(w.max, w.hp + 2);
-  if (has('cook')) { for (const w of S.wagons) if (w.hp > 0) w.hp = Math.min(w.max, w.hp + 3); log('The Cook Wagon fed everyone: wagons +3.'); }
+  let note = `Beat ${e.name}.${e.loot ? ` +${e.loot} coin.` : ''}`;
+  if (has('cook')) { const got = heal(4); if (got) note += ` Cook Wagon: +${got} health.`; }
+  log(note);
   Sfx.play('win');
   if (f.kind === LEGS[LEGS.length - 1].boss) { S.screen = 'victory'; return; }
-  S.screen = e.boss ? 'camp' : 'reward';
+  if (e.boss) { S.hp = maxHp(); S.screen = 'camp'; return; }
+  S.screen = 'map';
 }
-function lose(why) { S.screen = 'defeat'; S.loseReason = why; Sfx.play('lose'); }
+function lose() { S.screen = 'defeat'; log(`The caravan fell to ${S.fight.enemy.name}.`); Sfx.play('lose'); }
 
 /* =========================================================
-   Storms, markets, ruins, camps
+   Market and training
    ========================================================= */
-function startStorm() {
-  S.storm = { need: LEGS[S.leg].storm, selected: defaultSel(), dice: [], rerolls: 0, phase: 'pick', knocked: [] };
-  S.screen = 'storm';
-  log('A sandstorm rolls over the road.');
-}
-
 function genMarket() {
   const hires = shuffle(Object.keys(CREW_POOL).filter((id) => !S.crew.some((c) => c.id === id))).slice(0, 2);
-  const wagons = Object.keys(WAGON_TYPES).filter((t) => !S.wagons.some((w) => w.type === t));
+  const wagons = Object.keys(WAGON_TYPES).filter((t) => !has(t));
   return { hires, wagon: wagons.length ? pick(wagons) : null, bought: [] };
 }
-
 function upgradeFace(c, i) {
   const f = c.faces[i];
   const before = faceLabel(f);
   if (f.t === 'blank') { f.t = 'atk'; f.v = 3; } else f.v += 2;
   log(`${c.name}: ${before} became ${faceLabel(f)}.`);
-}
-function trainWorst(c) {
-  const score = (f) => (f.t === 'blank' ? -1 : hasValue(f) ? f.v : 99);
-  let worst = 0;
-  c.faces.forEach((f, i) => { if (score(f) < score(c.faces[worst])) worst = i; });
-  upgradeFace(c, worst);
 }
 
 /* =========================================================
@@ -713,126 +572,59 @@ const A = {
   resume() { const s = loadSave(); if (s) { S = s; resumePending(); } },
   mute() { Sfx.toggle(); },
 
-  // Map
   go(key) {
     if (S.screen !== 'map') return;
     const n = reachable().find((x) => x.key === key);
     if (!n) return;
-    travelCost();
     S.pos = { row: n.row, lane: n.lane };
     S.visited.push(`${S.leg}-${n.row}-${n.lane}`);
     Sfx.play('click');
     enterNode(n.type);
   },
-  front(i) { i = +i; if (i > 0) { [S.wagons[i - 1], S.wagons[i]] = [S.wagons[i], S.wagons[i - 1]]; } },
 
-  // Dice
   pick(id) {
-    const R = roller();
-    if (!R || R.phase !== 'pick' || R.knocked.includes(id) || !crewById(id)) return;
-    const i = R.selected.indexOf(id);
-    if (i >= 0) R.selected.splice(i, 1);
-    else if (R.selected.length < DICE_PER_TURN) R.selected.push(id);
-    else { R.selected.shift(); R.selected.push(id); }
+    const f = S.fight;
+    if (!f || f.phase !== 'pick' || !crewById(id)) return;
+    const i = f.selected.indexOf(id);
+    if (i >= 0) f.selected.splice(i, 1);
+    else if (f.selected.length < DICE_PER_TURN) f.selected.push(id);
+    else { f.selected.shift(); f.selected.push(id); }
     Sfx.play('click');
   },
   roll() {
-    const R = roller();
-    if (!R || R.phase !== 'pick' || !R.selected.length) return;
-    R.dice = R.selected.map((id) => ({ crew: id, face: rollFace(id), held: false, poured: false, fresh: true }));
-    R.rerolls = S.screen === 'storm' ? 1 : BASE_REROLLS;
-    R.phase = 'roll';
-    gainRerolls(R, R.dice);
+    const f = S.fight;
+    if (!f || f.phase !== 'pick' || !f.selected.length) return;
+    f.dice = f.selected.map((id) => ({ crew: id, face: rollFace(id), held: false, fresh: true }));
+    f.rerolls = REROLLS;
+    f.phase = 'roll';
     Sfx.play('roll');
   },
   hold(i) {
-    const R = roller();
-    const d = R && R.phase === 'roll' && R.dice[+i];
-    if (d && !d.poured) { d.held = !d.held; Sfx.play('click'); }
+    const f = S.fight;
+    const d = f && f.phase === 'roll' && f.dice[+i];
+    if (d) { d.held = !d.held; Sfx.play('click'); }
   },
   reroll() {
-    const R = roller();
-    if (!R || R.phase !== 'roll') return;
-    const free = R.dice.filter((d) => !d.held);
-    if (R.rerolls < 1 || !free.length) return;
-    R.rerolls--;
+    const f = S.fight;
+    if (!f || f.phase !== 'roll' || f.rerolls < 1) return;
+    const free = f.dice.filter((d) => !d.held);
+    if (!free.length) return;
+    f.rerolls--;
     for (const d of free) { d.face = rollFace(d.crew); d.fresh = true; }
-    gainRerolls(R, free);
     Sfx.play('roll');
   },
-  pour(i) {
-    const R = roller();
-    const d = R && R.phase === 'roll' && R.dice[+i];
-    if (!d || !canPour(d)) return;
-    S.water--; d.poured = true; d.held = true;
-    Sfx.play('water');
-  },
-  bribe() {
-    const f = S.fight;
-    if (!f || !['pick', 'roll'].includes(f.phase) || S.coin < f.bribeCost || f.intent.cancelled) return;
-    S.coin -= f.bribeCost;
-    log(`Paid ${f.bribeCost} coin. ${f.enemy.name} will skip its move.`);
-    f.bribeCost += 3;
-    f.intent.cancelled = true;
-    Sfx.play('coin');
-  },
   end() { if (S.screen === 'fight' && S.fight.phase === 'roll') playerPhase(); },
-  weather() {
-    const R = S.storm;
-    if (S.screen !== 'storm' || R.phase !== 'roll') return;
-    const t = totals(R);
-    const prot = t.shd + t.heal * 2;
-    S.coin += t.coin; S.water += t.water;
-    const short = Math.max(0, R.need - prot);
-    if (short) log(`The storm got through: ${hitCaravan(short, { shield: 0 }, 'storm')}.`);
-    else { log(`You held against the storm with ${prot} block.`); fx({ k: 'gain', text: 'Held!', cls: 't-shd', sfx: 'block' }); }
-    S.lastSel = R.selected.slice();
-    R.phase = 'done';
-    later(1300, () => {
-      if (!rearWagon()) { lose('The storm wrecked every wagon.'); return; }
-      S.screen = 'map';
-    });
-  },
 
-  // After a normal fight
-  reward(kind) {
-    if (kind === 'repair') { for (const w of S.wagons) w.hp = Math.min(w.max, Math.max(w.hp, 0) + 8); log('Wagons patched: +8 each.'); }
-    if (kind === 'water') { S.water += 3; log('Found water in the wreckage: +3.'); }
-    if (kind === 'loot') { S.coin += 5; S.stats.coinEarned += 5; log('Searched the wreckage: +5 coin.'); Sfx.play('coin'); }
-    S.screen = 'map';
-  },
-  // After a boss
   camp(kind) {
-    if (kind === 'rest') { for (const w of S.wagons) w.hp = w.max; log('A full night of repairs. Every wagon is like new.'); }
     if (kind === 'recruit') {
       const pool = Object.keys(CREW_POOL).filter((id) => !S.crew.some((c) => c.id === id));
-      if (pool.length && S.crew.length < MAX_CREW) { const c = mkCrew(pick(pool)); S.crew.push(c); log(`${c.name} the ${c.role} joined the caravan.`); }
+      if (!pool.length || S.crew.length >= MAX_CREW) return;
+      const c = mkCrew(pick(pool)); S.crew.push(c); log(`${c.name} the ${c.role} joined the caravan.`);
     }
     if (kind === 'train') { S.upgrade = { free: true, crew: null }; S.screen = 'upgrade'; return; }
     nextLeg();
   },
-  oasis(kind) {
-    if (kind === 'water') { S.water += 5; log('Filled every water skin: +5.'); Sfx.play('water'); }
-    if (kind === 'rest') { for (const w of S.wagons) w.hp = Math.min(w.max, Math.max(w.hp, 0) + 6); log('Rested in the shade: wagons +6.'); }
-    S.screen = 'map';
-  },
-  ruins(kind) {
-    if (kind === 'dig') {
-      if (Math.random() < 0.5) { S.coin += 10; S.stats.coinEarned += 10; log('You dug up an old coin chest: +10 coin.'); Sfx.play('coin'); S.screen = 'map'; }
-      else { log('The dead do not like being disturbed.'); startFight(LEGS[S.leg].ruins); }
-      return;
-    }
-    if (kind === 'pray') {
-      if (S.water < 2) return;
-      S.water -= 2;
-      const c = pick(S.crew);
-      log(`You left 2 water at the statue. ${c.name} feels stronger.`);
-      trainWorst(c);
-    }
-    S.screen = 'map';
-  },
 
-  // Market
   buy(key) {
     const m = S.market;
     if (S.screen !== 'market' || m.bought.includes(key)) return;
@@ -844,21 +636,20 @@ const A = {
       const c = mkCrew(arg); S.crew.push(c); log(`Hired ${c.name} the ${c.role}.`);
     } else if (kind === 'wagon') {
       if (S.wagons.length >= MAX_WAGONS) return;
-      S.wagons.push(mkWagon(arg)); log(`Bought a ${WAGON_TYPES[arg].name}. It joins at the rear.`);
-    } else if (kind === 'water') { S.water += 3; log('Bought 3 water.'); }
-    else if (kind === 'repair') { for (const w of S.wagons) w.hp = Math.min(w.max, Math.max(w.hp, 0) + 5); log('The wainwright patched every wagon: +5.'); }
-    else if (kind === 'upgrade') { S.upgrade = { free: false, crew: null }; S.screen = 'upgrade'; Sfx.play('click'); return; }
+      S.wagons.push({ type: arg }); S.hp += WAGON_TYPES[arg].hp; log(`Bought a ${WAGON_TYPES[arg].name}.`);
+    } else if (kind === 'repair') {
+      if (S.hp >= maxHp()) return;
+      log(`Repairs: +${heal(REPAIR)} health.`);
+    } else if (kind === 'upgrade') { S.upgrade = { free: false, crew: null }; S.screen = 'upgrade'; Sfx.play('click'); return; }
     S.coin -= cost;
-    if (kind !== 'water' && kind !== 'repair') m.bought.push(key);
+    if (kind === 'hire' || kind === 'wagon') m.bought.push(key);
     Sfx.play('coin');
   },
   leave() { S.screen = 'map'; },
   upCrew(id) { if (S.upgrade) S.upgrade.crew = id; Sfx.play('click'); },
   upFace(i) {
     const u = S.upgrade, c = u && crewById(u.crew);
-    if (!c) return;
-    const f = c.faces[+i];
-    if (f.t === 'rr' || f.t === 'heal') return;
+    if (!c || c.faces[+i].t === 'heal') return;
     if (!u.free) { if (S.coin < S.upgradeCost) return; S.coin -= S.upgradeCost; S.upgradeCost += 2; }
     upgradeFace(c, +i);
     Sfx.play('coin');
@@ -875,14 +666,11 @@ const A = {
 
 // A save made in the middle of an enemy turn picks up where it stopped.
 function resumePending() {
-  if (S.screen === 'fight') {
-    const f = S.fight;
-    if (f.phase === 'enemy') enemyPhase();
-    else if (f.phase === 'done') { if (f.enemy.hp <= 0) winFight(); else if (!rearWagon()) lose('Every wagon was wrecked.'); else lose('The whole crew was knocked out.'); }
-  }
-  if (S.screen === 'storm' && S.storm.phase === 'done') S.screen = 'map';
+  if (S.screen !== 'fight') return;
+  const f = S.fight;
+  if (f.phase === 'enemy') enemyPhase();
+  else if (f.phase === 'done') { if (f.enemy.hp <= 0) winFight(); else lose(); }
 }
-
 /* =========================================================
    Sound (synthesised with Web Audio, starts after the first tap)
    ========================================================= */
@@ -923,9 +711,7 @@ const Sfx = (() => {
     hurt() { tone(95, 0.35, 'triangle', 0.3, 0, 0.5); noise(0.22, 0.25, 0, 420); },
     block() { tone(880, 0.18, 'triangle', 0.12); tone(1320, 0.24, 'sine', 0.08, 0.02); },
     coin() { tone(1568, 0.08, 'square', 0.05); tone(2093, 0.16, 'square', 0.045, 0.07); },
-    water() { tone(420, 0.16, 'sine', 0.12, 0, 2); },
     click() { tone(680, 0.05, 'triangle', 0.06); },
-    ko() { tone(330, 0.45, 'sawtooth', 0.07, 0, 0.35); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.28, 'triangle', 0.12, i * 0.11)); },
     lose() { [392, 330, 262].forEach((f, i) => tone(f, 0.45, 'triangle', 0.12, i * 0.2)); },
   };
@@ -1119,7 +905,7 @@ const Scene = (() => {
   const pos = (e, dy) => new T.Vector3(e.outer.position.x, dy, e.outer.position.z);
 
   const ringGeo = new T.RingGeometry(0.34, 0.46, 28);
-  const ringMats = { sel: basic('#ef8a26'), target: basic('#d4532d'), water: basic('#2f8ea6') };
+  const ringMats = { sel: basic('#ef8a26') };
   function ring() { const r = new T.Mesh(ringGeo, ringMats.sel); r.rotation.x = -PI / 2; r.position.y = 0.03; r.visible = false; return r; }
 
   /* Scenery and location sets, built once the models arrive */
@@ -1174,17 +960,6 @@ const Scene = (() => {
     addAt(ruins, prop('pillar', { h: 1.2 }), 3.1, 2.7);
     addAt(ruins, prop('pillar', { h: 1.5 }), 4.6, -2.7);
 
-    const storm = groups.storm = new T.Group();
-    for (let i = 0; i < 26; i++) {
-      const m = mesh(i % 3 ? new T.TetrahedronGeometry(0.12 + sr() * 0.14, 0) : new T.DodecahedronGeometry(0.1 + sr() * 0.1, 0), i % 2 ? C.sandDark : C.sand);
-      const a = sr() * PI * 2, r = 2 + sr() * 5.5;
-      m.position.set(Math.cos(a) * r, 0.3 + sr() * 2.4, Math.sin(a) * r * 0.6);
-      storm.add(m);
-    }
-    for (const r of [3.5, 5.5]) {
-      const band = new T.Mesh(new T.TorusGeometry(r, 0.06, 4, 32), basic('#c99c5c', { transparent: true, opacity: 0.45 }));
-      band.rotation.x = PI / 2; band.position.y = 0.8 + r * 0.15; band.scale.y = 0.6; storm.add(band);
-    }
     for (const g of Object.values(groups)) { g.visible = false; W.add(g); }
   }
 
@@ -1343,7 +1118,7 @@ const Scene = (() => {
   }
   function syncDice(R) {
     const scr = S ? S.screen : '';
-    const show = R && R.phase !== 'pick' && R.dice.length && (scr === 'fight' || scr === 'storm');
+    const show = R && R.phase !== 'pick' && R.dice.length && scr === 'fight';
     diceGroup.visible = !!show;
     dieMeshes.forEach((m) => { m.visible = false; m.userData.pick = null; });
     if (!show) return;
@@ -1358,8 +1133,7 @@ const Scene = (() => {
         m.userData.key = key;
         if (d.fresh) animateRoll(m, home, i); else { m.position.copy(home); m.rotation.set(0, 0.1, 0); }
       }
-      m.userData.ring.visible = d.held || d.poured;
-      m.userData.ring.material = d.poured ? ringMats.water : ringMats.sel;
+      m.userData.ring.visible = d.held;
     });
   }
 
@@ -1421,21 +1195,19 @@ const Scene = (() => {
         if (fr) floatAt(pos(fr, 1.8), f.text, f.cls, (f.delay || 0) + t);
         if (f.sfx) setTimeout(() => Sfx.play(f.sfx), (f.delay || 0) + t);
       }
-      if (f.k === 'float') { const c = crewEnt[f.id]; if (c) floatAt(pos(c, 1.6), f.text, f.cls, t); }
-      if ((f.k === 'eshot' || f.k === 'stormhit')) {
-        const target = f.to === 'wagon' ? wagonEnt[f.id] : crewEnt[f.id];
+      if (f.k === 'eshot') {
+        const target = wagonEnt[f.id];
         if (!target) continue;
-        const tp = pos(target, f.to === 'wagon' ? 1.0 : 0.8);
+        const tp = pos(target, 1.0);
         const d = t;
         const onHit = () => {
           if (f.blocked) { burst(tp, '#6fa8d0'); floatAt(pos(target, 1.9), 'Blocked', 't-shd'); Sfx.play('block'); }
           else {
             shake(target.inner); burst(tp, '#d4532d');
-            floatAt(pos(target, 1.9), f.ko ? 'Knocked out' : `−${f.dmg}`, f.ko ? 't-atk small' : 't-atk');
-            Sfx.play(f.ko ? 'ko' : 'hurt');
+            floatAt(pos(target, 1.9), `−${f.dmg}`, 't-atk');
+            Sfx.play('hurt');
           }
         };
-        if (f.k === 'stormhit') { target.lock = now + d + 300; setTimeout(onHit, d + 200); t += 300; continue; }
         if (!enemy) { onHit(); continue; }
         target.lock = now + d + 640;
         tween(300, (p) => { enemy.inner.position.x = -Math.sin(p * PI) * 0.5; }, () => { enemy.inner.position.x = 0; }, d);
@@ -1461,10 +1233,9 @@ const Scene = (() => {
     const scr = state ? state.screen : 'title';
     const f = state && state.fight;
 
-    groups.camp.visible = ['reward', 'camp', 'victory'].includes(scr);
+    groups.camp.visible = scr === 'camp' || scr === 'victory';
     groups.market.visible = scr === 'market' || (scr === 'upgrade' && state.upgrade && !state.upgrade.free);
-    groups.ruins.visible = scr === 'ruins' || (scr === 'fight' && f && (f.kind === 'skeletons' || f.kind === 'legion'));
-    groups.storm.visible = scr === 'storm';
+    groups.ruins.visible = scr === 'fight' && f && (f.kind === 'skeletons' || f.kind === 'legion');
 
     if (f && scr === 'fight' && f.id !== enemyFightId) {
       if (enemy) removeEntity(enemy);
@@ -1473,47 +1244,35 @@ const Scene = (() => {
     }
     if (enemy && !enemy.dying) enemy.outer.visible = scr === 'fight' && f && f.id === enemyFightId && f.enemy.hp > 0;
 
-    const wagons = state ? state.wagons : [mkWagon('water'), mkWagon('armory')];
+    const wagons = state ? state.wagons : [{ type: 'supply' }, { type: 'armory' }];
     for (const type of Object.keys(wagonEnt)) if (!wagons.some((w) => w.type === type)) { removeEntity(wagonEnt[type]); delete wagonEnt[type]; }
     wagons.forEach((w, i) => {
       const e = wagonEnt[w.type] || (wagonEnt[w.type] = buildWagon(w.type));
-      const dead = w.hp <= 0;
-      setT(e, { x: -1.5 - i * 2.15, z: 0.5, y: dead ? -0.12 : 0, rx: dead ? 0.32 : 0 });
+      setT(e, { x: -1.5 - i * 2.15, z: 0.5 });
     });
 
     const crew = state ? state.crew : START_CREW.map((id) => ({ id, model: CREW_POOL[id].model }));
     for (const id of Object.keys(crewEnt)) if (!crew.some((c) => c.id === id)) {
       const e = crewEnt[id]; hitTargets.splice(hitTargets.indexOf(e.hit), 1); removeEntity(e); delete crewEnt[id];
     }
-    const R = state && (scr === 'storm' ? state.storm : scr === 'fight' ? f : null);
+    const R = state && scr === 'fight' ? f : null;
     const forward = R ? (R.phase === 'pick' ? R.selected : R.dice.map((d) => d.crew)) : [];
-    const knocked = scr === 'fight' && f ? f.knocked : [];
-    const target = scr === 'fight' && f && f.intent && f.intent.k === 'snipe' && !f.intent.cancelled && f.phase !== 'done' ? f.intent.target : null;
     const n = crew.length;
     crew.forEach((c, i) => {
       const e = crewEnt[c.id] || (crewEnt[c.id] = buildCrew(c));
       let x = -7.0 + i * 0.8, z = 2.35, ry = PI / 4, base = 'idle';
-      if (['reward', 'camp', 'victory'].includes(scr)) {
+      if (scr === 'camp' || scr === 'victory') {
         const a = (i / n) * PI * 2 + 0.4;
         x = 2.6 + Math.cos(a) * 1.5; z = 1.0 + Math.sin(a) * 1.05;
         ry = Math.atan2(2.6 - x, 1.0 - z);
         base = scr === 'victory' ? 'emote-yes' : 'sit';
-      } else if (scr === 'oasis') {
-        const a = 0.25 + (i / Math.max(1, n - 1)) * 2.6;
-        x = -1.4 + Math.cos(a) * 2.3; z = -3.0 + Math.sin(a) * 1.6;
-        ry = Math.atan2(-1.4 - x, -3.0 - z);
-        base = 'sit';
       } else if (scr === 'map') base = 'walk';
       else if (scr === 'defeat') base = 'die';
-      else {
-        if (forward.includes(c.id)) z += 0.55;
-        if (knocked.includes(c.id)) base = 'die';
-      }
+      else if (forward.includes(c.id)) z += 0.55;
       setT(e, { x, z, ry });
       e.wantBase = base;
       const sel = R && R.phase === 'pick' && R.selected.includes(c.id);
-      e.ring.visible = !!sel || c.id === target;
-      e.ring.material = c.id === target ? ringMats.target : ringMats.sel;
+      e.ring.visible = !!sel;
       e.hit.userData.pick = R && R.phase === 'pick' ? { crew: c.id } : null;
     });
     syncDice(R);
@@ -1582,7 +1341,6 @@ const Scene = (() => {
         if (enemy.kind === 'wraith' || enemy.kind === 'storm') enemy.inner.position.y = 0.2 + Math.sin(t * 1.6) * 0.15;
       }
       flames.forEach((fl, i) => fl.scale.set(1 + Math.sin(t * 13 + i) * 0.08, 1 + Math.sin(t * 9 + i * 2) * 0.16, 1));
-      if (groups.storm && groups.storm.visible) groups.storm.rotation.y = t * 0.9;
     }
     renderer.render(scene, cam);
     requestAnimationFrame(frame);
@@ -1617,7 +1375,6 @@ function headerHtml() {
   return `<header class="top">
     <div class="brand">Caravan</div>
     <div class="res">
-      <span class="chip water" title="Water">${icon('water')}<span class="num">${S.water}</span></span>
       <span class="chip coin" title="Coin">${icon('coin')}<span class="num">${S.coin}</span></span>
       ${muteBtn}
     </div>
@@ -1627,25 +1384,19 @@ function headerHtml() {
 
 function overlayHtml() {
   if (!S) return '';
-  const scr = S.screen;
   let ctx = '';
-  if (scr === 'fight') {
+  if (S.screen === 'fight') {
     const e = S.fight.enemy;
     ctx = `<div class="ctx">
       <div class="row"><b>${e.name}</b><span class="hp">${e.hp}/${e.max}</span></div>
       <div class="bar"><span style="width:${(100 * e.hp) / e.max}%"></span></div>
-      ${e.block && S.fight.phase !== 'done' ? `<span class="block">${icon('shd')} Absorbs ${e.block} this turn</span>` : ''}
     </div>`;
-  } else {
-    const names = { map: 'On the road', oasis: 'Oasis', market: 'Market', upgrade: 'Market', ruins: 'Ruins', storm: 'Sandstorm', reward: 'After the fight', camp: 'Camp', victory: 'The city gate', defeat: 'Lost in the sand' };
-    ctx = `<div class="ctx"><b>${names[scr] || ''}</b></div>`;
   }
-  const rear = rearWagon();
-  const chips = [...S.wagons].reverse().map((w) => `<div class="wchip ${w.hp <= 0 ? 'dead' : ''} ${w === rear ? 'rear' : ''}">
-      <span>${wagonName(w)} <span class="num">${Math.max(0, w.hp)}</span></span>
-      <div class="bar fill-ok"><span style="width:${(100 * Math.max(0, w.hp)) / w.max}%"></span></div>
-    </div>`).join('');
-  return `${ctx}<div class="wchips">${chips}</div>`;
+  const mx = maxHp();
+  return `${ctx || '<span></span>'}<div class="ctx">
+      <div class="row"><b>Caravan</b><span class="hp" style="color:var(--heal)">${S.hp}/${mx}</span></div>
+      <div class="bar fill-ok"><span style="width:${(100 * S.hp) / mx}%"></span></div>
+    </div>`;
 }
 
 function faceHtml(f, bonus = 0) {
@@ -1655,174 +1406,81 @@ function miniFaces(c, act) {
   return c.faces.map((fc, i) => {
     const inner = `${icon(fc.t)}${hasValue(fc) ? fc.v : ''}`;
     if (!act) return `<span class="mini t-${fc.t}" title="${faceLabel(fc)}">${inner}</span>`;
-    const ok = fc.t !== 'rr' && fc.t !== 'heal';
-    return `<button class="mini t-${fc.t}" data-act="${act}" data-arg="${i}" ${ok ? '' : 'disabled'} aria-label="Upgrade ${faceLabel(fc)}">${inner}</button>`;
+    return `<button class="mini t-${fc.t}" data-act="${act}" data-arg="${i}" ${fc.t === 'heal' ? 'disabled' : ''} aria-label="Upgrade ${faceLabel(fc)}">${inner}</button>`;
   }).join('');
 }
-
-function trayHtml(R) {
-  return R.dice.map((d, i) => {
-    const c = crewById(d.crew);
-    const bonus = (d.poured ? 2 : 0) + (d.face.t === 'atk' && c.role === 'Guard' && has('armory') ? 1 : 0) + (d.face.t === 'coin' && has('spice') ? 1 : 0);
-    const live = R.phase === 'roll';
-    return `<div class="slot">
-      <button class="die ${d.held ? 'held' : ''} ${d.fresh ? 'tumble' : ''}" data-act="hold" data-arg="${i}" ${live ? '' : 'disabled'} aria-pressed="${d.held}" aria-label="${c.name}: ${faceLabel(d.face)}${d.held ? ', held' : ''}">
-        ${d.held ? '<span class="held-tag">Held</span>' : ''}
-        ${faceHtml(d.face, bonus)}
-        <span class="who">${c.name}</span>
-      </button>
-      <button class="pour ${d.poured ? 'done' : ''}" data-act="pour" data-arg="${i}" ${live && canPour(d) ? '' : 'disabled'} aria-label="Pour water on ${c.name} for +2">${icon('water')}+2</button>
-    </div>`;
-  }).join('');
-}
-
-function previewHtml(R, storm) {
-  if (R.phase === 'pick') return `<span class="hint">Pick up to ${DICE_PER_TURN} crew here or by tapping them on the island, then roll.</span>`;
-  const t = totals(R);
-  const out = [];
-  if (storm) {
-    const prot = t.shd + t.heal * 2;
-    out.push(`<span class="t-shd">${icon('shd')}<span class="num">${prot}</span>&nbsp;of ${R.need} block</span>`);
-  } else {
-    const e = S.fight.enemy;
-    out.push(`<span class="t-atk">${icon('atk')}<span class="num">${Math.max(0, t.atk - e.block)}</span>&nbsp;damage${e.block && t.atk ? ` (${Math.min(e.block, t.atk)} absorbed)` : ''}${t.bell ? ` incl. bell +${t.bell}` : ''}</span>`);
-    out.push(`<span class="t-shd">${icon('shd')}<span class="num">${t.shd}</span>&nbsp;block</span>`);
-    if (t.heal) out.push(`<span class="t-heal">${icon('heal')}${t.heal} mend</span>`);
-  }
-  if (t.coin) out.push(`<span class="t-coin">${icon('coin')}+${t.coin}</span>`);
-  if (t.water) out.push(`<span class="t-water">${icon('water')}+${t.water}</span>`);
-  return out.join('');
-}
-
-function rosterHtml(R) {
-  const f = S.screen === 'fight' ? S.fight : null;
-  return S.crew.map((c) => {
-    const ko = R.knocked.includes(c.id);
-    const sel = R.selected.includes(c.id);
-    const targeted = f && f.intent && f.intent.k === 'snipe' && f.intent.target === c.id && !f.intent.cancelled;
-    const badge = ko ? '<span class="badge grey">Out</span>' : targeted ? '<span class="badge red">Targeted</span>' : sel ? '<span class="badge">Rolling</span>' : '';
-    return `<button class="crew ${sel ? 'sel' : ''} ${targeted ? 'targeted' : ''} ${ko ? 'ko' : ''}" data-act="pick" data-arg="${c.id}" ${R.phase !== 'pick' || ko ? 'disabled' : ''} aria-pressed="${sel}">
-      ${badge}
-      <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
-      <span class="faces">${miniFaces(c)}</span>
-    </button>`;
-  }).join('');
-}
-
-function diceSection(R, storm) {
-  const picking = R.phase === 'pick';
-  const head = picking
-    ? `<div class="label"><span>Who rolls</span><span>${R.selected.length}/${Math.min(DICE_PER_TURN, S.crew.length - R.knocked.length)} chosen</span></div><div class="roster">${rosterHtml(R)}</div>`
-    : `<div class="label"><span>${R.phase === 'roll' ? 'Tap a die to hold it' : 'Resolving…'}</span><span>${R.dice.filter((d) => d.held).length} held</span></div><div class="tray">${trayHtml(R)}</div>`;
-  return `<section class="stack" style="gap:10px" aria-label="Dice">${head}<div class="preview">${previewHtml(R, storm)}</div></section>`;
+function crewCard(c, act, opts = {}) {
+  return `<button class="crew ${opts.sel ? 'sel' : ''}" data-act="${act}" data-arg="${c.id}" ${opts.disabled ? 'disabled' : ''} ${opts.sel != null ? `aria-pressed="${!!opts.sel}"` : ''}>
+    ${opts.sel ? '<span class="badge">Rolling</span>' : ''}
+    <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
+    <span class="faces">${miniFaces(c)}</span>
+  </button>`;
 }
 
 function fightHtml() {
-  const f = S.fight, info = intentInfo(f.intent);
-  const busy = f.phase === 'enemy' || f.phase === 'done';
-  const canBribe = !busy && S.coin >= f.bribeCost && !f.intent.cancelled;
-  const bribe = `<button class="btn" data-act="bribe" ${canBribe ? '' : 'disabled'}>Bribe<small>${f.bribeCost} coin</small></button>`;
-  let actions;
-  if (f.phase === 'pick') actions = `${bribe}<button class="btn primary" data-act="roll" ${f.selected.length ? '' : 'disabled'}>Roll ${f.selected.length} crew<small>Turn ${f.turn}</small></button>`;
-  else if (f.phase === 'roll') {
-    const free = f.dice.some((d) => !d.held);
-    actions = `${bribe}<button class="btn" data-act="reroll" ${f.rerolls > 0 && free ? '' : 'disabled'}>Reroll<small>${f.rerolls} left</small></button>
-      <button class="btn primary" data-act="end">End turn<small>Enemy moves</small></button>`;
-  } else actions = `<button class="btn primary" disabled>${f.phase === 'enemy' ? `${f.enemy.name} moves…` : 'Fight over'}</button>`;
+  const f = S.fight, it = intentText(f.intent);
+  let body, actions;
+  if (f.phase === 'pick') {
+    body = `<div class="label"><span>Choose who rolls</span><span>${f.selected.length}/${Math.min(DICE_PER_TURN, S.crew.length)}</span></div>
+      <div class="roster">${S.crew.map((c) => crewCard(c, 'pick', { sel: f.selected.includes(c.id) })).join('')}</div>`;
+    actions = `<button class="btn primary" data-act="roll" ${f.selected.length ? '' : 'disabled'}>Roll ${f.selected.length} crew</button>`;
+  } else {
+    const t = totals(f);
+    const dice = f.dice.map((d, i) => {
+      const c = crewById(d.crew);
+      const bonus = (d.face.t === 'atk' && c.role === 'Guard' && has('armory') ? 1 : 0) + (d.face.t === 'coin' && has('spice') ? 1 : 0);
+      return `<button class="die ${d.held ? 'held' : ''} ${d.fresh ? 'tumble' : ''}" data-act="hold" data-arg="${i}" ${f.phase === 'roll' ? '' : 'disabled'} aria-pressed="${d.held}" aria-label="${c.name}: ${faceLabel(d.face)}${d.held ? ', held' : ''}">
+        ${d.held ? '<span class="held-tag">Held</span>' : ''}${faceHtml(d.face, bonus)}<span class="who">${c.name}</span></button>`;
+    }).join('');
+    const sum = [`<span class="t-atk">${icon('atk')}<span class="num">${Math.max(0, t.atk - f.enemy.block)}</span>&nbsp;damage</span>`,
+      `<span class="t-shd">${icon('shd')}<span class="num">${t.shd}</span>&nbsp;block</span>`];
+    if (t.coin) sum.push(`<span class="t-coin">${icon('coin')}+${t.coin}</span>`);
+    if (t.heal) sum.push(`<span class="t-heal">${icon('heal')}+${t.heal}</span>`);
+    body = `<div class="label"><span>${f.phase === 'roll' ? 'Tap a die to keep it' : 'Enemy turn'}</span><span></span></div>
+      <div class="tray">${dice}</div><div class="preview">${sum.join('')}</div>`;
+    actions = f.phase === 'roll'
+      ? `<button class="btn" data-act="reroll" ${f.rerolls > 0 && f.dice.some((d) => !d.held) ? '' : 'disabled'}>Reroll<small>${f.rerolls} left</small></button>
+         <button class="btn primary" data-act="end">End turn</button>`
+      : `<button class="btn primary" disabled>${f.phase === 'enemy' ? `${f.enemy.name} attacks…` : 'Fight over'}</button>`;
+  }
   return `
-  <div class="intent ${f.intent.cancelled ? 'cancelled' : ''} ${f.phase === 'enemy' ? 'acting' : ''}">
-    <span class="tile">${icon(info.icon)}</span>
-    <span class="txt">
-      <span class="eyebrow">${f.intent.cancelled ? 'Bribed, skipping this move' : `${f.enemy.name} · next move`}</span>
-      <strong>${info.title}</strong>
-      <span class="detail">${info.detail}</span>
-    </span>
+  <div class="intent ${f.phase === 'enemy' ? 'acting' : ''}">
+    <span class="tile">${icon(it.icon)}</span>
+    <span class="txt"><span class="eyebrow">Enemy's next move</span><strong>${it.title}</strong><span class="detail">${it.detail}</span></span>
   </div>
-  ${diceSection(f, false)}
-  <ul class="log" aria-live="polite">${S.log.slice(0, 2).map((l) => `<li>${l}</li>`).join('')}</ul>
-  <details class="help">
-    <summary>How a turn works</summary>
-    <ol>
-      <li>Read the enemy's next move.</li>
-      <li>Pick up to ${DICE_PER_TURN} crew. Each crew member is a die with six faces, shown on their card.</li>
-      <li>Roll. Tap dice to hold them, then reroll the rest. You get ${BASE_REROLLS} rerolls a turn, plus one for each Reroll face.</li>
-      <li>Pour water on an Attack, Block or Coin die for +2. The Water Cart has to be standing.</li>
-      <li>End the turn. Your attacks land first, then the enemy moves. Enemies hit the rear wagon.</li>
-      <li>Coin bribes an enemy to skip its next move. Knocked-out crew come back after the fight.</li>
-    </ol>
-  </details>
-  <div class="actions">${actions}</div>`;
-}
-
-function stormHtml() {
-  const R = S.storm;
-  let actions;
-  if (R.phase === 'pick') actions = `<button class="btn primary" data-act="roll" ${R.selected.length ? '' : 'disabled'}>Roll ${R.selected.length} crew<small>Brace for the storm</small></button>`;
-  else if (R.phase === 'roll') {
-    const free = R.dice.some((d) => !d.held);
-    actions = `<button class="btn" data-act="reroll" ${R.rerolls > 0 && free ? '' : 'disabled'}>Reroll<small>${R.rerolls} left</small></button>
-      <button class="btn primary" data-act="weather">Weather it<small>Need ${R.need} block</small></button>`;
-  } else actions = `<button class="btn primary" disabled>The storm passes…</button>`;
-  return `
-  <div class="intent storm">
-    <span class="tile">${icon('wind')}</span>
-    <span class="txt">
-      <span class="eyebrow">Sandstorm</span>
-      <strong>Roll at least ${R.need} block</strong>
-      <span class="detail">Every point short hits the rear wagon. Mend faces count as 2 block. You get 1 reroll.</span>
-    </span>
-  </div>
-  ${diceSection(R, true)}
-  <ul class="log" aria-live="polite">${S.log.slice(0, 2).map((l) => `<li>${l}</li>`).join('')}</ul>
+  <section class="stack" style="gap:10px">${body}</section>
   <div class="actions">${actions}</div>`;
 }
 
 function mapHtml() {
   const leg = S.map[S.leg], p = S.pos;
-  const reach = reachable();
-  const reachKeys = reach.map((n) => n.key);
-  // Grid: 5 rows from the top (boss) to the bottom (start), 3 lanes.
+  const reachKeys = reachable().map((n) => n.key);
   const X = (lane) => ((lane + 0.5) / 3) * 100;
-  const Y = (row) => ((4 - (row + 1) + 0.5) / 5) * 100; // row -1 = start at bottom, row 3 = boss at top
+  const Y = (row) => ((4 - (row + 1) + 0.5) / 5) * 100; // start at the bottom, boss at the top
   const lines = [];
   const link = (r1, l1, r2, l2, hot) => lines.push(`<line x1="${X(l1) * 3}" y1="${Y(r1) * 3.4}" x2="${X(l2) * 3}" y2="${Y(r2) * 3.4}" stroke="${hot ? '#ef8a26' : '#d6c5a5'}" stroke-width="${hot ? 3 : 2}" stroke-dasharray="${hot ? '0' : '5 5'}" stroke-linecap="round"/>`);
   leg.rows[0].forEach((n) => link(-1, 1, 0, n.lane, p.row === -1));
   for (let r = 0; r < 2; r++) for (const a of leg.rows[r]) for (const b of leg.rows[r + 1]) if (Math.abs(a.lane - b.lane) <= 1) link(r, a.lane, r + 1, b.lane, p.row === r && p.lane === a.lane);
   leg.rows[2].forEach((n) => link(2, n.lane, 3, 1, p.row === 2 && p.lane === n.lane));
-  const nodeBtn = (row, lane, type, extra = '') => {
+  const node = (row, lane, type) => {
     const key = row === 3 ? 'boss' : `${row}-${lane}`;
-    const visited = S.visited.includes(`${S.leg}-${row}-${lane}`);
     const here = p.row === row && p.lane === lane;
+    const visited = S.visited.includes(`${S.leg}-${row}-${lane}`);
     const can = reachKeys.includes(key);
-    const info = NODE_INFO[type];
-    const label = type === 'boss' ? ENEMY_TYPES[LEGS[S.leg].boss].name.replace('The ', '') : info.label;
+    const label = type === 'boss' ? ENEMY_TYPES[LEGS[S.leg].boss].name.replace('The ', '') : NODE_INFO[type].label;
     const cls = [here ? 'here' : visited ? 'visited' : can ? 'reach' : (row <= p.row ? 'far' : ''), type === 'boss' ? 'boss' : ''].join(' ');
     return `<button class="node ${cls}" data-t="${type}" style="left:${X(lane)}%;top:${Y(row)}%" ${can ? `data-act="go" data-arg="${key}"` : 'tabindex="-1" aria-disabled="true"'} aria-label="${label}${can ? ', go here' : ''}">
-      <span class="disc">${icon(info.icon)}</span><span class="nl">${label}</span>${extra}</button>`;
+      <span class="disc">${icon(NODE_INFO[type].icon)}</span><span class="nl">${label}</span></button>`;
   };
-  const nodes = [];
-  nodes.push(`<div class="node ${p.row === -1 ? 'here' : 'visited'}" style="left:${X(1)}%;top:${Y(-1)}%"><span class="disc">${icon('flag')}</span><span class="nl">Start</span></div>`);
-  leg.rows.forEach((row, r) => row.forEach((n) => nodes.push(nodeBtn(r, n.lane, n.type))));
-  nodes.push(nodeBtn(3, 1, 'boss'));
-  const boss = ENEMY_TYPES[LEGS[S.leg].boss];
-  const moves = boss.pattern.map((it) => `<li>${it.k === 'atk' ? `Attack for ${it.v}` : it.k === 'guard' ? `Brace (absorbs ${it.v}), hit for ${it.dmg}` : it.k === 'drain' ? `Steal ${it.v} water, hit for ${it.dmg}` : `Snipe a crew member for ${it.v}`}</li>`).join('');
-  const wl = S.wagons.map((w, i) => `<div class="wrow">
-      <span class="pos">${i === 0 ? 'Front' : i === S.wagons.length - 1 ? 'Rear' : i + 1}</span>
-      <span class="txt"><b>${wagonName(w)} <span class="num" style="font-weight:500;color:var(--muted)">${Math.max(0, w.hp)}/${w.max}</span></b><span class="d">${WAGON_TYPES[w.type].perk}</span></span>
-      <button class="small-btn" data-act="front" data-arg="${i}" ${i === 0 ? 'disabled' : ''} aria-label="Move ${wagonName(w)} forward">${icon('up')}</button>
-    </div>`).join('');
+  const nodes = [`<div class="node ${p.row === -1 ? 'here' : 'visited'}" style="left:${X(1)}%;top:${Y(-1)}%"><span class="disc">${icon('flag')}</span><span class="nl">Start</span></div>`];
+  leg.rows.forEach((row, r) => row.forEach((n) => nodes.push(node(r, n.lane, n.type))));
+  nodes.push(node(3, 1, 'boss'));
   return `<section class="panel">
-    <h1>${p.row === -1 ? `Set out across ${LEGS[S.leg].name}` : 'Choose the next stop'}</h1>
-    <p>Tap a glowing stop. Each step on the road costs 1 water${S.water < 1 ? '. You have none, so every wagon will take 3 damage' : ''}.</p>
+    <p>${S.log[0] || ''} Tap a glowing stop to move on.</p>
     <div class="map">
       <svg class="lines" viewBox="0 0 300 340" preserveAspectRatio="none" aria-hidden="true">${lines.join('')}</svg>
       ${nodes.join('')}
     </div>
-    <div class="legend">${['ambush', 'oasis', 'market', 'ruins', 'storm'].map((t) => `<span>${icon(NODE_INFO[t].icon)} <b>${NODE_INFO[t].label}</b> ${NODE_INFO[t].desc}</span>`).join('')}</div>
-    <div class="card scout"><div class="label"><span>Scout report: ${boss.name}</span><span class="num">${boss.hp} health</span></div><p>${boss.blurb} Its moves, in order, then repeating and getting stronger:</p><ol>${moves}</ol></div>
-    <div class="label"><span>Wagon order</span><span>Enemies hit the rear first</span></div>
-    <div class="wlist">${wl}</div>
-    <ul class="log">${S.log.slice(0, 3).map((l) => `<li>${l}</li>`).join('')}</ul>
   </section>`;
 }
 
@@ -1834,79 +1492,36 @@ function choice(act, arg, ic, cls, title, desc, opts = {}) {
   </button>`;
 }
 
-function rewardHtml() {
-  return `<section class="panel">
-    <h1>${ENEMY_TYPES[S.fight.kind].name} defeated</h1>
-    <p>Your crew is back on their feet and patched every wagon for 2. Choose one more thing before you move on.</p>
-    <div class="choices">
-      ${choice('reward', 'repair', 'shd', 't-shd', 'Patch the wagons', '+8 health to every wagon, including wrecked ones.')}
-      ${choice('reward', 'water', 'water', 't-water', 'Look for water', `+3 water. You have ${S.water}.`)}
-      ${choice('reward', 'loot', 'coin', 't-coin', 'Search the wreckage', `+5 coin. You have ${S.coin}.`)}
-    </div>
-    <ul class="log">${S.log.slice(0, 3).map((l) => `<li>${l}</li>`).join('')}</ul>
-  </section>`;
-}
-
 function campHtml() {
   const full = S.crew.length >= MAX_CREW;
   return `<section class="panel">
     <h1>${ENEMY_TYPES[S.fight.kind].name} is beaten</h1>
-    <p>You made it across ${LEGS[S.leg].name}. Camp for the night, then set out for ${LEGS[S.leg + 1].name}. Choose one.</p>
+    <p>The caravan is fully repaired. Choose one before you set out for ${LEGS[S.leg + 1].name}.</p>
     <div class="choices">
-      ${choice('camp', 'rest', 'shd', 't-shd', 'Full repairs', 'Every wagon goes back to full health.')}
-      ${choice('camp', 'recruit', personSvg('#ef8a26'), '', 'Recruit a traveller', full ? 'Your caravan is full.' : 'A random new crew member joins for free.', { disabled: full })}
-      ${choice('camp', 'train', 'atk', 't-atk', 'Train', 'Upgrade any one face for free.')}
-    </div>
-    <ul class="log">${S.log.slice(0, 3).map((l) => `<li>${l}</li>`).join('')}</ul>
-  </section>`;
-}
-
-function oasisHtml() {
-  return `<section class="panel">
-    <h1>An oasis</h1>
-    <p>Shade, palms and a clear pool. You have time for one thing.</p>
-    <div class="choices">
-      ${choice('oasis', 'water', 'water', 't-water', 'Fill the water skins', `+5 water. You have ${S.water}.`)}
-      ${choice('oasis', 'rest', 'shd', 't-shd', 'Rest in the shade', '+6 health to every wagon, including wrecked ones.')}
-    </div>
-  </section>`;
-}
-
-function ruinsHtml() {
-  return `<section class="panel">
-    <h1>Half-buried ruins</h1>
-    <p>An old statue watches the road. Something glints in the sand under the pillars.</p>
-    <div class="choices">
-      ${choice('ruins', 'dig', 'coin', 't-coin', 'Dig under the pillars', 'Even odds: a chest of 10 coin, or the tomb guards wake up and fight.')}
-      ${choice('ruins', 'pray', 'water', 't-water', 'Leave water at the statue', 'Costs 2 water. A random crew member\'s weakest face improves.', { disabled: S.water < 2 })}
-      ${choice('ruins', 'leave', 'flag', '', 'Walk on', 'Nothing gained, nothing lost.')}
+      ${choice('camp', 'recruit', personSvg('#ef8a26'), '', 'Recruit a traveller', full ? 'Your caravan is full.' : 'A random new crew member joins.', { disabled: full })}
+      ${choice('camp', 'train', 'atk', 't-atk', 'Train', 'Upgrade any one face.')}
     </div>
   </section>`;
 }
 
 function marketHtml() {
   const m = S.market;
-  const items = [];
-  for (const id of m.hires) {
+  const items = m.hires.map((id) => {
     const d = CREW_POOL[id], key = `hire:${id}`, bought = m.bought.includes(key);
-    const faces = d.faces.map(parseFace).map(faceLabel).join(', ');
-    items.push(choice('buy', key, personSvg(d.color), '', `Hire ${d.name} the ${d.role}`, bought ? 'Hired.' : S.crew.length >= MAX_CREW ? 'Your caravan is full.' : faces,
-      { price: PRICES.hire, done: bought, disabled: bought || S.coin < PRICES.hire || S.crew.length >= MAX_CREW }));
-  }
+    return choice('buy', key, personSvg(d.color), '', `Hire ${d.name} the ${d.role}`, bought ? 'Hired.' : d.faces.map(parseFace).map(faceLabel).join(', '),
+      { price: PRICES.hire, done: bought, disabled: bought || S.coin < PRICES.hire || S.crew.length >= MAX_CREW });
+  });
   if (m.wagon) {
     const key = `wagon:${m.wagon}`, bought = m.bought.includes(key), def = WAGON_TYPES[m.wagon];
-    items.push(choice('buy', key, 'cart', '', `Buy a ${def.name}`, bought ? 'Bought.' : S.wagons.length >= MAX_WAGONS ? 'You already have 4 wagons.' : `${def.perk} ${def.max} health.`,
+    items.push(choice('buy', key, 'cart', '', `Buy a ${def.name}`, bought ? 'Bought.' : `+${def.hp} caravan health. ${def.perk}`,
       { price: PRICES.wagon, done: bought, disabled: bought || S.coin < PRICES.wagon || S.wagons.length >= MAX_WAGONS }));
   }
-  items.push(choice('buy', 'upgrade', 'atk', 't-atk', 'Upgrade a face', 'Pick any crew member and face: +2, or a blank becomes Attack 3.', { price: S.upgradeCost, disabled: S.coin < S.upgradeCost }));
-  items.push(choice('buy', 'water', 'water', 't-water', 'Buy water', '+3 water.', { price: PRICES.water, disabled: S.coin < PRICES.water }));
-  items.push(choice('buy', 'repair', 'shd', 't-shd', 'Hire the wainwright', '+5 health to every wagon.', { price: PRICES.repair, disabled: S.coin < PRICES.repair }));
+  items.push(choice('buy', 'upgrade', 'atk', 't-atk', 'Upgrade a face', '+2 to one face, or a blank becomes Attack 3.', { price: S.upgradeCost, disabled: S.coin < S.upgradeCost }));
+  items.push(choice('buy', 'repair', 'heal', 't-heal', 'Repairs', `+${REPAIR} caravan health.`, { price: PRICES.repair, disabled: S.coin < PRICES.repair || S.hp >= maxHp() }));
   return `<section class="panel">
-    <h1>A market in the dunes</h1>
-    <p>You have <b class="num">${S.coin}</b> coin. Buy as much as you can afford.</p>
+    <h1>Market</h1>
     <div class="choices">${items.join('')}</div>
-    <ul class="log">${S.log.slice(0, 2).map((l) => `<li>${l}</li>`).join('')}</ul>
-    <button class="btn primary solo" data-act="leave">Leave the market</button>
+    <button class="btn primary solo" data-act="leave">Leave</button>
   </section>`;
 }
 
@@ -1916,57 +1531,45 @@ function upgradeHtml() {
   if (!u.crew) {
     return `<section class="panel">
       <h1>Who trains?</h1>
-      <p>Choose a crew member, then the face to improve. ${cost}.</p>
-      <div class="roster">${S.crew.map((c) => `<button class="crew" data-act="upCrew" data-arg="${c.id}">
-        <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
-        <span class="faces">${miniFaces(c)}</span></button>`).join('')}</div>
+      <p>${cost}.</p>
+      <div class="roster">${S.crew.map((c) => crewCard(c, 'upCrew')).join('')}</div>
       <button class="btn solo" data-act="upBack">Back</button>
     </section>`;
   }
   const c = crewById(u.crew);
   return `<section class="panel">
-    <h1>Upgrade one of ${c.name}'s faces</h1>
-    <p>Attack, Block, Coin and Water faces get +2. A blank becomes Attack 3. Reroll and Mend faces can't be upgraded. ${cost}.</p>
+    <h1>Pick one of ${c.name}'s faces</h1>
+    <p>It gets +2, or a blank becomes Attack 3. ${cost}.</p>
     <div class="card" style="padding:12px"><div class="faces" style="gap:8px">${miniFaces(c, 'upFace')}</div></div>
-    <button class="btn solo" data-act="upBack">Choose someone else</button>
+    <button class="btn solo" data-act="upBack">Back</button>
   </section>`;
 }
 
 function endHtml(won) {
   return `<section class="panel">
-    <h1>${won ? 'You reached the city' : `Lost on ${LEGS[S.leg].name}`}</h1>
-    <p>${won ? 'The Gate Warden fell and the caravan rolled through the gate. Every run starts from scratch, so try a different route and crew next time.' : `${S.loseReason} The caravan scatters into the sand.`}</p>
+    <h1>${won ? 'You reached the city' : 'The caravan fell'}</h1>
+    <p>${won ? 'The Gate Warden fell and the caravan rolled through the gate.' : `${S.log[0]} Every run starts fresh, so try a different route and crew.`}</p>
     <div class="stats">
       <div class="stat"><b class="num">${S.stats.fights}</b><span>fights</span></div>
       <div class="stat"><b class="num">${S.stats.dmg}</b><span>damage dealt</span></div>
       <div class="stat"><b class="num">${S.stats.coinEarned}</b><span>coin earned</span></div>
     </div>
-    <ul class="log">${S.log.slice(0, 5).map((l) => `<li>${l}</li>`).join('')}</ul>
     <button class="btn primary solo" data-act="newRun">Ride again</button>
   </section>`;
 }
 
 function titleHtml() {
   const s = loadSave();
-  const cont = s ? `<button class="btn primary solo" data-act="resume">Continue run<small>Leg ${s.leg + 1}: ${LEGS[s.leg].name} · ${s.crew.length} crew · ${s.coin} coin</small></button>` : '';
+  const cont = s ? `<button class="btn primary solo" data-act="resume">Continue<small>Leg ${s.leg + 1}: ${LEGS[s.leg].name}</small></button>` : '';
   return `<section class="panel hero">
     <h1>Cross the desert, one roll at a time</h1>
-    <p>Lead a merchant caravan to the city on the far side of the sand. Your crew are your dice. Each turn, choose who rolls and spend the faces to fight, block, trade and survive.</p>
-    <div class="cta">${cont}<button class="btn ${s ? '' : 'primary'} solo" data-act="newRun">${s ? 'Start a new run' : 'Start a run'}<small>Three legs, about 45 minutes</small></button></div>
-    <details class="help"><summary>How a run works</summary><ul>
-      <li>Pick a route across each leg's map: ambushes, oases, markets, ruins and sandstorms.</li>
-      <li>Each leg ends with a boss. The Gate Warden waits at the end of the third.</li>
-      <li>Spend coin at markets to hire crew, buy wagons and upgrade faces.</li>
-      <li>Your progress saves after every step, so you can close the page and come back.</li>
-    </ul></details>
+    <p>Your crew are your dice. In each fight, choose who rolls, keep the faces you like, reroll the rest, then end your turn. Attack hurts the enemy, Block stops its next hit, Coin buys things at markets and Mend repairs the caravan.</p>
+    <div class="cta">${cont}<button class="btn ${s ? '' : 'primary'} solo" data-act="newRun">${s ? 'New run' : 'Start'}</button></div>
     <p class="credit">3D models by Kenney (kenney.nl), CC0.</p>
   </section>`;
 }
 
-const VIEWS = {
-  map: mapHtml, fight: fightHtml, storm: stormHtml, reward: rewardHtml, camp: campHtml, oasis: oasisHtml,
-  ruins: ruinsHtml, market: marketHtml, upgrade: upgradeHtml, victory: () => endHtml(true), defeat: () => endHtml(false),
-};
+const VIEWS = { map: mapHtml, fight: fightHtml, camp: campHtml, market: marketHtml, upgrade: upgradeHtml, victory: () => endHtml(true), defeat: () => endHtml(false) };
 
 function render() {
   document.getElementById('top').innerHTML = headerHtml();
@@ -1974,8 +1577,7 @@ function render() {
   document.getElementById('app').innerHTML = S ? VIEWS[S.screen]() : titleHtml();
   if (Scene) { Scene.play(pendingFx); Scene.sync(S); }
   pendingFx = [];
-  const R = S && roller();
-  if (R) for (const d of R.dice) d.fresh = false;
+  if (S && S.fight) for (const d of S.fight.dice) d.fresh = false;
   save();
 }
 
