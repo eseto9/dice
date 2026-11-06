@@ -7,40 +7,28 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Rakkas&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap">
 <style>
-/* Layout: one column read like a road — enemy ahead, caravan in the middle, dice tray, crew roster, sticky action bar at the bottom. Dark-first: caravans travel by night. */
+/* Layout: one light column. A low-poly diorama of the fight sits on top, then the enemy's move, wagons, dice, crew, and a sticky action bar.
+   Single light look on purpose: clean white page, beige icon tiles, orange accent, soft shadows. */
 :root {
-  --bg: #15162b;
-  --surface: #1f2142;
-  --surface-2: #2a2d57;
-  --line: #3b3e70;
-  --ink: #f1e8d4;
-  --muted: #a9a5c4;
-  --accent: #eba63d;
-  --accent-ink: #1b1428;
-  --atk: #f2775f;
-  --shd: #74abf3;
-  --coin: #f2cb52;
-  --water: #4fd3c6;
-  --heal: #80da93;
-  --rr: #c6a0f6;
-  --font-display: 'Rakkas', 'Georgia', serif;
-  --font-body: 'Alegreya Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #e7e2ee; --surface: #f8f6fb; --surface-2: #eee9f5; --line: #cec5dc;
-    --ink: #1f1b37; --muted: #5f597a; --accent: #a95f12; --accent-ink: #fff9ef;
-    --atk: #c13b25; --shd: #2a60b6; --coin: #8f6200; --water: #0d7d73; --heal: #2c8543; --rr: #7547bd;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #e7e2ee; --surface: #f8f6fb; --surface-2: #eee9f5; --line: #cec5dc;
-  --ink: #1f1b37; --muted: #5f597a; --accent: #a95f12; --accent-ink: #fff9ef;
-  --atk: #c13b25; --shd: #2a60b6; --coin: #8f6200; --water: #0d7d73; --heal: #2c8543; --rr: #7547bd;
+  --bg: #fafaf8;
+  --card: #ffffff;
+  --tile: #f3ede3;
+  --line: #e9e4db;
+  --ink: #262b29;
+  --muted: #6a6f6b;
+  --accent: #ef8a26;
+  --accent-ink: #ffffff;
+  --atk: #d4532d;
+  --shd: #477b9b;
+  --coin: #b9860c;
+  --water: #2f8ea6;
+  --heal: #5f9334;
+  --rr: #8466ad;
+  --shadow: 0 1px 0 rgba(70, 50, 20, 0.05), 0 6px 18px rgba(70, 50, 20, 0.08);
+  --font-display: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color-scheme: light;
 }
 
@@ -55,157 +43,188 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 button { font: inherit; color: inherit; }
-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .num { font-variant-numeric: tabular-nums; }
 
-.app {
-  max-width: 560px;
+.shell {
+  max-width: 600px;
   margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 12px 0;
+  padding-block: 14px 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
+.stack { display: flex; flex-direction: column; gap: 16px; }
 
 /* Header */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.brand { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.02em; color: var(--accent); line-height: 1; }
+.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; line-height: 1; letter-spacing: -0.01em; display: flex; flex-direction: column; gap: 8px; }
+.brand::after { content: ""; width: 40px; height: 5px; border-radius: 3px; background: var(--accent); }
 .res { display: flex; gap: 8px; }
-.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-weight: 700; font-variant-numeric: tabular-nums; }
-.chip.water { color: var(--water); }
-.chip.coin { color: var(--coin); }
-.chip.shd { color: var(--shd); }
-.road { display: flex; align-items: center; gap: 6px; width: 100%; font-size: 0.8rem; color: var(--muted); }
-.road .leg { flex: 1; height: 2px; background: var(--line); }
-.road .leg.done { background: var(--accent); }
-.road .stop { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
-.road .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line); }
-.road .stop.done .dot { background: var(--accent); border-color: var(--accent); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-weight: 700; font-variant-numeric: tabular-nums; }
+.chip.water .ic { color: var(--water); }
+.chip.coin .ic { color: var(--coin); }
+.road { display: flex; align-items: center; gap: 6px; width: 100%; font-size: 0.82rem; color: var(--muted); }
+.road .leg { flex: 1; height: 3px; border-radius: 2px; background: var(--line); }
+.road .stop { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.road .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+.road .stop.done .dot { background: var(--accent); }
 .road .stop.here { color: var(--ink); font-weight: 700; }
-.road .stop.here .dot { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
-@media (max-width: 420px) { .road .stop:not(.here) .label { display: none; } }
+.road .stop.here .dot { background: var(--card); border: 3px solid var(--accent); }
+@media (max-width: 430px) { .road .stop:not(.here) .label { display: none; } }
 
-/* Enemy */
-.enemy { display: flex; flex-direction: column; gap: 8px; }
-.enemy-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.enemy h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; margin: 0; line-height: 1.05; text-wrap: balance; }
-.hpnum { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--atk); white-space: nowrap; }
-.blurb { margin: 0; color: var(--muted); font-size: 0.95rem; }
-.bar { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
-.bar > span { display: block; height: 100%; background: var(--atk); transition: width 300ms ease; }
+/* Diorama */
+.scene {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 10.5;
+  max-height: 380px;
+  margin-inline: auto;
+}
+.scene canvas { display: block; width: 100% !important; height: 100% !important; }
+.scene .overlay { position: absolute; left: 0; top: 0; pointer-events: none; }
+.hpcard { background: var(--card); box-shadow: var(--shadow); border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; min-width: 150px; }
+.hpcard .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.hpcard b { font-family: var(--font-display); font-weight: 600; font-size: 0.98rem; }
+.hpcard .hp { font-weight: 700; color: var(--atk); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.hpcard .block { font-size: 0.78rem; color: var(--shd); font-weight: 700; display: flex; align-items: center; gap: 4px; }
+.bar { height: 7px; border-radius: 4px; background: var(--tile); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--atk); border-radius: 4px; transition: width 400ms ease; }
 .bar.fill-acc > span { background: var(--accent); }
-.intent { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--atk) 45%, var(--line)); }
-.intent .big { grid-row: span 3; font-size: 1.9rem; color: var(--atk); display: flex; }
-.intent .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-.intent strong { font-size: 1.1rem; }
-.intent .detail { font-size: 0.9rem; color: var(--muted); }
-.intent.cancelled { border-color: var(--line); opacity: 0.6; }
+.bar.fill-ok > span { background: var(--heal); }
+
+/* Shared */
+.label { font-size: 0.78rem; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.label > span:first-child { display: flex; align-items: center; gap: 8px; color: var(--ink); }
+.label > span:first-child::before { content: ""; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); }
+.tile { background: var(--tile); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
+
+/* Intent */
+.intent { display: flex; gap: 14px; align-items: center; padding: 12px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+.intent .tile { width: 56px; height: 56px; font-size: 1.7rem; color: var(--atk); }
+.intent .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.intent .eyebrow { font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+.intent strong { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.25; }
+.intent .detail { font-size: 0.88rem; color: var(--muted); }
+.intent.cancelled { opacity: 0.55; }
 .intent.cancelled strong { text-decoration: line-through; }
 
-/* Caravan */
-.caravan { display: flex; flex-direction: column; gap: 6px; }
-.section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+/* Wagons */
 .wagons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.wagon { padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.wagon .wname { font-weight: 800; display: flex; justify-content: space-between; gap: 6px; }
-.wagon .perk { font-size: 0.82rem; color: var(--muted); }
-.wagon.rear { border-color: color-mix(in srgb, var(--atk) 55%, var(--line)); }
-.tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 6px; border-radius: 4px; white-space: nowrap; align-self: center; }
-.tag.target { color: var(--atk); background: color-mix(in srgb, var(--atk) 16%, transparent); }
-.tag.out { color: var(--muted); background: var(--surface-2); }
-.wagon.dead { opacity: 0.45; }
+.wagon { padding: 10px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; min-width: 0; border: 2px solid transparent; }
+.wagon .wtop { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.wagon .wname { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; }
+.wagon .perk { font-size: 0.8rem; color: var(--muted); }
+.wagon.rear { border-color: color-mix(in srgb, var(--atk) 35%, transparent); }
+.wagon.dead { opacity: 0.5; }
+.tag { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tag.target { color: var(--atk); background: color-mix(in srgb, var(--atk) 12%, transparent); }
+.tag.out { color: var(--muted); background: var(--tile); }
+.tag.go { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 
-/* Dice tray */
+/* Dice */
 .tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .slot { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .die {
-  aspect-ratio: 1; max-width: 100%; width: 100%;
-  border-radius: 16px; border: 2px solid var(--line); background: var(--surface-2);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  aspect-ratio: 1; width: 100%; max-width: 100%;
+  border-radius: 18px; border: 0; background: var(--card);
+  box-shadow: 0 4px 0 #e6dccb, 0 10px 20px rgba(70, 50, 20, 0.1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   cursor: pointer; position: relative; padding: 4px;
-  box-shadow: 0 3px 0 var(--line);
 }
-.die .face { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: clamp(1.6rem, 7vw, 2.3rem); line-height: 1; }
-.die .face .ic { font-size: 0.8em; }
-.die .who { font-size: 0.72rem; color: var(--muted); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.die.held { border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
-.die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; }
-.die.empty { cursor: default; border-style: dashed; box-shadow: none; background: transparent; color: var(--muted); }
-.die.empty .who { color: var(--ink); font-size: 0.85rem; }
-.die.ready { border-style: solid; background: var(--surface); }
-.die.ready .face { font-size: 1.3rem; color: var(--muted); }
+.die .face { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 7vw, 2.2rem); line-height: 1; }
+.die .face .ic { font-size: 0.75em; }
+.die .who { font-size: 0.72rem; color: var(--muted); font-weight: 700; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.die.held { box-shadow: 0 0 0 3px var(--accent), 0 4px 0 3px #f3c08d, 0 10px 20px rgba(70, 50, 20, 0.1); }
+.die .held-tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.66rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
+.die.empty { cursor: default; box-shadow: none; background: transparent; border: 2px dashed var(--line); }
+.die.empty .who { color: var(--muted); }
+.die.ready { background: var(--tile); border: 0; box-shadow: none; }
+.die.ready .face { color: #c9b89a; font-size: 1.5rem; }
+.die.ready .who { color: var(--ink); }
 .t-atk { color: var(--atk); } .t-shd { color: var(--shd); } .t-coin { color: var(--coin); }
-.t-water { color: var(--water); } .t-heal { color: var(--heal); } .t-rr { color: var(--rr); } .t-blank { color: var(--muted); }
-.pour { border: 1px solid var(--line); background: var(--surface); color: var(--water); border-radius: 8px; padding: 4px 0; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
-.pour:disabled { opacity: 0.35; cursor: default; }
-.pour.done { color: var(--accent-ink); background: var(--water); border-color: var(--water); opacity: 1; }
+.t-water { color: var(--water); } .t-heal { color: var(--heal); } .t-rr { color: var(--rr); } .t-blank { color: #b9b2a6; }
+.pour { border: 0; background: var(--card); box-shadow: var(--shadow); color: var(--water); border-radius: 10px; padding: 5px 0; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
+.pour:disabled { opacity: 0.35; cursor: default; box-shadow: none; background: transparent; }
+.pour.done { color: #fff; background: var(--water); opacity: 1; }
 .tumble { animation: tumble 420ms cubic-bezier(.3,1.4,.5,1); }
-@keyframes tumble { 0% { transform: rotate(-200deg) scale(.6); opacity: 0.2; } 100% { transform: none; opacity: 1; } }
+@keyframes tumble { 0% { transform: rotate(-160deg) scale(.6); opacity: 0.2; } 100% { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .tumble { animation: none; } .bar > span { transition: none; } }
 
 .preview { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 700; font-size: 0.95rem; min-height: 1.4em; }
 .preview span { display: inline-flex; align-items: center; gap: 4px; }
 .preview .hint { font-weight: 400; color: var(--muted); }
+.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 0.88rem; color: var(--muted); }
+.log li:first-child { color: var(--ink); font-weight: 500; }
 
-.log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 0.88rem; color: var(--muted); }
-.log li:first-child { color: var(--ink); }
-
-/* Roster */
+/* Crew */
 .roster { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media (min-width: 540px) { .roster { grid-template-columns: repeat(3, 1fr); } }
-.crew { text-align: left; padding: 10px; border-radius: 12px; background: var(--surface); border: 2px solid var(--line); display: flex; flex-direction: column; gap: 6px; cursor: pointer; min-width: 0; }
-.crew .cname { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-.crew .cname b { font-size: 1.05rem; }
+@media (min-width: 560px) { .roster { grid-template-columns: repeat(3, 1fr); } }
+.crew { text-align: left; padding: 10px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); border: 2px solid transparent; display: flex; flex-direction: column; gap: 8px; cursor: pointer; min-width: 0; }
+.crew .head { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.crew .tile { width: 40px; height: 40px; border-radius: 10px; }
+.crew .tile svg { width: 26px; height: 26px; }
+.crew .nm { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.crew .nm b { font-family: var(--font-display); font-weight: 600; font-size: 1rem; line-height: 1.15; }
 .crew .role { font-size: 0.78rem; color: var(--muted); }
-.crew.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.crew .head .tag { align-self: flex-start; }
+.crew.sel { border-color: var(--accent); }
 .crew.ko { opacity: 0.45; cursor: not-allowed; }
 .crew:disabled { cursor: default; }
 .faces { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
-.mini { aspect-ratio: 1; max-width: 100%; border-radius: 5px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.72rem; font-weight: 800; }
-.mini .ic { font-size: 0.8rem; }
+.mini { aspect-ratio: 1; max-width: 100%; border-radius: 6px; background: var(--tile); display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.7rem; font-weight: 700; }
+.mini .ic { font-size: 0.78rem; }
 
-/* Action bar */
+/* Actions */
 .actions {
   position: sticky; bottom: 0; z-index: 5;
   margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
   margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
   padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--line);
   display: flex; gap: 8px;
 }
-.btn { flex: 1; min-height: 50px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-weight: 800; font-size: 1rem; cursor: pointer; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
-.btn small { font-weight: 500; font-size: 0.75rem; color: var(--muted); }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); flex: 1.4; }
-.btn.primary small { color: inherit; opacity: 0.8; }
+.btn { flex: 1; min-height: 52px; border-radius: 14px; border: 0; background: var(--card); box-shadow: var(--shadow); font-family: var(--font-display); font-weight: 600; font-size: 1rem; cursor: pointer; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; }
+.btn small { font-family: var(--font-body); font-weight: 500; font-size: 0.75rem; color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); flex: 1.4; box-shadow: 0 4px 0 #c96d14, 0 8px 16px rgba(239, 138, 38, 0.25); }
+.btn.primary small { color: inherit; opacity: 0.85; }
 .btn:disabled { opacity: 0.4; cursor: default; }
+.btn:not(:disabled):active { transform: translateY(2px); }
 
-details.help { font-size: 0.92rem; color: var(--muted); }
+details.help { font-size: 0.92rem; color: var(--muted); padding-bottom: 6px; }
 details.help summary { cursor: pointer; font-weight: 700; color: var(--ink); }
 details.help ol { padding-left: 20px; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
 
-/* Between-stop screens */
-.panel { display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
-.panel h1 { font-family: var(--font-display); font-weight: 400; font-size: 2.2rem; margin: 0; line-height: 1.05; text-wrap: balance; }
+/* Camp and end screens */
+.panel { display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; }
+.panel h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; margin: 0; line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
 .panel p { margin: 0; color: var(--muted); max-width: 60ch; }
 .choices { display: grid; gap: 10px; }
-.choice { text-align: left; padding: 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; }
-.choice .big { grid-row: span 2; font-size: 1.6rem; display: flex; }
-.choice b { font-size: 1.05rem; }
-.choice span { color: var(--muted); font-size: 0.9rem; }
+.choice { text-align: left; padding: 12px; border-radius: 16px; border: 2px solid transparent; background: var(--card); box-shadow: var(--shadow); cursor: pointer; display: flex; gap: 14px; align-items: center; }
+.choice .tile { width: 52px; height: 52px; font-size: 1.5rem; }
+.choice .txt { display: flex; flex-direction: column; gap: 2px; }
+.choice b { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.choice span.d { color: var(--muted); font-size: 0.88rem; }
 .choice:hover { border-color: var(--accent); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.stat { padding: 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
-.stat b { display: block; font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; }
+.stat { padding: 12px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
+.stat b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; }
 .stat span { font-size: 0.8rem; color: var(--muted); }
 </style>
 </head>
 <body>
-<div class="app" id="app"></div>
+<div class="shell" id="root">
+  <div id="top"></div>
+  <div class="scene" id="scene"><div class="overlay" id="overlay"></div></div>
+  <div class="stack" id="app"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 
@@ -218,7 +237,6 @@ const ICONS = {
   heal: '<path d="M12 5v14M5 12h14"/>',
   water: '<path d="M12 3.5c3 4.6 6 7.6 6 11.5a6 6 0 0 1-12 0c0-3.9 3-6.9 6-11.5z"/>',
   blank: '<path d="M7 12h10"/>',
-  bribe: '<path d="M4 8h16v10H4zM4 12h16M9 8V6h6v2"/>',
 };
 const icon = (t) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[t]}</svg>`;
 const FACE_NAME = { atk: 'Attack', shd: 'Block', coin: 'Coin', rr: 'Reroll', heal: 'Mend', water: 'Water', blank: 'Blank' };
@@ -230,27 +248,28 @@ function parseFace(s) {
   return { t: { a: 'atk', s: 'shd', c: 'coin', w: 'water' }[s[0]], v: Number(s.slice(1)) };
 }
 
+// Robe colours are shared by the crew cards and the 3D figures.
 const CREW_DEFS = [
-  { id: 'amir', name: 'Amir', role: 'Guard', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
-  { id: 'lena', name: 'Lena', role: 'Guard', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
-  { id: 'tavi', name: 'Tavi', role: 'Scout', faces: ['r', 'r', 'a2', 's2', 'a1', 'w1'] },
-  { id: 'oskar', name: 'Oskar', role: 'Trader', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 'w1'] },
-  { id: 'noor', name: 'Noor', role: 'Medic', faces: ['h', 'h', 's3', 's2', 'w2', 'a1'] },
-  { id: 'zane', name: 'Zane', role: 'Fire-eater', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
+  { id: 'amir', name: 'Amir', role: 'Guard', color: '#4f7f9c', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
+  { id: 'lena', name: 'Lena', role: 'Guard', color: '#3f6a86', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
+  { id: 'tavi', name: 'Tavi', role: 'Scout', color: '#7f9c45', faces: ['r', 'r', 'a2', 's2', 'a1', 'w1'] },
+  { id: 'oskar', name: 'Oskar', role: 'Trader', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 'w1'] },
+  { id: 'noor', name: 'Noor', role: 'Medic', color: '#ece6da', faces: ['h', 'h', 's3', 's2', 'w2', 'a1'] },
+  { id: 'zane', name: 'Zane', role: 'Fire-eater', color: '#d4532d', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
 ];
 
 const ENEMIES = [
-  { name: 'Dune Bandits', blurb: 'Raiders on sand-skiffs. They hit the back of the line first.', hp: 28,
+  { kind: 'bandits', name: 'Dune Bandits', blurb: 'Raiders on a sand-skiff. They hit the back of the line first.', hp: 28,
     pattern: [{ k: 'atk', v: 6 }, { k: 'snipe', v: 5 }, { k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 3 }] },
-  { name: 'Sand Wraith', blurb: 'A storm with a face. It drinks whatever water you carry.', hp: 36,
+  { kind: 'wraith', name: 'Sand Wraith', blurb: 'A storm with a face. It drinks whatever water you carry.', hp: 36,
     pattern: [{ k: 'atk', v: 7 }, { k: 'drain', v: 2, dmg: 4 }, { k: 'snipe', v: 6 }, { k: 'atk', v: 10 }] },
-  { name: 'The Gate Warden', blurb: 'A brass colossus at the city gate. Get past it and the road is yours.', hp: 44,
+  { kind: 'warden', name: 'The Gate Warden', blurb: 'A brass colossus at the city gate. Get past it and the road is yours.', hp: 44,
     pattern: [{ k: 'guard', v: 6, dmg: 4 }, { k: 'atk', v: 9 }, { k: 'snipe', v: 8 }, { k: 'atk', v: 13 }] },
 ];
 
 const WAGON_DEFS = [
-  { id: 'water', name: 'Water Cart', max: 14, perk: 'Lets you pour water on a die for +2.' },
-  { id: 'armory', name: 'Armoury', max: 14, perk: 'Guards get +1 on Attack faces.' },
+  { id: 'water', name: 'Water Cart', max: 14, perk: 'Pour water on a die for +2.' },
+  { id: 'armory', name: 'Armoury', max: 14, perk: 'Guards get +1 on Attack.' },
 ];
 
 const DICE_PER_TURN = 4;
@@ -259,6 +278,7 @@ const ROAD_WATER = 2;
 
 /* ---------- State ---------- */
 let S;
+let pendingFx = [];
 const rand = (n) => Math.floor(Math.random() * n);
 const crewById = (id) => S.crew.find((c) => c.id === id);
 const wagonAlive = (id) => S.wagons.some((w) => w.id === id && w.hp > 0);
@@ -278,7 +298,8 @@ function newRun() {
 function startFight() {
   const e = ENEMIES[S.stop];
   S.fight = {
-    enemy: { name: e.name, blurb: e.blurb, hp: e.hp, max: e.hp, block: 0, pattern: e.pattern, step: 0 },
+    id: Math.random(),
+    enemy: { kind: e.kind, name: e.name, blurb: e.blurb, hp: e.hp, max: e.hp, block: 0, pattern: e.pattern, step: 0 },
     intent: null, knocked: [], selected: ['amir', 'lena', 'noor', 'zane'], dice: [],
     rerolls: 0, phase: 'pick', bribeCost: 6, turn: 1,
   };
@@ -306,8 +327,8 @@ function intentInfo(it) {
   const rn = rear ? rear.name : 'caravan';
   switch (it.k) {
     case 'atk': return { icon: 'atk', title: `Attack the ${rn} for ${it.v}`, detail: 'Block reduces the damage.' };
-    case 'guard': return { icon: 'shd', title: `Brace, then hit the ${rn} for ${it.dmg}`, detail: `Blocks ${it.v} of your damage this turn.` };
-    case 'drain': return { icon: 'water', title: `Steal ${it.v} water, hit the ${rn} for ${it.dmg}`, detail: 'Spend water now or lose it.' };
+    case 'guard': return { icon: 'shd', title: `Brace, then hit the ${rn} for ${it.dmg}`, detail: `Absorbs ${it.v} of your damage this turn.` };
+    case 'drain': return { icon: 'water', title: `Steal ${it.v} water, hit the ${rn} for ${it.dmg}`, detail: 'Spend your water now or lose it.' };
     case 'snipe': {
       const n = crewById(it.target).name;
       return { icon: 'atk', title: `Snipe ${n} for ${it.v}`, detail: `If ${n} rolls and you block less than ${it.v}, ${n} is knocked out. If ${n} stays back, the ${rn} takes it.` };
@@ -420,9 +441,11 @@ function travel() {
 }
 
 function hitCaravan(dmg, state) {
+  const target = rearWagon();
   const blocked = Math.min(state.shield, dmg);
   state.shield -= blocked;
   let rem = dmg - blocked;
+  if (target) pendingFx.push({ k: 'eshot', to: 'wagon', id: target.id, blocked: rem === 0 });
   const parts = [];
   if (blocked) parts.push(`${blocked} blocked`);
   while (rem > 0) {
@@ -431,7 +454,7 @@ function hitCaravan(dmg, state) {
     const take = Math.min(rem, w.hp);
     w.hp -= take; rem -= take;
     parts.push(`${w.name} −${take}`);
-    if (w.hp === 0) parts.push(`${w.name} destroyed`);
+    if (w.hp === 0) parts.push(`${w.name} wrecked`);
   }
   return parts.join(', ');
 }
@@ -444,6 +467,7 @@ function resolveTurn() {
   S.stats.dmg += dealt; S.stats.turns++;
   S.coin += t.coin; S.stats.coinEarned += t.coin;
   S.water += t.water;
+  if (t.atk) pendingFx.push({ k: 'pshot', ids: f.dice.filter((d) => d.face.t === 'atk').map((d) => d.crew) });
   const state = { shield: t.shd };
   for (let i = 0; i < t.heal; i++) {
     if (f.knocked.length) { const id = f.knocked.pop(); log(`Noor patched up ${crewById(id).name}.`); }
@@ -455,11 +479,11 @@ function resolveTurn() {
   if (t.water) bits.push(`+${t.water} water`);
   log(bits.join(', ') + '.');
 
-  if (e.hp <= 0) { win(); return; }
+  if (e.hp <= 0) { pendingFx.push({ k: 'edown' }); win(); return; }
 
   if (!it.cancelled) {
-    if (it.k === 'atk') log(`${e.name} attack: ${hitCaravan(it.v, state)}.`);
-    if (it.k === 'guard') log(`${e.name} strike: ${hitCaravan(it.dmg, state)}.`);
+    if (it.k === 'atk') log(`${e.name}: ${hitCaravan(it.v, state)}.`);
+    if (it.k === 'guard') log(`${e.name}: ${hitCaravan(it.dmg, state)}.`);
     if (it.k === 'drain') {
       const lost = Math.min(S.water, it.v); S.water -= lost;
       log(`Lost ${lost} water. ${hitCaravan(it.dmg, state)}.`);
@@ -467,13 +491,15 @@ function resolveTurn() {
     if (it.k === 'snipe') {
       const c = crewById(it.target);
       if (f.dice.some((d) => d.crew === it.target)) {
-        if (state.shield >= it.v) log(`The shot at ${c.name} was blocked.`);
+        const blocked = state.shield >= it.v;
+        pendingFx.push({ k: 'eshot', to: 'crew', id: c.id, blocked });
+        if (blocked) log(`The shot at ${c.name} was blocked.`);
         else { f.knocked.push(c.id); log(`${c.name} was knocked out for this fight.`); }
       } else log(`${c.name} stayed back. ${hitCaravan(it.v, state)}.`);
     }
   }
 
-  if (!rearWagon()) { lose('Every wagon was destroyed.'); return; }
+  if (!rearWagon()) { lose('Every wagon was wrecked.'); return; }
   if (f.knocked.length >= S.crew.length) { lose('The whole crew was knocked out.'); return; }
 
   f.dice = [];
@@ -489,8 +515,426 @@ function win() {
 }
 function lose(why) { S.screen = 'defeat'; S.loseReason = why; }
 
+/* ---------- 3D diorama (three.js, low-poly, flat shaded) ---------- */
+const Scene = (() => {
+  const T = window.THREE;
+  const host = document.getElementById('scene');
+  if (!T) { host.hidden = true; return null; }
+  let renderer;
+  try { renderer = new T.WebGLRenderer({ antialias: true, alpha: true }); } catch (err) { host.hidden = true; return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = T.PCFSoftShadowMap;
+  host.insertBefore(renderer.domElement, host.firstChild);
+
+  const PI = Math.PI;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scene = new T.Scene();
+  const cam = new T.OrthographicCamera(-1, 1, 1, -1, -60, 100);
+  cam.position.set(14, 11.5, 14);
+  cam.lookAt(0, 0.3, 0);
+
+  scene.add(new T.HemisphereLight(0xfdf6ea, 0xb89a6a, 0.55));
+  const sun = new T.DirectionalLight(0xfff1dc, 0.78);
+  sun.position.set(5, 14, 9);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 40 });
+  sun.shadow.bias = -0.0008;
+  scene.add(sun);
+
+  // World group is turned 45° so local x runs left→right on screen and local z runs toward the viewer.
+  const W = new T.Group();
+  W.rotation.y = PI / 4;
+  scene.add(W);
+
+  const mats = {};
+  const mat = (c) => mats[c] || (mats[c] = new T.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.95, metalness: 0 }));
+  function mesh(geo, color, opts = {}) {
+    const m = new T.Mesh(geo, Array.isArray(color) ? color.map(mat) : mat(color));
+    m.castShadow = opts.cast !== false;
+    m.receiveShadow = !!opts.receive;
+    return m;
+  }
+  let seed = 11;
+  const sr = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  const C = {
+    sand: '#dcb478', sandDark: '#c99c5c', road: '#e8cf9c', dirt: '#b98457', rock: '#8e6748',
+    stone: '#a59d92', stoneLight: '#c9c0b2', wood: '#9c6b3f', woodDark: '#6e4a2b', cloth: '#f3ece0',
+    orange: '#ef8a26', teal: '#3f8fa8', water: '#5d9dbb', leaf: '#6f9a3d', leafDark: '#557d2c',
+    cactus: '#7d9c4f', skin: '#c99a72', brass: '#c9953a', brassDark: '#9d7128', maroon: '#8f3328', ember: '#ff9d3b',
+  };
+
+  // Island: a sandy top with layered earth underneath, like a diorama tile.
+  function slab(rx, rz, depth, top, side, y, jitter) {
+    const pts = [];
+    const N = 18;
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * PI * 2;
+      const r = 1 + (sr() - 0.5) * jitter;
+      pts.push(new T.Vector2(Math.cos(a) * rx * r, Math.sin(a) * rz * r));
+    }
+    const g = new T.ExtrudeGeometry(new T.Shape(pts), { depth, bevelEnabled: false });
+    const m = mesh(g, [top, side], { receive: true });
+    m.rotation.x = -PI / 2;
+    m.position.y = y - depth;
+    return m;
+  }
+  W.add(slab(8.4, 5.2, 1.1, C.sand, C.dirt, 0, 0.12));
+  W.add(slab(7.8, 4.7, 0.9, C.rock, C.rock, -1.1, 0.16));
+
+  const road = mesh(new T.BoxGeometry(15.2, 0.04, 1.5), C.road, { cast: false, receive: true });
+  road.position.set(0, 0.02, 0.5);
+  W.add(road);
+
+  function at(obj, x, z, y = 0) { obj.position.set(x, y, z); W.add(obj); return obj; }
+
+  function dune(x, z, s) {
+    const g = new T.SphereGeometry(1, 7, 4, 0, PI * 2, 0, PI / 2);
+    const m = mesh(g, C.sandDark, { receive: true });
+    m.scale.set(1.6 * s, 0.55 * s, 1.1 * s);
+    m.rotation.y = sr() * PI;
+    return at(m, x, z);
+  }
+  function rock(x, z, s) {
+    const m = mesh(new T.DodecahedronGeometry(0.4 * s, 0), sr() > 0.5 ? C.stone : C.stoneLight);
+    m.scale.y = 0.7; m.rotation.set(sr(), sr() * PI, sr());
+    return at(m, x, z, 0.12 * s);
+  }
+  function cactus(x, z, s = 1) {
+    const g = new T.Group();
+    const trunk = mesh(new T.CylinderGeometry(0.18, 0.2, 1.3, 6), C.cactus); trunk.position.y = 0.65; g.add(trunk);
+    const arm = mesh(new T.CylinderGeometry(0.12, 0.12, 0.5, 6), C.cactus); arm.position.set(0.28, 0.85, 0); g.add(arm);
+    const armBase = mesh(new T.CylinderGeometry(0.1, 0.1, 0.3, 6), C.cactus); armBase.rotation.z = PI / 2; armBase.position.set(0.15, 0.62, 0); g.add(armBase);
+    const arm2 = mesh(new T.CylinderGeometry(0.1, 0.1, 0.38, 6), C.cactus); arm2.position.set(-0.24, 0.72, 0); g.add(arm2);
+    g.scale.setScalar(s);
+    return at(g, x, z);
+  }
+  function palm(x, z, h = 2.4) {
+    const g = new T.Group();
+    for (let i = 0; i < 4; i++) {
+      const seg = mesh(new T.CylinderGeometry(0.12, 0.15, h / 4, 6), i % 2 ? C.wood : C.woodDark);
+      seg.position.set(i * 0.06, h / 8 + (i * h) / 4, 0);
+      g.add(seg);
+    }
+    for (let i = 0; i < 6; i++) {
+      const leaf = mesh(new T.BoxGeometry(1.2, 0.05, 0.32), i % 2 ? C.leaf : C.leafDark);
+      leaf.geometry.translate(0.6, 0, 0);
+      leaf.position.set(0.24, h, 0);
+      leaf.rotation.set(0, (i / 6) * PI * 2, -0.45);
+      g.add(leaf);
+    }
+    return at(g, x, z);
+  }
+
+  // Oasis at the back of the island.
+  const pond = mesh(new T.CylinderGeometry(1.5, 1.5, 0.08, 9), C.water, { cast: false, receive: true });
+  pond.scale.z = 0.7;
+  at(pond, -1.4, -3.0, 0.03);
+  const shore = mesh(new T.CylinderGeometry(1.75, 1.75, 0.05, 9), C.road, { cast: false, receive: true });
+  shore.scale.z = 0.72;
+  at(shore, -1.4, -3.0, 0.01);
+  palm(-3.1, -3.4, 2.5); palm(0.3, -3.6, 2.1); palm(-2.0, -1.8, 1.8);
+  for (let i = 0; i < 5; i++) {
+    const reed = mesh(new T.ConeGeometry(0.05, 0.6, 4), C.leafDark);
+    at(reed, -0.3 + sr() * 0.4, -2.4 - sr() * 0.5, 0.3);
+  }
+  dune(3.2, -3.0, 1.1); dune(5.6, -1.8, 0.8); dune(-6.2, -1.6, 0.9); dune(1.5, 3.5, 0.6);
+  cactus(1.0, 3.2, 0.9); cactus(5.4, 2.3, 1.1); cactus(-6.6, 1.6, 0.8); cactus(4.3, -3.4, 1);
+  rock(2.2, 2.6, 1.2); rock(-4.6, 3.3, 1); rock(6.5, 0.9, 0.9); rock(-0.6, -1.3, 0.7); rock(3.4, -1.6, 0.8); rock(-7.1, 0.2, 1);
+
+  // Signpost pointing to the city.
+  const post = new T.Group();
+  const pole = mesh(new T.CylinderGeometry(0.06, 0.06, 1.4, 5), C.woodDark); pole.position.y = 0.7; post.add(pole);
+  const sign = mesh(new T.BoxGeometry(0.8, 0.22, 0.06), C.orange); sign.position.set(0.25, 1.2, 0); post.add(sign);
+  at(post, 0.6, -0.6);
+
+  // Entities have an outer group (moved toward a target each frame) and an inner group (for hit animations).
+  function entity() {
+    const outer = new T.Group();
+    const inner = new T.Group();
+    outer.add(inner);
+    outer.userData = { tx: 0, tz: 0, ty: 0, trz: 0 };
+    W.add(outer);
+    return { outer, inner };
+  }
+
+  function buildWagon(kind) {
+    const e = entity();
+    const g = e.inner;
+    const body = mesh(new T.BoxGeometry(1.7, 0.45, 0.95), C.wood); body.position.y = 0.6; g.add(body);
+    const rim = mesh(new T.BoxGeometry(1.78, 0.08, 1.02), C.woodDark); rim.position.y = 0.85; g.add(rim);
+    for (const [x, z] of [[-0.55, 0.52], [0.55, 0.52], [-0.55, -0.52], [0.55, -0.52]]) {
+      const w = mesh(new T.CylinderGeometry(0.3, 0.3, 0.12, 8), C.woodDark);
+      w.rotation.x = PI / 2; w.position.set(x, 0.3, z); g.add(w);
+    }
+    const shaft = mesh(new T.BoxGeometry(0.7, 0.06, 0.06), C.woodDark); shaft.position.set(1.15, 0.45, 0); g.add(shaft);
+    if (kind === 'water') {
+      for (const z of [-0.22, 0.22]) {
+        const b = mesh(new T.CylinderGeometry(0.3, 0.3, 1.3, 8), C.wood);
+        b.rotation.z = PI / 2; b.position.set(0, 1.18, z); g.add(b);
+        for (const x of [-0.4, 0.4]) {
+          const hoop = mesh(new T.CylinderGeometry(0.32, 0.32, 0.07, 8), C.teal);
+          hoop.rotation.z = PI / 2; hoop.position.set(x, 1.18, z); g.add(hoop);
+        }
+      }
+    } else {
+      const canopy = mesh(new T.CylinderGeometry(0.55, 0.55, 1.6, 8, 1, false, 0, PI), C.cloth);
+      canopy.rotation.set(0, 0, PI / 2);
+      canopy.position.y = 0.88; g.add(canopy);
+      const stripe = mesh(new T.CylinderGeometry(0.565, 0.565, 0.22, 8, 1, false, 0, PI), C.orange);
+      stripe.rotation.set(0, 0, PI / 2); stripe.position.set(0.35, 0.88, 0); g.add(stripe);
+      const flagPole = mesh(new T.CylinderGeometry(0.03, 0.03, 0.9, 4), C.woodDark); flagPole.position.set(-0.7, 1.75, 0); g.add(flagPole);
+      const flag = mesh(new T.BoxGeometry(0.4, 0.24, 0.03), C.orange); flag.position.set(-0.5, 2.05, 0); g.add(flag);
+    }
+    return e;
+  }
+
+  function figure(color, wrap) {
+    const g = new T.Group();
+    const body = mesh(new T.CylinderGeometry(0.17, 0.26, 0.62, 6), color); body.position.y = 0.31; g.add(body);
+    const head = mesh(new T.IcosahedronGeometry(0.17, 0), C.skin); head.position.y = 0.78; g.add(head);
+    const hat = mesh(new T.CylinderGeometry(0.19, 0.2, 0.12, 6), wrap || C.cloth); hat.position.y = 0.88; g.add(hat);
+    return g;
+  }
+
+  const wagonObj = {};
+  for (const w of WAGON_DEFS) wagonObj[w.id] = buildWagon(w.id);
+
+  const crewObj = {};
+  CREW_DEFS.forEach((c, i) => {
+    const e = entity();
+    const fig = figure(c.color, c.role === 'Fire-eater' ? C.orange : c.role === 'Medic' ? '#d4532d' : C.cloth);
+    fig.scale.setScalar(1.3); e.inner.add(fig);
+    e.home = { x: -6.3 + i * 0.95, z: 2.25 };
+    e.outer.position.set(e.home.x, 0, e.home.z);
+    crewObj[c.id] = e;
+  });
+
+  // Campfire, shown at camp between fights.
+  const camp = new T.Group();
+  for (let i = 0; i < 3; i++) {
+    const log3 = mesh(new T.BoxGeometry(0.7, 0.12, 0.12), C.woodDark);
+    log3.rotation.y = (i / 3) * PI; log3.position.y = 0.08; camp.add(log3);
+  }
+  const ringStones = 7;
+  for (let i = 0; i < ringStones; i++) {
+    const st = mesh(new T.DodecahedronGeometry(0.11, 0), C.stone);
+    const a = (i / ringStones) * PI * 2; st.position.set(Math.cos(a) * 0.5, 0.06, Math.sin(a) * 0.5); camp.add(st);
+  }
+  const flame = new T.Mesh(new T.ConeGeometry(0.22, 0.6, 5), new T.MeshBasicMaterial({ color: C.ember }));
+  flame.position.y = 0.38; camp.add(flame);
+  const flame2 = new T.Mesh(new T.ConeGeometry(0.12, 0.38, 5), new T.MeshBasicMaterial({ color: '#ffd36b' }));
+  flame2.position.y = 0.32; camp.add(flame2);
+  camp.position.set(2.6, 0, 1.0);
+  camp.visible = false;
+  W.add(camp);
+
+  /* Enemies */
+  let enemy = null, enemyFightId = null, enemyKind = null, dying = false;
+  function buildEnemy(kind) {
+    const e = entity();
+    const g = e.inner;
+    if (kind === 'bandits') {
+      const hull = mesh(new T.BoxGeometry(2.4, 0.35, 1.1), C.woodDark); hull.position.y = 0.45; g.add(hull);
+      const bow = mesh(new T.ConeGeometry(0.62, 0.8, 4), C.woodDark); bow.rotation.set(0, PI / 4, PI / 2); bow.scale.set(1, 1, 0.55); bow.position.set(-1.5, 0.45, 0); g.add(bow);
+      const runner = mesh(new T.BoxGeometry(2.8, 0.06, 0.12), C.wood);
+      for (const z of [-0.45, 0.45]) { const r = runner.clone(); r.position.set(-0.2, 0.22, z); g.add(r); }
+      const mast = mesh(new T.CylinderGeometry(0.05, 0.05, 2.4, 5), C.wood); mast.position.set(0.2, 1.8, 0); g.add(mast);
+      const sailShape = new T.Shape([new T.Vector2(0, 0), new T.Vector2(1.4, 0), new T.Vector2(0, 1.9)]);
+      const sail = mesh(new T.ExtrudeGeometry(sailShape, { depth: 0.03, bevelEnabled: false }), C.maroon);
+      sail.position.set(0.25, 0.8, 0); g.add(sail);
+      for (const [x, z] of [[-0.6, 0.25], [0.6, -0.2], [0.9, 0.3]]) {
+        const b = figure(C.maroon, '#2f2a28'); b.position.set(x, 0.62, z); g.add(b);
+      }
+    } else if (kind === 'wraith') {
+      const body = mesh(new T.ConeGeometry(0.95, 2.8, 7), '#d6b27a'); body.rotation.x = PI; body.position.y = 1.7; g.add(body);
+      const mid = mesh(new T.ConeGeometry(0.7, 1.6, 7), '#e3c48f'); mid.rotation.x = PI; mid.position.y = 2.4; g.add(mid);
+      const head = mesh(new T.DodecahedronGeometry(0.62, 0), '#cfa66a'); head.position.y = 3.35; g.add(head);
+      const eyeMat = new T.MeshBasicMaterial({ color: C.ember });
+      for (const z of [-0.2, 0.2]) { const eye = new T.Mesh(new T.BoxGeometry(0.1, 0.1, 0.12), eyeMat); eye.position.set(-0.56, 3.4, z); g.add(eye); }
+      const orbit = new T.Group(); orbit.position.y = 1.6;
+      for (let i = 0; i < 6; i++) {
+        const r = mesh(new T.DodecahedronGeometry(0.16 + sr() * 0.12, 0), i % 2 ? C.stone : C.sandDark);
+        const a = (i / 6) * PI * 2; r.position.set(Math.cos(a) * 1.5, (sr() - 0.5) * 1.6, Math.sin(a) * 1.5); orbit.add(r);
+      }
+      g.add(orbit); e.spin = orbit;
+      const swirl = mesh(new T.CylinderGeometry(1.4, 1.6, 0.1, 9), C.sandDark, { cast: false }); swirl.position.y = 0.05; g.add(swirl);
+    } else {
+      const gate = new T.Group();
+      for (const z of [-1.7, 1.7]) {
+        const pillar = mesh(new T.BoxGeometry(0.8, 3.6, 0.8), C.stoneLight); pillar.position.set(1.6, 1.8, z); gate.add(pillar);
+        const cap = mesh(new T.BoxGeometry(1.0, 0.25, 1.0), C.stone); cap.position.set(1.6, 3.7, z); gate.add(cap);
+      }
+      const lintel = mesh(new T.BoxGeometry(0.9, 0.6, 4.4), C.stoneLight); lintel.position.set(1.6, 4.1, 0); gate.add(lintel);
+      const banner = mesh(new T.BoxGeometry(0.06, 1.0, 0.6), C.orange); banner.position.set(1.15, 3.2, 0); gate.add(banner);
+      g.add(gate);
+      const body = new T.Group();
+      for (const z of [-0.35, 0.35]) { const leg = mesh(new T.BoxGeometry(0.45, 1.1, 0.42), C.brassDark); leg.position.set(0, 0.55, z); body.add(leg); }
+      const torso = mesh(new T.BoxGeometry(1.0, 1.25, 1.4), C.brass); torso.position.y = 1.72; body.add(torso);
+      const belt = mesh(new T.BoxGeometry(1.04, 0.18, 1.44), C.brassDark); belt.position.y = 1.2; body.add(belt);
+      for (const z of [-0.9, 0.9]) {
+        const arm = mesh(new T.BoxGeometry(0.4, 1.2, 0.36), C.brassDark); arm.position.set(0, 1.65, z); body.add(arm);
+        const fist = mesh(new T.BoxGeometry(0.46, 0.4, 0.42), C.brass); fist.position.set(0, 0.95, z); body.add(fist);
+      }
+      const head = mesh(new T.BoxGeometry(0.7, 0.6, 0.7), C.brass); head.position.y = 2.65; body.add(head);
+      const eyeMat = new T.MeshBasicMaterial({ color: C.ember });
+      for (const z of [-0.16, 0.16]) { const eye = new T.Mesh(new T.BoxGeometry(0.08, 0.1, 0.14), eyeMat); eye.position.set(-0.36, 2.7, z); body.add(eye); }
+      const crest = mesh(new T.ConeGeometry(0.2, 0.4, 4), C.orange); crest.position.y = 3.15; body.add(crest);
+      g.add(body);
+    }
+    e.outer.position.set(3.6, 0, 0.3);
+    Object.assign(e.outer.userData, { tx: 3.6, tz: 0.3, ty: 0, trz: 0 });
+    return e;
+  }
+
+  /* Tweens and effects */
+  const tweens = [];
+  function tween(dur, fn, done, delay = 0) { tweens.push({ t0: performance.now() + delay, dur, fn, done }); }
+  function bump(obj, delay) {
+    tween(320, (p) => obj.scale.setScalar(1 + Math.sin(p * PI) * 0.16), () => obj.scale.setScalar(1), delay);
+  }
+  function shake(obj, delay) {
+    tween(420, (p) => { obj.rotation.z = Math.sin(p * PI * 6) * 0.12 * (1 - p); }, () => { obj.rotation.z = 0; }, delay);
+  }
+  function burst(pos, color, delay) {
+    const m = new T.Mesh(new T.IcosahedronGeometry(0.6, 1), new T.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 }));
+    m.position.copy(pos); m.visible = false; W.add(m);
+    tween(380, (p) => { m.visible = true; m.scale.setScalar(0.4 + p * 1.2); m.material.opacity = 0.5 * (1 - p); }, () => { W.remove(m); m.geometry.dispose(); m.material.dispose(); }, delay);
+  }
+  function shot(from, to, color, delay, onHit) {
+    const m = new T.Mesh(new T.OctahedronGeometry(0.2, 0), new T.MeshBasicMaterial({ color }));
+    m.visible = false; W.add(m);
+    const a = from.clone(), b = to.clone();
+    tween(460, (p) => {
+      m.visible = true;
+      m.position.lerpVectors(a, b, p);
+      m.position.y += Math.sin(p * PI) * 1.8;
+      m.rotation.x += 0.25; m.rotation.y += 0.2;
+    }, () => { W.remove(m); m.geometry.dispose(); m.material.dispose(); if (onHit) onHit(); }, delay);
+  }
+  const posOf = (e, dy) => new T.Vector3(e.outer.userData.tx, dy, e.outer.userData.tz);
+
+  function play(list) {
+    let enemyDelay = 0;
+    for (const fx of list) {
+      if (fx.k === 'pshot' && enemy) {
+        fx.ids.forEach((id, i) => {
+          const d = i * 110;
+          shot(posOf(crewObj[id], 0.9), posOf(enemy, 1.4), C.orange, d, () => { bump(enemy.inner); burst(posOf(enemy, 1.4), C.orange, 0); });
+        });
+        enemyDelay = 650 + fx.ids.length * 110;
+      }
+      if (fx.k === 'eshot' && enemy) {
+        const target = fx.to === 'wagon' ? wagonObj[fx.id] : crewObj[fx.id];
+        const tpos = posOf(target, fx.to === 'wagon' ? 1.0 : 0.7);
+        tween(300, (p) => { enemy.inner.position.x = -Math.sin(p * PI) * 0.5; }, () => { enemy.inner.position.x = 0; }, enemyDelay);
+        shot(posOf(enemy, 1.6), tpos, fx.blocked ? C.teal : C.maroon, enemyDelay + 120, () => {
+          if (fx.blocked) burst(tpos, '#6fa8d0', 0); else { shake(target.inner, 0); burst(tpos, '#d4532d', 0); }
+        });
+        enemyDelay += 300;
+      }
+      if (fx.k === 'edown' && enemy) {
+        dying = true;
+        const e = enemy;
+        tween(900, (p) => { e.inner.rotation.z = p * 0.9; e.inner.position.y = -p * 1.5; e.inner.scale.setScalar(1 - p * 0.5); },
+          () => { e.outer.visible = false; dying = false; }, enemyDelay + 500);
+      }
+    }
+  }
+
+  /* Sync scene to game state */
+  function sync(S) {
+    const f = S.fight;
+    if (f && f.id !== enemyFightId) {
+      if (enemy) { W.remove(enemy.outer); }
+      enemy = buildEnemy(f.enemy.kind);
+      enemyFightId = f.id; enemyKind = f.enemy.kind; dying = false;
+    }
+    if (enemy && !dying) enemy.outer.visible = S.screen === 'fight';
+    camp.visible = S.screen === 'reward' || S.screen === 'train' || S.screen === 'victory';
+
+    S.wagons.forEach((w, i) => {
+      const o = wagonObj[w.id].outer.userData;
+      o.tx = -1.4 - i * 2.2; o.tz = 0.5;
+      const dead = w.hp <= 0;
+      o.ty = dead ? -0.2 : 0; o.trz = dead ? 0.35 : 0;
+    });
+
+    const fighting = S.screen === 'fight' && f;
+    const forward = fighting ? (f.phase === 'pick' ? f.selected : f.dice.map((d) => d.crew)) : [];
+    const knocked = f ? f.knocked : [];
+    S.crew.forEach((c, i) => {
+      const e = crewObj[c.id], o = e.outer.userData;
+      if (S.screen !== 'fight') {
+        const a = (i / S.crew.length) * PI * 2;
+        o.tx = 2.6 + Math.cos(a) * 1.35; o.tz = 1.0 + Math.sin(a) * 1.0; o.ty = 0; o.trz = 0;
+        return;
+      }
+      o.tx = e.home.x; o.tz = forward.includes(c.id) ? e.home.z + 0.65 : e.home.z - 0.1;
+      const ko = knocked.includes(c.id);
+      o.ty = ko ? 0.17 : 0; o.trz = ko ? PI / 2 : 0;
+    });
+  }
+
+  /* Size and render loop */
+  function resize() {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    const aspect = w / h;
+    let worldW = 17, worldH = worldW / aspect;
+    if (worldH < 9.6) { worldH = 9.6; worldW = worldH * aspect; }
+    cam.left = -worldW / 2; cam.right = worldW / 2; cam.top = worldH / 2 + 0.6; cam.bottom = -worldH / 2 + 0.6;
+    cam.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(host);
+  resize();
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    for (let i = tweens.length - 1; i >= 0; i--) {
+      const tw = tweens[i];
+      const p = (now - tw.t0) / tw.dur;
+      if (p < 0) continue;
+      tw.fn(Math.min(p, 1));
+      if (p >= 1) { tweens.splice(i, 1); if (tw.done) tw.done(); }
+    }
+    const k = 1 - Math.pow(0.0015, dt);
+    const ents = [...Object.values(wagonObj), ...Object.values(crewObj)];
+    if (enemy) ents.push(enemy);
+    for (const e of ents) {
+      const o = e.outer, u = o.userData;
+      o.position.x += (u.tx - o.position.x) * k;
+      o.position.z += (u.tz - o.position.z) * k;
+      o.position.y += (u.ty - o.position.y) * k;
+      o.rotation.x += (u.trz - o.rotation.x) * k;
+    }
+    if (!reduced) {
+      const t = now / 1000;
+      if (enemy && !dying) {
+        if (enemyKind === 'bandits') enemy.inner.position.y = 0.12 + Math.sin(t * 2) * 0.08;
+        if (enemyKind === 'wraith') { enemy.inner.position.y = Math.sin(t * 1.6) * 0.15; if (enemy.spin) enemy.spin.rotation.y = t * 1.2; }
+      }
+      flame.scale.set(1 + Math.sin(t * 13) * 0.08, 1 + Math.sin(t * 9) * 0.15, 1);
+      flame2.scale.y = 1 + Math.sin(t * 11 + 1) * 0.2;
+    }
+    renderer.render(scene, cam);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  return { sync, play };
+})();
+
 /* ---------- Rendering ---------- */
-function header() {
+function personSvg(color) {
+  return `<svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="8" r="4.2" fill="#c99a72"/><rect x="8.6" y="2.6" width="8.8" height="3.2" rx="1.6" fill="#f3ece0"/><path d="M7 23c0-6 2.6-10 6-10s6 4 6 10z" fill="${color}" stroke="#00000018"/></svg>`;
+}
+
+function headerHtml() {
   const stops = ENEMIES.map((e, i) => {
     const cls = i < S.stop ? 'done' : i === S.stop ? 'here' : '';
     return `<span class="stop ${cls}"><span class="dot"></span><span class="label">${e.name}</span></span>`;
@@ -505,16 +949,28 @@ function header() {
   </header>`;
 }
 
+function overlayHtml() {
+  if (S.screen !== 'fight') {
+    const title = S.screen === 'defeat' ? 'The caravan fell' : S.screen === 'victory' ? 'At the city gate' : 'Camp';
+    return `<div class="hpcard"><b>${title}</b></div>`;
+  }
+  const e = S.fight.enemy;
+  return `<div class="hpcard">
+    <div class="row"><b>${e.name}</b><span class="hp">${e.hp}/${e.max}</span></div>
+    <div class="bar"><span style="width:${(100 * e.hp) / e.max}%"></span></div>
+    ${e.block ? `<span class="block">${icon('shd')} Absorbs ${e.block} this turn</span>` : ''}
+  </div>`;
+}
+
 function wagonsHtml() {
   const rear = rearWagon();
-  // Shown back-to-front: the rear wagon on the left, the caravan heading right toward the city.
   return [...S.wagons].reverse().map((w) => {
     const dead = w.hp <= 0;
-    const tag = dead ? '<span class="tag out">Wrecked</span>' : w === rear ? '<span class="tag target">Rear</span>' : '';
+    const tag = dead ? '<span class="tag out">Wrecked</span>' : w === rear ? '<span class="tag target">Rear</span>' : '<span class="tag out">Front</span>';
     return `<div class="wagon ${dead ? 'dead' : ''} ${w === rear ? 'rear' : ''}">
-      <div class="wname"><span>${w.name}</span>${tag}</div>
-      <div class="bar fill-acc"><span style="width:${(100 * Math.max(0, w.hp)) / w.max}%"></span></div>
-      <div class="perk"><span class="num">${Math.max(0, w.hp)}/${w.max}</span> · ${w.perk}</div>
+      <div class="wtop"><span class="wname">${w.name}</span>${tag}</div>
+      <div class="bar fill-ok"><span style="width:${(100 * Math.max(0, w.hp)) / w.max}%"></span></div>
+      <div class="perk"><b class="num">${Math.max(0, w.hp)}/${w.max}</b> · ${w.perk}</div>
     </div>`;
   }).join('');
 }
@@ -531,7 +987,7 @@ function trayHtml() {
     for (let i = 0; i < DICE_PER_TURN; i++) {
       const id = f.selected[i];
       slots.push(id
-        ? `<div class="slot"><div class="die empty ready"><span class="face">?</span><span class="who">${crewById(id).name}</span></div></div>`
+        ? `<div class="slot"><div class="die ready"><span class="face">?</span><span class="who">${crewById(id).name}</span></div></div>`
         : `<div class="slot"><div class="die empty"><span class="who">Empty</span></div></div>`);
     }
     return slots.join('');
@@ -552,9 +1008,7 @@ function trayHtml() {
 
 function previewHtml() {
   const f = S.fight;
-  if (f.phase === 'pick') {
-    return `<span class="hint">Choose up to ${DICE_PER_TURN} crew below, then roll. Tap a crew member again to bench them.</span>`;
-  }
+  if (f.phase === 'pick') return `<span class="hint">Choose up to ${DICE_PER_TURN} crew below, then roll. Chosen crew step forward on the map.</span>`;
   const t = totals();
   const out = [];
   const net = Math.max(0, t.atk - f.enemy.block);
@@ -566,21 +1020,23 @@ function previewHtml() {
   return out.join('');
 }
 
+function miniFaces(c) {
+  return c.faces.map((fc) => {
+    const showV = fc.t !== 'blank' && fc.t !== 'rr' && fc.t !== 'heal';
+    return `<span class="mini t-${fc.t}" title="${faceLabel(fc)}">${icon(fc.t)}${showV ? fc.v : ''}</span>`;
+  }).join('');
+}
+
 function rosterHtml() {
   const f = S.fight;
   return S.crew.map((c) => {
     const ko = f.knocked.includes(c.id);
     const sel = f.selected.includes(c.id);
     const targeted = f.intent && f.intent.k === 'snipe' && f.intent.target === c.id && !f.intent.cancelled;
-    const tag = ko ? '<span class="tag out">Out</span>' : targeted ? '<span class="tag target">Targeted</span>' : sel ? '<span class="tag" style="color:var(--accent)">Rolling</span>' : '';
-    const faces = c.faces.map((fc) => {
-      const showV = fc.t !== 'blank' && fc.t !== 'rr' && fc.t !== 'heal';
-      return `<span class="mini t-${fc.t}" title="${faceLabel(fc)}">${icon(fc.t)}${showV ? fc.v : ''}</span>`;
-    }).join('');
+    const tag = ko ? '<span class="tag out">Out</span>' : targeted ? '<span class="tag target">Targeted</span>' : sel ? '<span class="tag go">Rolling</span>' : '';
     return `<button class="crew ${sel ? 'sel' : ''} ${ko ? 'ko' : ''}" data-act="pick" data-arg="${c.id}" ${f.phase !== 'pick' || ko ? 'disabled' : ''} aria-pressed="${sel}">
-      <span class="cname"><b>${c.name}</b>${tag}</span>
-      <span class="role">${c.role}</span>
-      <span class="faces">${faces}</span>
+      <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span>${tag}</span>
+      <span class="faces">${miniFaces(c)}</span>
     </button>`;
   }).join('');
 }
@@ -599,38 +1055,35 @@ function actionsHtml() {
 }
 
 function fightHtml() {
-  const f = S.fight, e = f.enemy, info = intentInfo(f.intent);
-  return `${header()}
-  <section class="enemy" aria-label="Enemy">
-    <div class="enemy-head"><h1>${e.name}</h1><span class="hpnum">${e.hp}/${e.max}</span></div>
-    <div class="bar"><span style="width:${(100 * e.hp) / e.max}%"></span></div>
-    <p class="blurb">${e.blurb}</p>
-    <div class="intent ${f.intent.cancelled ? 'cancelled' : ''}">
-      <span class="big">${icon(info.icon)}</span>
-      <span class="label">${f.intent.cancelled ? 'Bribed — skipping this move' : 'Next move'}</span>
+  const f = S.fight, info = intentInfo(f.intent);
+  return `
+  <div class="intent ${f.intent.cancelled ? 'cancelled' : ''}">
+    <span class="tile">${icon(info.icon)}</span>
+    <span class="txt">
+      <span class="eyebrow">${f.intent.cancelled ? 'Bribed, skipping this move' : `${f.enemy.name} · next move`}</span>
       <strong>${info.title}</strong>
       <span class="detail">${info.detail}</span>
-    </div>
-  </section>
-  <section class="caravan" aria-label="Your caravan">
-    <div class="section-label"><span>Your caravan</span><span>Rear ← → Front</span></div>
+    </span>
+  </div>
+  <section class="stack" style="gap:8px" aria-label="Your caravan">
+    <div class="label"><span>Your wagons</span><span>Enemies hit the rear first</span></div>
     <div class="wagons">${wagonsHtml()}</div>
   </section>
-  <section aria-label="Dice">
-    <div class="section-label" style="margin-bottom:8px"><span>${f.phase === 'pick' ? 'Who rolls this turn' : 'Tap a die to hold it'}</span><span>${f.phase === 'roll' ? `${f.dice.filter((d) => d.held).length} held` : `${f.selected.length}/${DICE_PER_TURN}`}</span></div>
+  <section class="stack" style="gap:10px" aria-label="Dice">
+    <div class="label"><span>${f.phase === 'pick' ? 'Who rolls this turn' : 'Tap a die to hold it'}</span><span>${f.phase === 'roll' ? `${f.dice.filter((d) => d.held).length} held` : `${f.selected.length}/${DICE_PER_TURN}`}</span></div>
     <div class="tray">${trayHtml()}</div>
+    <div class="preview">${previewHtml()}</div>
   </section>
-  <div class="preview">${previewHtml()}</div>
   <ul class="log" aria-live="polite">${S.log.slice(0, 3).map((l) => `<li>${l}</li>`).join('')}</ul>
-  <section aria-label="Crew">
-    <div class="section-label" style="margin-bottom:8px"><span>Crew</span><span>${S.crew.length - f.knocked.length} standing</span></div>
+  <section class="stack" style="gap:8px" aria-label="Crew">
+    <div class="label"><span>Crew</span><span>${S.crew.length - f.knocked.length} standing</span></div>
     <div class="roster">${rosterHtml()}</div>
   </section>
   <details class="help">
     <summary>How a turn works</summary>
     <ol>
-      <li>Read the enemy's next move at the top.</li>
-      <li>Pick up to ${DICE_PER_TURN} crew. Each crew member is a die with their own six faces, shown on their card.</li>
+      <li>Read the enemy's next move.</li>
+      <li>Pick up to ${DICE_PER_TURN} crew. Each crew member is a die with six faces, shown on their card.</li>
       <li>Roll. Tap dice to hold them, then reroll the rest. You get ${BASE_REROLLS} rerolls a turn, plus one for each Reroll face.</li>
       <li>Pour water on an Attack, Block or Coin die for +2. The Water Cart has to be standing.</li>
       <li>End the turn. Your attacks land first, then the enemy moves. Enemies hit the rear wagon.</li>
@@ -642,39 +1095,35 @@ function fightHtml() {
 
 function rewardHtml() {
   const next = ENEMIES[S.stop + 1];
-  const order = [...S.wagons].reverse().map((w) => w.name).join(' → ');
-  return `${header()}
-  <section class="panel">
+  return `<section class="panel">
     <h1>${ENEMIES[S.stop].name} defeated</h1>
-    <p>Your crew is back on their feet. The road to ${next.name} costs ${ROAD_WATER} water. Without it, every wagon takes damage. Choose one thing to do at camp.</p>
+    <p>Your crew is back on their feet around the fire. The road to ${next.name} costs ${ROAD_WATER} water. Without it, every wagon takes damage. Choose one thing to do at camp.</p>
     <div class="choices">
-      <button class="choice" data-act="reward" data-arg="repair"><span class="big t-shd">${icon('shd')}</span><b>Repair the wagons</b><span>+7 health to each wagon, including wrecked ones.</span></button>
-      <button class="choice" data-act="reward" data-arg="water"><span class="big t-water">${icon('water')}</span><b>Find a well</b><span>+4 water. You have ${S.water}.</span></button>
-      <button class="choice" data-act="reward" data-arg="train"><span class="big t-atk">${icon('atk')}</span><b>Train a crew member</b><span>Their weakest face gets better.</span></button>
+      <button class="choice" data-act="reward" data-arg="repair"><span class="tile t-shd">${icon('shd')}</span><span class="txt"><b>Repair the wagons</b><span class="d">+7 health to each wagon, including wrecked ones.</span></span></button>
+      <button class="choice" data-act="reward" data-arg="water"><span class="tile t-water">${icon('water')}</span><span class="txt"><b>Draw from the oasis</b><span class="d">+4 water. You have ${S.water}.</span></span></button>
+      <button class="choice" data-act="reward" data-arg="train"><span class="tile t-atk">${icon('atk')}</span><span class="txt"><b>Train a crew member</b><span class="d">Their weakest face gets better.</span></span></button>
     </div>
-    <div class="section-label"><span>Wagon order (rear → front): ${order}</span></div>
+    <div class="label"><span>Wagon order</span><span>Rear on the left</span></div>
     <div class="wagons">${wagonsHtml()}</div>
     <button class="btn" data-act="swap" style="flex:none">Swap wagon order<small>The rear wagon takes hits first</small></button>
   </section>`;
 }
 
 function trainHtml() {
-  return `${header()}
-  <section class="panel">
+  return `<section class="panel">
     <h1>Who trains?</h1>
     <p>Their weakest face is upgraded: a blank becomes Attack 3, a Reroll or Mend becomes Attack 4, and anything else gets +2.</p>
     <div class="roster">${S.crew.map((c) => `<button class="crew" data-act="train" data-arg="${c.id}">
-      <span class="cname"><b>${c.name}</b></span><span class="role">${c.role}</span>
-      <span class="faces">${c.faces.map((fc) => `<span class="mini t-${fc.t}">${icon(fc.t)}${['blank', 'rr', 'heal'].includes(fc.t) ? '' : fc.v}</span>`).join('')}</span>
+      <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
+      <span class="faces">${miniFaces(c)}</span>
     </button>`).join('')}</div>
   </section>`;
 }
 
 function endHtml(won) {
-  return `${header()}
-  <section class="panel">
+  return `<section class="panel">
     <h1>${won ? 'You reached the city' : `Lost on the road to ${ENEMIES[S.stop].name}`}</h1>
-    <p>${won ? 'The Gate Warden fell and the caravan rolled through. Every run starts from one cart again, so try a different crew next time.' : S.loseReason + ' The caravan scatters back into the sand.'}</p>
+    <p>${won ? 'The Gate Warden fell and the caravan rolled through. Every run starts from scratch, so try a different crew next time.' : S.loseReason + ' The caravan scatters into the sand.'}</p>
     <div class="stats">
       <div class="stat"><b class="num">${S.stats.turns}</b><span>turns</span></div>
       <div class="stat"><b class="num">${S.stats.dmg}</b><span>damage dealt</span></div>
@@ -686,13 +1135,19 @@ function endHtml(won) {
 }
 
 function render() {
-  const app = document.getElementById('app');
+  document.getElementById('top').innerHTML = headerHtml();
+  document.getElementById('overlay').innerHTML = overlayHtml();
   const views = { fight: fightHtml, reward: rewardHtml, train: trainHtml, victory: () => endHtml(true), defeat: () => endHtml(false) };
-  app.innerHTML = views[S.screen]();
+  document.getElementById('app').innerHTML = views[S.screen]();
+  if (Scene) {
+    Scene.play(pendingFx);
+    Scene.sync(S);
+  }
+  pendingFx = [];
   if (S.fight) for (const d of S.fight.dice) d.fresh = false;
 }
 
-document.getElementById('app').addEventListener('click', (ev) => {
+document.getElementById('root').addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-act]');
   if (!b || b.disabled) return;
   const prevScreen = S.screen;

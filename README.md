@@ -2,11 +2,13 @@
 
 A roguelike dice game prototype. You lead a desert caravan to a city. Your crew are dice: each turn you choose who rolls, then spend the results to fight whatever blocks the road.
 
+The fight plays out on a low-poly 3D desert island: your wagons and crew on one side, the enemy on the other.
+
 This prototype has one run of three fights (Dune Bandits, Sand Wraith, The Gate Warden), with a camp between each fight.
 
 ## Play
 
-Open `index.html` in a browser. It works on a phone, and there's no build step.
+Open `index.html` in a browser. It works on a phone, and there's no build step. The 3D scene uses three.js (r128) from cdnjs, so it needs an internet connection.
 
 ## What's in it
 
