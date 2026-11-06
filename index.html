@@ -291,20 +291,48 @@ const faceLabel = (f) => (hasValue(f) ? `${FACE_NAME[f.t]} ${f.v}` : FACE_NAME[f
    ========================================================= */
 const MEND = 3; // health restored by each Mend face
 
-// Each crew member uses a Kenney mini-character model; colours tint the card portraits.
+// Crew portraits use their colour. Their 3D looks (Quaternius modular outfits) are in LOOKS below.
 const CREW_POOL = {
-  amir: { name: 'Amir', role: 'Guard', model: 'char-male-a', color: '#4f7f9c', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
-  lena: { name: 'Lena', role: 'Guard', model: 'char-female-b', color: '#3f6a86', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
-  tavi: { name: 'Tavi', role: 'Scout', model: 'char-male-c', color: '#7f9c45', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
-  oskar: { name: 'Oskar', role: 'Trader', model: 'char-male-d', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
-  noor: { name: 'Noor', role: 'Medic', model: 'char-female-c', color: '#c9c2b4', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
-  zane: { name: 'Zane', role: 'Fire-eater', model: 'char-male-e', color: '#d4532d', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
-  ilse: { name: 'Ilse', role: 'Archer', model: 'char-female-a', color: '#a0522d', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
-  bram: { name: 'Bram', role: 'Smith', model: 'char-male-f', color: '#6b6f73', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
-  rhea: { name: 'Rhea', role: 'Healer', model: 'char-female-d', color: '#5f9334', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
-  dov: { name: 'Dov', role: 'Brawler', model: 'char-male-b', color: '#8f3328', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
-  sela: { name: 'Sela', role: 'Fortune-teller', model: 'char-female-e', color: '#8466ad', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
-  kito: { name: 'Kito', role: 'Lookout', model: 'char-female-f', color: '#6f9a3d', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
+  amir: { name: 'Amir', role: 'Guard', color: '#8a7f70', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
+  lena: { name: 'Lena', role: 'Guard', color: '#a3794e', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
+  tavi: { name: 'Tavi', role: 'Scout', color: '#9c7a4e', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
+  oskar: { name: 'Oskar', role: 'Trader', color: '#8f3a2a', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
+  noor: { name: 'Noor', role: 'Medic', color: '#c9bba3', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
+  zane: { name: 'Zane', role: 'Fire-eater', color: '#9a4a2c', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
+  ilse: { name: 'Ilse', role: 'Archer', color: '#7d6a4c', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
+  bram: { name: 'Bram', role: 'Smith', color: '#6b6560', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
+  rhea: { name: 'Rhea', role: 'Healer', color: '#8a9468', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
+  dov: { name: 'Dov', role: 'Brawler', color: '#7a5a42', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
+  sela: { name: 'Sela', role: 'Fortune-teller', color: '#6e5878', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
+  kito: { name: 'Kito', role: 'Lookout', color: '#8c7650', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
+};
+
+// 3D looks: a head, hair and outfit parts sharing one skeleton, plus skin, hair and cloth tints.
+const OUTFIT = {
+  knight: ['Male_Knight_Body_Armor', 'Male_Knight_Arms', 'Male_Knight_Legs_Armor', 'Male_Knight_Feet_Armor'],
+  mRanger: ['Male_Ranger_Body', 'Male_Ranger_Arms', 'Male_Ranger_Legs', 'Male_Ranger_Feet_Boots'],
+  fRanger: ['Female_Ranger_Body', 'Female_Ranger_Arms', 'Female_Ranger_Legs', 'Female_Ranger_Feet'],
+  noble: ['Male_Noble_Body', 'Male_Noble_Arms', 'Male_Noble_Legs', 'Male_Noble_Feet'],
+  mPeasant: ['Male_Peasant_Body', 'Male_Peasant_Arms', 'Male_Peasant_Legs', 'Male_Peasant_Feet'],
+  fPeasant: ['Female_Peasant_Body', 'Female_Peasant_Arms', 'Female_Peasant_Legs', 'Female_Peasant_Feet'],
+};
+const MH = 'Regular_Male_OnlyHead', FH = 'Regular_Female_OnlyHead';
+const LOOKS = {
+  amir: { parts: [MH, 'Hair_Beard', 'Hair_Buzzed', ...OUTFIT.knight, 'Male_Knight_Acc_Pauldron_Round', 'Male_Knight_Acc_Scarf'], hair: '#2b1d14', skin: '#b07a55', cloth: '#d6c4a4' },
+  lena: { parts: [FH, 'Hair_Ponytail', ...OUTFIT.fRanger, 'Female_Ranger_Acc_Pauldrons'], hair: '#3a2216', skin: '#9a6a48', cloth: '#d2a878' },
+  tavi: { parts: [MH, 'Male_Ranger_Head_Hood', ...OUTFIT.mRanger, 'Male_Ranger_Acc_Pauldron'], hair: '#2b1d14', skin: '#a87250', cloth: '#cfae80' },
+  oskar: { parts: [MH, 'Hair_Moustache', 'Hair_Balding', ...OUTFIT.noble, 'Male_Noble_Acc_Gorget'], hair: '#5a4030', skin: '#c08a64', cloth: '#d9b48a' },
+  noor: { parts: [FH, ...OUTFIT.fPeasant], hair: '#1c1410', skin: '#7d5236', cloth: '#efe4d0' },
+  zane: { parts: [MH, 'Hair_Mohawk', 'Hair_MuttonChops', ...OUTFIT.mPeasant], hair: '#8a2e14', skin: '#9c6844', cloth: '#b8704c' },
+  ilse: { parts: [FH, 'Female_Ranger_Head_Hood', ...OUTFIT.fRanger], hair: '#3a2216', skin: '#c49070', cloth: '#a88a62' },
+  bram: { parts: [MH, 'Hair_Beard', 'Hair_Balding', ...OUTFIT.mPeasant], hair: '#3b2b20', skin: '#8a5a3a', cloth: '#8f8a84' },
+  rhea: { parts: [FH, ...OUTFIT.fPeasant], hair: '#4a2c1a', skin: '#6e4a30', cloth: '#bcc49e' },
+  dov: { parts: [MH, 'Hair_Beard', 'Male_Knight_Head_Horns', 'Male_Knight_Body_Cloth', 'Male_Knight_Arms', 'Male_Knight_Legs_Armor', 'Male_Knight_Feet_Armor'], hair: '#1a120c', skin: '#a06a46', cloth: '#b08060' },
+  sela: { parts: [FH, 'Hair_Dreads', ...OUTFIT.fPeasant], hair: '#120c08', skin: '#5a3a26', cloth: '#9a7aa8' },
+  kito: { parts: [MH, 'Hair_Dreads', 'Hair_Moustache', ...OUTFIT.mRanger, 'Male_Ranger_Acc_Pauldron'], hair: '#1a120c', skin: '#5e3e28', cloth: '#b89a6a' },
+  banditA: { parts: [MH, 'Male_Ranger_Head_Hood', ...OUTFIT.mRanger], hair: '#1a120c', skin: '#a87250', cloth: '#8a3e2c' },
+  banditB: { parts: [FH, 'Female_Ranger_Head_Hood', ...OUTFIT.fRanger, 'Female_Ranger_Acc_Pauldrons'], hair: '#1a120c', skin: '#8a5a3a', cloth: '#6e3326' },
+  king: { parts: [MH, 'Hair_Beard', ...OUTFIT.knight, 'Male_Knight_Head_Horns', 'Male_Knight_Acc_Pauldron_Spike', 'Male_Knight_Acc_Scarf'], hair: '#1a120c', skin: '#9c6844', cloth: '#a8927a' },
 };
 const START_CREW = ['amir', 'lena', 'tavi', 'oskar', 'noor', 'zane'];
 const MAX_CREW = 8;
@@ -387,7 +415,7 @@ function later(ms, fn) {
 
 function mkCrew(id) {
   const d = CREW_POOL[id];
-  return { id, name: d.name, role: d.role, model: d.model, color: d.color, faces: d.faces.map(parseFace) };
+  return { id, name: d.name, role: d.role, color: d.color, faces: d.faces.map(parseFace) };
 }
 
 function genLeg() {
@@ -807,7 +835,6 @@ const Scene = (() => {
   dune(3.2, -3.1, 1.1); dune(6.0, -1.6, 0.8); dune(-6.2, -1.8, 0.9); dune(1.4, 3.6, 0.6);
 
   /* Model loading */
-  const CHAR_MODELS = ['male-a', 'male-b', 'male-c', 'male-d', 'male-e', 'male-f', 'female-a', 'female-b', 'female-c', 'female-d', 'female-e', 'female-f'].map((c) => `chars/char-${c}`);
   const MODEL_FILES = [
     'town/cart', 'town/cart-high', 'town/stall-red', 'town/lantern', 'town/banner-red',
     'pirate/ship-small', 'pirate/palm-bend', 'pirate/palm-straight', 'pirate/barrel', 'pirate/crate', 'pirate/chest', 'pirate/rocks-sand-a', 'pirate/rocks-sand-b',
@@ -815,22 +842,31 @@ const Scene = (() => {
     'nature/cactus-tall', 'nature/cactus-short', 'nature/statue-head', 'nature/stone-tall',
     'castle/gate', 'castle/tower', 'castle/siege-tower',
     'graveyard/skeleton', 'graveyard/ghost', 'graveyard/pillar',
-    ...CHAR_MODELS,
   ];
+  const PEOPLE_PARTS = [...new Set(Object.values(LOOKS).flatMap((l) => l.parts)), 'animations'];
   const M = {};
   let loaded = false;
   const MODEL_EXT = 'glb'; // the published copy uses JSON glTF files instead
   const loader = new T.GLTFLoader();
   let done = 0;
+  const total = MODEL_FILES.length + PEOPLE_PARTS.length;
+  const tick = () => { done++; status.textContent = `Unpacking the caravan… ${Math.round((100 * done) / total)}%`; };
   const loads = MODEL_FILES.map((file) => new Promise((res) => {
     loader.load(`models/${file}.${MODEL_EXT}`, (g) => {
       g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const box = new T.Box3().setFromObject(g.scene);
       M[file.split('/')[1]] = { g, size: box.getSize(new T.Vector3()) };
-      done++; status.textContent = `Unpacking the caravan… ${Math.round((100 * done) / MODEL_FILES.length)}%`;
-      res();
-    }, undefined, () => { done++; res(); });
+      tick(); res();
+    }, undefined, () => { tick(); res(); });
   }));
+  // Character parts are glTF JSON files in both the repo and the published copy.
+  const P = {};
+  PEOPLE_PARTS.forEach((name) => loads.push(new Promise((res) => {
+    loader.load(`models/people/${name}.json`, (g) => {
+      g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+      P[name] = g; tick(); res();
+    }, undefined, () => { tick(); res(); });
+  })));
 
   function cloneModel(name) {
     const m = M[name];
@@ -864,9 +900,52 @@ const Scene = (() => {
     setAnim(holder, 'idle');
     return holder;
   }
+  // Build a character from parts that share one skeleton: clone the head's rig, then bind every other part to its bones.
+  const PEOPLE_ANIMS = { idle: 'Idle_Loop', walk: 'Walk_Loop', 'attack-melee-right': 'Sword_Attack', die: 'Death01', sit: 'Sitting_Idle_Loop', 'emote-yes': 'Dance_Loop' };
+  function personObj(look, s) {
+    const head = P[look.parts[0]];
+    if (!head) return { obj: new T.Group(), ch: null };
+    const root = T.SkeletonUtils.clone(head.scene);
+    const bones = {};
+    root.traverse((o) => { if (o.isBone) bones[o.name] = o; });
+    let host = null;
+    root.traverse((o) => { if (o.isSkinnedMesh && !host) host = o; });
+    for (const name of look.parts.slice(1)) {
+      if (!P[name]) continue;
+      P[name].scene.traverse((o) => {
+        if (!o.isSkinnedMesh) return;
+        const m = new T.SkinnedMesh(o.geometry, o.material);
+        m.castShadow = true; m.frustumCulled = false;
+        m.bind(new T.Skeleton(o.skeleton.bones.map((b) => bones[b.name]), o.skeleton.boneInverses), o.bindMatrix);
+        host.parent.add(m);
+      });
+    }
+    const tints = { hair: new T.Color(look.hair), skin: new T.Color(look.skin), cloth: new T.Color(look.cloth) };
+    root.traverse((o) => {
+      if (!o.isMesh) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const out = mats.map((mt) => {
+        if (/Eye/.test(mt.name)) return mt;
+        const c = mt.clone();
+        c.color.copy(/Hair/.test(mt.name) ? tints.hair : /Regular/.test(mt.name) ? tints.skin : tints.cloth);
+        return c;
+      });
+      o.material = Array.isArray(o.material) ? out : out[0];
+    });
+    root.scale.setScalar(s);
+    const mixer = new T.AnimationMixer(root);
+    mixers.add(mixer);
+    const actions = {};
+    ((P.animations && P.animations.animations) || []).forEach((clip) => { actions[clip.name] = mixer.clipAction(clip); });
+    const holder = { obj: root, ch: { mixer, actions, alias: PEOPLE_ANIMS, cur: null, curA: null, base: 'idle' } };
+    setAnim(holder, 'idle');
+    mixer.setTime(Math.random() * 3); // so a line of crew doesn't move in lockstep
+    return holder;
+  }
+
   function setAnim(h, name, once = false) {
     const ch = h.ch; if (!ch) return;
-    const a = ch.actions[name]; if (!a) return;
+    const a = ch.actions[(ch.alias && ch.alias[name]) || name]; if (!a) return;
     if (ch.cur === name && !once) return;
     a.reset();
     a.setLoop(once ? T.LoopOnce : T.LoopRepeat, Infinity);
@@ -920,6 +999,9 @@ const Scene = (() => {
   }
   function addAt(parent, obj, x, z, y = 0) { obj.position.set(x, y, z); parent.add(obj); return obj; }
 
+  // Seats around the campfire at (2.6, 1.0): 8 fixed slots so crates and crew line up.
+  function campSeat(i, r = 1.75) { const a = (i / 8) * PI * 2 + 0.4; return { a, x: 2.6 + Math.cos(a) * r, z: 1.0 + Math.sin(a) * r * 0.75 }; }
+
   function buildWorld() {
     addAt(W, prop('palm-straight', { h: 2.8 }), -3.2, -3.5);
     addAt(W, prop('palm-bend', { h: 2.6, ry: 2.2 }), 0.4, -3.7);
@@ -940,7 +1022,9 @@ const Scene = (() => {
     addAt(camp, prop('tent', { h: 1.1, ry: -0.4 }), 1.4, -1.9);
     const pit = addAt(camp, prop('campfire', { s: 3.2 }), 2.6, 1.0);
     flame(camp, 2.6, 0.12, 1.0, 1.4);
-    addAt(camp, prop('lantern', { h: 1.4 }), 4.2, 2.4);
+    addAt(camp, prop('lantern', { h: 1.4 }), 4.4, 2.6);
+    // Crates for the crew to sit on, one per seat around the fire (see campSeat).
+    for (let i = 0; i < 8; i++) { const st = campSeat(i, 2.0); addAt(camp, prop('crate', { h: 0.34, ry: st.a }), st.x, st.z); }
     void pit;
 
     const market = groups.market = new T.Group();
@@ -987,7 +1071,7 @@ const Scene = (() => {
   const hitTargets = [];
   function buildCrew(c) {
     const e = entity();
-    const h = charObj(c.model, 1.65);
+    const h = personObj(LOOKS[c.id], 0.78);
     e.inner.add(h.obj);
     e.ch = h.ch; e.obj = h.obj;
     e.ring = ring(); e.outer.add(e.ring);
@@ -1030,13 +1114,16 @@ const Scene = (() => {
     const addChar = (model, s, x, z, tint, ry = -PI / 4) => {
       const h = charObj(model, s, tint); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
     };
+    const addPerson = (look, s, x, z, ry = -PI / 4) => {
+      const h = personObj(LOOKS[look], s); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
+    };
     const add = (o, x, z, y = 0) => { o.position.set(x, y, z); g.add(o); return o; };
     if (kind === 'bandits' || kind === 'king') {
       const big = kind === 'king';
       add(prop('ship-small', { h: big ? 3.6 : 2.8, ry: PI }), 1.1, -0.4);
-      addChar('char-male-b', big ? 2.4 : 1.65, -0.7, 0.3, '#c58f80');
-      addChar('char-female-f', 1.65, -0.3, -0.9, '#c58f80');
-      if (big) { addChar('char-male-f', 1.65, -0.2, 1.2, '#c58f80'); add(prop('banner-red', { s: 2, ry: PI / 2 }), -1.2, -0.4); }
+      addPerson(big ? 'king' : 'banditA', big ? 1.05 : 0.8, -0.7, 0.3);
+      addPerson('banditB', 0.78, -0.3, -0.9);
+      if (big) { addPerson('banditA', 0.8, -0.2, 1.2); add(prop('banner-red', { s: 2, ry: PI / 2 }), -1.2, -0.4); }
     } else if (kind === 'skeletons' || kind === 'legion') {
       const spots = kind === 'legion' ? [[-0.6, 0.4], [0.1, -0.6], [0.3, 1.0], [0.9, 0.1], [1.2, -1.1]] : [[-0.5, 0.4], [0.2, -0.6], [0.5, 1.0]];
       spots.forEach(([x, z]) => addChar('skeleton', kind === 'legion' ? 1.8 : 1.7, x, z));
@@ -1050,8 +1137,8 @@ const Scene = (() => {
       swirl.position.y = 0.04; g.add(swirl);
     } else if (kind === 'siege') {
       add(prop('siege-tower', { h: 3.6, ry: PI / 2 }), 0.6, 0);
-      addChar('char-male-b', 1.65, -0.9, 0.9, '#c58f80');
-      addChar('char-female-f', 1.65, -0.9, -0.9, '#c58f80');
+      addPerson('banditA', 0.8, -0.9, 0.9);
+      addPerson('banditB', 0.78, -0.9, -0.9);
     } else if (kind === 'sentinel') {
       colossus(g, 0.75);
     } else if (kind === 'warden') {
@@ -1251,7 +1338,7 @@ const Scene = (() => {
       setT(e, { x: -1.5 - i * 2.15, z: 0.5 });
     });
 
-    const crew = state ? state.crew : START_CREW.map((id) => ({ id, model: CREW_POOL[id].model }));
+    const crew = state ? state.crew : START_CREW.map((id) => ({ id }));
     for (const id of Object.keys(crewEnt)) if (!crew.some((c) => c.id === id)) {
       const e = crewEnt[id]; hitTargets.splice(hitTargets.indexOf(e.hit), 1); removeEntity(e); delete crewEnt[id];
     }
@@ -1262,8 +1349,8 @@ const Scene = (() => {
       const e = crewEnt[c.id] || (crewEnt[c.id] = buildCrew(c));
       let x = -7.0 + i * 0.8, z = 2.35, ry = PI / 4, base = 'idle';
       if (scr === 'camp' || scr === 'victory') {
-        const a = (i / n) * PI * 2 + 0.4;
-        x = 2.6 + Math.cos(a) * 1.5; z = 1.0 + Math.sin(a) * 1.05;
+        const st = campSeat(i, scr === 'victory' ? 1.75 : 1.85);
+        x = st.x; z = st.z;
         ry = Math.atan2(2.6 - x, 1.0 - z);
         base = scr === 'victory' ? 'emote-yes' : 'sit';
       } else if (scr === 'map') base = 'walk';
