@@ -1,20 +1,43 @@
 # Caravan Dice
 
-A roguelike dice game prototype. You lead a desert caravan to a city. Your crew are dice: each turn you choose who rolls, then spend the results to fight whatever blocks the road.
-
-The fight plays out on a low-poly 3D desert island: your wagons and crew on one side, the enemy on the other.
-
-This prototype has one run of three fights (Dune Bandits, Sand Wraith, The Gate Warden), with a camp between each fight.
+A roguelike dice game. You lead a desert caravan to a city on the far side of the sand. Your crew are your dice: each turn you choose who rolls, then spend the faces to fight, block, trade and survive.
 
 ## Play
 
-Open `index.html` in a browser. It works on a phone, and there's no build step. The 3D scene uses three.js (r128) from cdnjs, so it needs an internet connection.
+Serve the folder with any static web server and open `index.html`. For example:
 
-## What's in it
+```
+python3 -m http.server 8000
+```
 
-- **Six crew dice**, each with its own faces: two Guards, a Scout, a Trader, a Medic and a Fire-eater.
-- **Choose who rolls**: up to 4 of the 6 crew each turn, with 2 rerolls and the option to hold dice.
-- **Enemy moves shown in advance**, including snipes that knock out the crew member they target if that person is rolled and your block is too low.
-- **Two wagons**: the Water Cart lets you pour water on a die for +2, and the Armoury gives Guards +1 attack. Enemies hit the rear wagon first.
-- **Coin** from the Trader, which can bribe an enemy to skip its move.
-- **Camp between fights**: repair wagons, find water, or train a crew member. The road costs water.
+Then open http://localhost:8000. It works on a phone. A web server is needed (rather than opening the file directly) because the browser loads the 3D models from the `models/` folder. Everything the game needs is in this repository, so it works offline.
+
+## A run
+
+- **Three legs**, each with a branching route map: ambushes, oases, markets, ruins and sandstorms. Each step on the road costs 1 water.
+- **A boss at the end of each leg**: The Bandit King, The Storm Mother, then The Gate Warden at the city gate. The map shows a scout report of the boss's moves.
+- **Markets** sell new crew, new wagons, face upgrades, water and repairs.
+- **Progress saves** after every step, so you can close the page and continue later.
+
+## A fight
+
+- The enemy shows its next move ahead of time.
+- Choose up to 4 crew to roll, on their cards or by tapping them on the island. Each crew member is a die with six faces.
+- Hold dice and reroll the rest (2 rerolls a turn). Pour water on a die for +2. Coin can bribe the enemy to skip a move.
+- Your attacks land, then the enemy moves. Enemies hit the rear wagon first; snipes knock out the crew member they target.
+
+## Wagons
+
+| Wagon | Perk |
+|---|---|
+| Water Cart | Pour water on a die for +2 |
+| Armoury | Guards get +1 on Attack |
+| Cook Wagon | After each fight, every wagon heals 3 |
+| Bell Wagon | Each matching pair of faces deals +3 damage |
+| Spice Wagon | Coin faces give +1 coin |
+| Bulwark | Start every turn with 2 block |
+
+## Credits
+
+- 3D models: Kenney (https://kenney.nl), CC0. See `models/README.md`.
+- 3D engine: three.js r128, MIT. See `vendor/README.md`.
