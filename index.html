@@ -144,6 +144,8 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .die .face { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.35rem, 6.4vw, 2rem); line-height: 1; }
 .die .face .ic { font-size: 0.75em; }
 .die .who { font-size: 0.7rem; color: var(--muted); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.die.acting { transform: translateY(-6px) scale(1.06); box-shadow: 0 0 0 3px var(--accent), 0 10px 22px rgba(239, 138, 38, 0.35); transition: transform 150ms; }
+.die.spent { opacity: 0.45; }
 .die.held { box-shadow: 0 0 0 3px var(--accent), 0 4px 0 3px #f3c08d, 0 10px 20px rgba(70, 50, 20, 0.1); }
 .die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.64rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
 .die:disabled { cursor: default; }
@@ -291,50 +293,39 @@ const faceLabel = (f) => (hasValue(f) ? `${FACE_NAME[f.t]} ${f.v}` : FACE_NAME[f
    ========================================================= */
 const MEND = 3; // health restored by each Mend face
 
-// Crew portraits use their colour. Their 3D looks (Quaternius modular outfits) are in LOOKS below.
+// Each crew member uses a Kenney mini-character model; colours tint the card portraits.
 const CREW_POOL = {
-  amir: { name: 'Amir', role: 'Guard', color: '#8a7f70', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
-  lena: { name: 'Lena', role: 'Guard', color: '#a3794e', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
-  tavi: { name: 'Tavi', role: 'Scout', color: '#9c7a4e', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
-  oskar: { name: 'Oskar', role: 'Trader', color: '#8f3a2a', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
-  noor: { name: 'Noor', role: 'Medic', color: '#c9bba3', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
-  zane: { name: 'Zane', role: 'Fire-eater', color: '#9a4a2c', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
-  ilse: { name: 'Ilse', role: 'Archer', color: '#7d6a4c', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
-  bram: { name: 'Bram', role: 'Smith', color: '#6b6560', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
-  rhea: { name: 'Rhea', role: 'Healer', color: '#8a9468', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
-  dov: { name: 'Dov', role: 'Brawler', color: '#7a5a42', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
-  sela: { name: 'Sela', role: 'Fortune-teller', color: '#6e5878', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
-  kito: { name: 'Kito', role: 'Lookout', color: '#8c7650', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
-};
-
-// 3D looks: a head, hair and outfit parts sharing one skeleton, plus skin, hair and cloth tints.
-const OUTFIT = {
-  knight: ['Male_Knight_Body_Armor', 'Male_Knight_Arms', 'Male_Knight_Legs_Armor', 'Male_Knight_Feet_Armor'],
-  mRanger: ['Male_Ranger_Body', 'Male_Ranger_Arms', 'Male_Ranger_Legs', 'Male_Ranger_Feet_Boots'],
-  fRanger: ['Female_Ranger_Body', 'Female_Ranger_Arms', 'Female_Ranger_Legs', 'Female_Ranger_Feet'],
-  noble: ['Male_Noble_Body', 'Male_Noble_Arms', 'Male_Noble_Legs', 'Male_Noble_Feet'],
-  mPeasant: ['Male_Peasant_Body', 'Male_Peasant_Arms', 'Male_Peasant_Legs', 'Male_Peasant_Feet'],
-  fPeasant: ['Female_Peasant_Body', 'Female_Peasant_Arms', 'Female_Peasant_Legs', 'Female_Peasant_Feet'],
-};
-const MH = 'Regular_Male_OnlyHead', FH = 'Regular_Female_OnlyHead';
-const LOOKS = {
-  amir: { parts: [MH, 'Hair_Beard', 'Hair_Buzzed', ...OUTFIT.knight, 'Male_Knight_Acc_Pauldron_Round', 'Male_Knight_Acc_Scarf'], hair: '#2b1d14', skin: '#b07a55', cloth: '#d6c4a4' },
-  lena: { parts: [FH, 'Hair_Ponytail', ...OUTFIT.fRanger, 'Female_Ranger_Acc_Pauldrons'], hair: '#3a2216', skin: '#9a6a48', cloth: '#d2a878' },
-  tavi: { parts: [MH, 'Male_Ranger_Head_Hood', ...OUTFIT.mRanger, 'Male_Ranger_Acc_Pauldron'], hair: '#2b1d14', skin: '#a87250', cloth: '#cfae80' },
-  oskar: { parts: [MH, 'Hair_Moustache', 'Hair_Balding', ...OUTFIT.noble, 'Male_Noble_Acc_Gorget'], hair: '#5a4030', skin: '#c08a64', cloth: '#d9b48a' },
-  noor: { parts: [FH, ...OUTFIT.fPeasant], hair: '#1c1410', skin: '#7d5236', cloth: '#efe4d0' },
-  zane: { parts: [MH, 'Hair_Mohawk', 'Hair_MuttonChops', ...OUTFIT.mPeasant], hair: '#8a2e14', skin: '#9c6844', cloth: '#b8704c' },
-  ilse: { parts: [FH, 'Female_Ranger_Head_Hood', ...OUTFIT.fRanger], hair: '#3a2216', skin: '#c49070', cloth: '#a88a62' },
-  bram: { parts: [MH, 'Hair_Beard', 'Hair_Balding', ...OUTFIT.mPeasant], hair: '#3b2b20', skin: '#8a5a3a', cloth: '#8f8a84' },
-  rhea: { parts: [FH, ...OUTFIT.fPeasant], hair: '#4a2c1a', skin: '#6e4a30', cloth: '#bcc49e' },
-  dov: { parts: [MH, 'Hair_Beard', 'Male_Knight_Head_Horns', 'Male_Knight_Body_Cloth', 'Male_Knight_Arms', 'Male_Knight_Legs_Armor', 'Male_Knight_Feet_Armor'], hair: '#1a120c', skin: '#a06a46', cloth: '#b08060' },
-  sela: { parts: [FH, 'Hair_Dreads', ...OUTFIT.fPeasant], hair: '#120c08', skin: '#5a3a26', cloth: '#9a7aa8' },
-  kito: { parts: [MH, 'Hair_Dreads', 'Hair_Moustache', ...OUTFIT.mRanger, 'Male_Ranger_Acc_Pauldron'], hair: '#1a120c', skin: '#5e3e28', cloth: '#b89a6a' },
-  banditA: { parts: [MH, 'Male_Ranger_Head_Hood', ...OUTFIT.mRanger], hair: '#1a120c', skin: '#a87250', cloth: '#8a3e2c' },
-  banditB: { parts: [FH, 'Female_Ranger_Head_Hood', ...OUTFIT.fRanger, 'Female_Ranger_Acc_Pauldrons'], hair: '#1a120c', skin: '#8a5a3a', cloth: '#6e3326' },
-  king: { parts: [MH, 'Hair_Beard', ...OUTFIT.knight, 'Male_Knight_Head_Horns', 'Male_Knight_Acc_Pauldron_Spike', 'Male_Knight_Acc_Scarf'], hair: '#1a120c', skin: '#9c6844', cloth: '#a8927a' },
+  amir: { name: 'Amir', role: 'Guard', model: 'char-male-a', color: '#4f7f9c', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
+  lena: { name: 'Lena', role: 'Guard', model: 'char-female-b', color: '#3f6a86', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
+  tavi: { name: 'Tavi', role: 'Scout', model: 'char-male-c', color: '#7f9c45', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
+  oskar: { name: 'Oskar', role: 'Trader', model: 'char-male-d', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
+  noor: { name: 'Noor', role: 'Medic', model: 'char-female-c', color: '#c9c2b4', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
+  zane: { name: 'Zane', role: 'Fire-eater', model: 'char-male-e', color: '#d4532d', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
+  ilse: { name: 'Ilse', role: 'Archer', model: 'char-female-a', color: '#a0522d', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
+  bram: { name: 'Bram', role: 'Smith', model: 'char-male-f', color: '#6b6f73', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
+  rhea: { name: 'Rhea', role: 'Healer', model: 'char-female-d', color: '#5f9334', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
+  dov: { name: 'Dov', role: 'Brawler', model: 'char-male-b', color: '#8f3328', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
+  sela: { name: 'Sela', role: 'Fortune-teller', model: 'char-female-e', color: '#8466ad', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
+  kito: { name: 'Kito', role: 'Lookout', model: 'char-female-f', color: '#6f9a3d', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
 };
 const START_CREW = ['amir', 'lena', 'tavi', 'oskar', 'noor', 'zane'];
+
+// Worn travelling gear, drawn on top of each character: tattered cloak, head wrap, neck rag, face cloth, patches.
+const RAGS = {
+  amir: { scarf: '#8a5a3c', cloak: '#6f6a60', patches: '#5a4a3a', bandage: 'right' },
+  lena: { wrap: '#b59a72', cloak: '#7a5a40' },
+  tavi: { wrap: '#7d776c', mask: '#7d776c', scarf: '#5e5446' },
+  oskar: { scarf: '#8f4a3a', patches: '#6b5a44' },
+  noor: { wrap: '#cfc2a8', patches: '#8a7a62' },
+  zane: { scarf: '#9a4a2c', patches: '#4e4236', eyepatch: true },
+  ilse: { wrap: '#7a5a40', cloak: '#b59a72' },
+  bram: { scarf: '#4e4236', patches: '#3e3a36', apron: '#5a4232', bandage: 'left' },
+  rhea: { wrap: '#b59a72', cloak: '#7d8466' },
+  dov: { scarf: '#3e3a36', patches: '#7a5a40', eyepatch: true, bandage: 'left' },
+  sela: { wrap: '#6e5a6e', cloak: '#3e3a36', scarf: '#8a6a50' },
+  kito: { wrap: '#7d776c', cloak: '#a88a62', mask: '#a88a62' },
+  bandit: { wrap: '#5e2a22', mask: '#4e2620', cloak: '#3e3028' },
+};
 const MAX_CREW = 8;
 const MAX_WAGONS = 4;
 
@@ -415,7 +406,7 @@ function later(ms, fn) {
 
 function mkCrew(id) {
   const d = CREW_POOL[id];
-  return { id, name: d.name, role: d.role, color: d.color, faces: d.faces.map(parseFace) };
+  return { id, name: d.name, role: d.role, model: d.model, color: d.color, faces: d.faces.map(parseFace) };
 }
 
 function genLeg() {
@@ -533,21 +524,70 @@ function intentText(it) {
     : { icon: 'atk', title: `Attack for ${it.v}`, detail: 'Your block reduces it.' };
 }
 
+// Your turn resolves one die at a time, in roll order: that crew member steps up and acts, then the next.
 function playerPhase() {
-  const f = S.fight, e = f.enemy;
-  const t = totals(f);
-  const dealt = Math.max(0, t.atk - e.block);
-  e.hp = Math.max(0, e.hp - dealt);
-  S.stats.dmg += dealt; S.stats.turns++;
-  S.coin += t.coin; S.stats.coinEarned += t.coin;
-  f.shield = t.shd;
-  const healed = t.heal ? heal(t.heal) : 0;
-  if (t.atk) fx({ k: 'pshot', ids: f.dice.filter((d) => d.face.t === 'atk').map((d) => d.crew), dmg: dealt, absorbed: Math.min(e.block, t.atk) });
-  if (t.coin) fx({ k: 'gain', text: `+${t.coin} coin`, cls: 't-coin', sfx: 'coin' });
-  if (healed) fx({ k: 'gain', text: `+${healed} health`, cls: 't-heal', delay: 250 });
-  if (e.hp <= 0) { f.phase = 'done'; fx({ k: 'edown' }); later(1700, winFight); return; }
-  f.phase = 'enemy';
-  later(1150, enemyPhase);
+  const f = S.fight;
+  S.stats.turns++;
+  const steps = f.dice.map((d, i) => ({ die: i }));
+  if (has('bell')) {
+    const counts = {};
+    for (const d of f.dice) if (hasValue(d.face)) { const k = d.face.t + d.face.v; counts[k] = (counts[k] || 0) + 1; }
+    let bell = 0; for (const k in counts) bell += Math.floor(counts[k] / 2) * 3;
+    if (bell) steps.push({ bell });
+  }
+  f.steps = steps;
+  f.shield = has('bulwark') ? 2 : 0;
+  f.guardLeft = f.enemy.block;
+  f.active = null;
+  f.phase = 'resolving';
+  later(250, nextStep);
+}
+
+function hitEnemy(f, v) {
+  const absorbed = Math.min(f.guardLeft, v);
+  f.guardLeft -= absorbed;
+  const dealt = v - absorbed;
+  f.enemy.hp = Math.max(0, f.enemy.hp - dealt);
+  S.stats.dmg += dealt;
+  return { dealt, absorbed };
+}
+
+function nextStep() {
+  const f = S.fight;
+  const st = f.steps.shift();
+  if (!st) { f.active = null; f.phase = 'enemy'; later(650, enemyPhase); return; }
+  let wait = 560;
+  if (st.bell) {
+    f.active = null;
+    const r = hitEnemy(f, st.bell);
+    fx({ k: 'bell', dmg: r.dealt, absorbed: r.absorbed });
+    wait = 700;
+  } else {
+    const d = f.dice[st.die], c = crewById(d.crew);
+    f.active = st.die;
+    d.done = true;
+    const t = d.face.t, v = d.face.v;
+    if (t === 'atk') {
+      const r = hitEnemy(f, v + (has('armory') && c.role === 'Guard' ? 1 : 0));
+      fx({ k: 'strike', id: c.id, dmg: r.dealt, absorbed: r.absorbed });
+      wait = 820;
+    } else if (t === 'shd') {
+      f.shield += v;
+      fx({ k: 'act', id: c.id, text: `+${v} block`, cls: 't-shd', sfx: 'block', burst: '#6fa8d0' });
+    } else if (t === 'coin') {
+      const n = v + (has('spice') ? 1 : 0);
+      S.coin += n; S.stats.coinEarned += n;
+      fx({ k: 'act', id: c.id, text: `+${n} coin`, cls: 't-coin', sfx: 'coin', burst: '#e0b23a' });
+    } else if (t === 'heal') {
+      const got = heal(MEND);
+      fx({ k: 'act', id: c.id, text: `+${got} health`, cls: 't-heal', sfx: 'block', burst: '#7fbf5a' });
+    } else {
+      fx({ k: 'act', id: c.id, text: 'Nothing', cls: 't-blank' });
+      wait = 450;
+    }
+  }
+  if (f.enemy.hp <= 0) { f.phase = 'done'; f.steps = []; fx({ k: 'edown' }); later(1700, () => { f.active = null; winFight(); }); return; }
+  later(wait, nextStep);
 }
 
 function enemyPhase() {
@@ -696,7 +736,8 @@ const A = {
 function resumePending() {
   if (S.screen !== 'fight') return;
   const f = S.fight;
-  if (f.phase === 'enemy') enemyPhase();
+  if (f.phase === 'resolving') later(300, nextStep);
+  else if (f.phase === 'enemy') enemyPhase();
   else if (f.phase === 'done') { if (f.enemy.hp <= 0) winFight(); else lose(); }
 }
 /* =========================================================
@@ -835,6 +876,7 @@ const Scene = (() => {
   dune(3.2, -3.1, 1.1); dune(6.0, -1.6, 0.8); dune(-6.2, -1.8, 0.9); dune(1.4, 3.6, 0.6);
 
   /* Model loading */
+  const CHAR_MODELS = ['male-a', 'male-b', 'male-c', 'male-d', 'male-e', 'male-f', 'female-a', 'female-b', 'female-c', 'female-d', 'female-e', 'female-f'].map((c) => `chars/char-${c}`);
   const MODEL_FILES = [
     'town/cart', 'town/cart-high', 'town/stall-red', 'town/lantern', 'town/banner-red',
     'pirate/ship-small', 'pirate/palm-bend', 'pirate/palm-straight', 'pirate/barrel', 'pirate/crate', 'pirate/chest', 'pirate/rocks-sand-a', 'pirate/rocks-sand-b',
@@ -842,31 +884,22 @@ const Scene = (() => {
     'nature/cactus-tall', 'nature/cactus-short', 'nature/statue-head', 'nature/stone-tall',
     'castle/gate', 'castle/tower', 'castle/siege-tower',
     'graveyard/skeleton', 'graveyard/ghost', 'graveyard/pillar',
+    ...CHAR_MODELS,
   ];
-  const PEOPLE_PARTS = [...new Set(Object.values(LOOKS).flatMap((l) => l.parts)), 'animations'];
   const M = {};
   let loaded = false;
   const MODEL_EXT = 'glb'; // the published copy uses JSON glTF files instead
   const loader = new T.GLTFLoader();
   let done = 0;
-  const total = MODEL_FILES.length + PEOPLE_PARTS.length;
-  const tick = () => { done++; status.textContent = `Unpacking the caravan… ${Math.round((100 * done) / total)}%`; };
   const loads = MODEL_FILES.map((file) => new Promise((res) => {
     loader.load(`models/${file}.${MODEL_EXT}`, (g) => {
       g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const box = new T.Box3().setFromObject(g.scene);
       M[file.split('/')[1]] = { g, size: box.getSize(new T.Vector3()) };
-      tick(); res();
-    }, undefined, () => { tick(); res(); });
+      done++; status.textContent = `Unpacking the caravan… ${Math.round((100 * done) / MODEL_FILES.length)}%`;
+      res();
+    }, undefined, () => { done++; res(); });
   }));
-  // Character parts are glTF JSON files in both the repo and the published copy.
-  const P = {};
-  PEOPLE_PARTS.forEach((name) => loads.push(new Promise((res) => {
-    loader.load(`models/people/${name}.json`, (g) => {
-      g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
-      P[name] = g; tick(); res();
-    }, undefined, () => { tick(); res(); });
-  })));
 
   function cloneModel(name) {
     const m = M[name];
@@ -886,12 +919,94 @@ const Scene = (() => {
     o.traverse((m) => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.multiply(c); } });
   }
 
+  /* Worn look: fade colours toward dusty tones, add grime blotches and specks, dirtier near the feet. */
+  function wornMaterial(base, heavy) {
+    const w = base.clone();
+    // Heavy wear for clothes and bodies, light dust for faces so they stay readable.
+    const k = heavy ? { desat: '0.6', blot: '0.3', freq: '13.0', speck: '0.32', dirt: '0.5', dirtTop: '0.26' } : { desat: '0.35', blot: '0.12', freq: '9.0', speck: '0.0', dirt: '1.0', dirtTop: '0.01' };
+    w.onBeforeCompile = (sh) => {
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vWorn;')
+        .replace('#include <skinning_vertex>', '#include <skinning_vertex>\nvWorn = transformed;');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vWorn;\nfloat wornHash(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }')
+        .replace('#include <map_fragment>', `#include <map_fragment>
+          {
+            vec3 c = diffuseColor.rgb;
+            float l = dot(c, vec3(0.299, 0.587, 0.114));
+            c = mix(c, vec3(l) * vec3(1.1, 0.95, 0.78), ${k.desat});
+            c *= (1.0 - ${k.blot}) + ${k.blot} * wornHash(floor(vWorn * ${k.freq}));
+            c *= 1.0 - ${k.speck} * step(0.9, wornHash(floor(vWorn * 36.0) + 3.1));
+            c *= mix(${k.dirt}, 1.0, smoothstep(0.0, ${k.dirtTop}, vWorn.y));
+            diffuseColor.rgb = c;
+          }`);
+    };
+    w.customProgramCacheKey = () => (heavy ? 'worn-heavy' : 'worn-light');
+    return w;
+  }
+  function wearOut(o) {
+    o.traverse((m) => { if (m.isMesh && !m.userData.rag) m.material = wornMaterial(m.material, !/head/i.test(m.name)); });
+  }
+
+  /* Rags: simple flat-shaded pieces parented to the head and torso bones, so they move with the animation. */
+  const ragMat = (c) => { const m = mat(c).clone(); m.side = T.DoubleSide; return m; };
+  function ragMesh(geo, color, parent, pos, rot = [0, 0, 0], scale = [1, 1, 1]) {
+    const m = new T.Mesh(geo, ragMat(color));
+    m.position.set(...pos); m.rotation.set(...rot); m.scale.set(...scale);
+    m.castShadow = true; m.userData.rag = true;
+    parent.add(m);
+    return m;
+  }
+  function cloakGeo() {
+    // Jagged, uneven hem so it reads as torn cloth.
+    const pts = [[-0.13, 0.2], [0.13, 0.2], [0.17, -0.12], [0.14, -0.17], [0.1, -0.12], [0.06, -0.19], [0.01, -0.13], [-0.04, -0.2], [-0.08, -0.13], [-0.12, -0.18], [-0.17, -0.11]];
+    return new T.ExtrudeGeometry(new T.Shape(pts.map(([x, y]) => new T.Vector2(x, y))), { depth: 0.012, bevelEnabled: false });
+  }
+  function dressUp(o, rag) {
+    if (!rag) return;
+    const head = o.getObjectByName('head'), torso = o.getObjectByName('torso');
+    if (!head || !torso) return;
+    // A strip of cloth wrapped around the (boxy) head, tilted across it.
+    const headBand = (color, h, y, tilt) => ragMesh(new T.CylinderGeometry(0.243, 0.243, h, 10, 1, true), color, head, [0, y, 0], [0, 0, tilt], [1, 1, 0.8]);
+    if (rag.cloak) {
+      ragMesh(cloakGeo(), rag.cloak, torso, [0, 0, -0.115], [0.16, 0, 0]);
+      // Ragged shoulder mantle: an open, low-poly cone draped over the shoulders, visible from the front.
+      ragMesh(new T.ConeGeometry(0.27, 0.2, 7, 1, true), rag.cloak, torso, [0, 0.13, -0.01], [0, 0.3, 0], [1.05, 1, 0.8]);
+    }
+    if (rag.wrap) {
+      ragMesh(new T.CylinderGeometry(0.242, 0.25, 0.085, 9), rag.wrap, head, [0, 0.215, 0], [0.08, 0, 0], [1, 1, 0.82]);
+      ragMesh(new T.BoxGeometry(0.06, 0.16, 0.02), rag.wrap, head, [0.07, 0.13, -0.165], [0.1, 0, 0.35]);
+      ragMesh(new T.BoxGeometry(0.05, 0.12, 0.02), rag.wrap, head, [0.13, 0.15, -0.15], [0.1, 0, 0.6]);
+    }
+    if (rag.mask) ragMesh(new T.BoxGeometry(0.4, 0.11, 0.05), rag.mask, head, [0, 0.085, 0.16], [-0.15, 0, 0]);
+    if (rag.scarf) {
+      ragMesh(new T.TorusGeometry(0.1, 0.032, 5, 9), rag.scarf, torso, [0, 0.18, 0], [PI / 2, 0, 0], [1, 0.85, 1]);
+      ragMesh(new T.BoxGeometry(0.05, 0.13, 0.02), rag.scarf, torso, [0.05, 0.11, 0.095], [0.05, 0, 0.25]);
+    }
+    if (rag.bandage) {
+      const arm = o.getObjectByName(rag.bandage === 'left' ? 'arm-left' : 'arm-right');
+      const side = rag.bandage === 'left' ? 1 : -1;
+      if (arm) for (let i = 0; i < 2; i++) ragMesh(new T.BoxGeometry(0.075, 0.05, 0.095), '#d8ccb4', arm, [side * (0.09 + i * 0.08), -0.02, 0], [0, 0, side * 0.2]);
+      headBand('#d8ccb4', 0.05, 0.25, side * 0.3);
+    }
+    if (rag.eyepatch) {
+      headBand('#1e1a16', 0.022, 0.18, 0.28);
+      ragMesh(new T.BoxGeometry(0.085, 0.08, 0.025), '#1e1a16', head, [0.075, 0.15, 0.172]);
+    }
+    if (rag.apron) ragMesh(new T.BoxGeometry(0.2, 0.22, 0.012), rag.apron, torso, [0, 0.03, 0.1]);
+    if (rag.patches) {
+      ragMesh(new T.BoxGeometry(0.055, 0.05, 0.012), rag.patches, torso, [-0.05, 0.08, 0.092], [0, 0, 0.2]);
+      ragMesh(new T.BoxGeometry(0.04, 0.045, 0.012), rag.patches, torso, [0.06, 0.03, 0.092], [0, 0, -0.3]);
+    }
+  }
+
   /* Animated characters */
   const mixers = new Set();
-  function charObj(model, s, tint) {
+  function charObj(model, s, tint, rag) {
     const o = cloneModel(model);
     o.scale.setScalar(s);
     if (tint) tintObj(o, tint);
+    if (rag !== undefined) { wearOut(o); dressUp(o, rag); }
     const mixer = new T.AnimationMixer(o);
     mixers.add(mixer);
     const actions = {};
@@ -900,52 +1015,9 @@ const Scene = (() => {
     setAnim(holder, 'idle');
     return holder;
   }
-  // Build a character from parts that share one skeleton: clone the head's rig, then bind every other part to its bones.
-  const PEOPLE_ANIMS = { idle: 'Idle_Loop', walk: 'Walk_Loop', 'attack-melee-right': 'Sword_Attack', die: 'Death01', sit: 'Sitting_Idle_Loop', 'emote-yes': 'Dance_Loop' };
-  function personObj(look, s) {
-    const head = P[look.parts[0]];
-    if (!head) return { obj: new T.Group(), ch: null };
-    const root = T.SkeletonUtils.clone(head.scene);
-    const bones = {};
-    root.traverse((o) => { if (o.isBone) bones[o.name] = o; });
-    let host = null;
-    root.traverse((o) => { if (o.isSkinnedMesh && !host) host = o; });
-    for (const name of look.parts.slice(1)) {
-      if (!P[name]) continue;
-      P[name].scene.traverse((o) => {
-        if (!o.isSkinnedMesh) return;
-        const m = new T.SkinnedMesh(o.geometry, o.material);
-        m.castShadow = true; m.frustumCulled = false;
-        m.bind(new T.Skeleton(o.skeleton.bones.map((b) => bones[b.name]), o.skeleton.boneInverses), o.bindMatrix);
-        host.parent.add(m);
-      });
-    }
-    const tints = { hair: new T.Color(look.hair), skin: new T.Color(look.skin), cloth: new T.Color(look.cloth) };
-    root.traverse((o) => {
-      if (!o.isMesh) return;
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      const out = mats.map((mt) => {
-        if (/Eye/.test(mt.name)) return mt;
-        const c = mt.clone();
-        c.color.copy(/Hair/.test(mt.name) ? tints.hair : /Regular/.test(mt.name) ? tints.skin : tints.cloth);
-        return c;
-      });
-      o.material = Array.isArray(o.material) ? out : out[0];
-    });
-    root.scale.setScalar(s);
-    const mixer = new T.AnimationMixer(root);
-    mixers.add(mixer);
-    const actions = {};
-    ((P.animations && P.animations.animations) || []).forEach((clip) => { actions[clip.name] = mixer.clipAction(clip); });
-    const holder = { obj: root, ch: { mixer, actions, alias: PEOPLE_ANIMS, cur: null, curA: null, base: 'idle' } };
-    setAnim(holder, 'idle');
-    mixer.setTime(Math.random() * 3); // so a line of crew doesn't move in lockstep
-    return holder;
-  }
-
   function setAnim(h, name, once = false) {
     const ch = h.ch; if (!ch) return;
-    const a = ch.actions[(ch.alias && ch.alias[name]) || name]; if (!a) return;
+    const a = ch.actions[name]; if (!a) return;
     if (ch.cur === name && !once) return;
     a.reset();
     a.setLoop(once ? T.LoopOnce : T.LoopRepeat, Infinity);
@@ -999,9 +1071,6 @@ const Scene = (() => {
   }
   function addAt(parent, obj, x, z, y = 0) { obj.position.set(x, y, z); parent.add(obj); return obj; }
 
-  // Seats around the campfire at (2.6, 1.0): 8 fixed slots so crates and crew line up.
-  function campSeat(i, r = 1.75) { const a = (i / 8) * PI * 2 + 0.4; return { a, x: 2.6 + Math.cos(a) * r, z: 1.0 + Math.sin(a) * r * 0.75 }; }
-
   function buildWorld() {
     addAt(W, prop('palm-straight', { h: 2.8 }), -3.2, -3.5);
     addAt(W, prop('palm-bend', { h: 2.6, ry: 2.2 }), 0.4, -3.7);
@@ -1022,9 +1091,7 @@ const Scene = (() => {
     addAt(camp, prop('tent', { h: 1.1, ry: -0.4 }), 1.4, -1.9);
     const pit = addAt(camp, prop('campfire', { s: 3.2 }), 2.6, 1.0);
     flame(camp, 2.6, 0.12, 1.0, 1.4);
-    addAt(camp, prop('lantern', { h: 1.4 }), 4.4, 2.6);
-    // Crates for the crew to sit on, one per seat around the fire (see campSeat).
-    for (let i = 0; i < 8; i++) { const st = campSeat(i, 2.0); addAt(camp, prop('crate', { h: 0.34, ry: st.a }), st.x, st.z); }
+    addAt(camp, prop('lantern', { h: 1.4 }), 4.2, 2.4);
     void pit;
 
     const market = groups.market = new T.Group();
@@ -1071,7 +1138,7 @@ const Scene = (() => {
   const hitTargets = [];
   function buildCrew(c) {
     const e = entity();
-    const h = personObj(LOOKS[c.id], 0.78);
+    const h = charObj(c.model, 1.65, null, RAGS[c.id]);
     e.inner.add(h.obj);
     e.ch = h.ch; e.obj = h.obj;
     e.ring = ring(); e.outer.add(e.ring);
@@ -1111,19 +1178,16 @@ const Scene = (() => {
     const e = entity();
     e.chars = []; e.kind = kind;
     const g = e.inner;
-    const addChar = (model, s, x, z, tint, ry = -PI / 4) => {
-      const h = charObj(model, s, tint); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
-    };
-    const addPerson = (look, s, x, z, ry = -PI / 4) => {
-      const h = personObj(LOOKS[look], s); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
+    const addChar = (model, s, x, z, tint, ry = -PI / 4, rag) => {
+      const h = charObj(model, s, tint, rag); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
     };
     const add = (o, x, z, y = 0) => { o.position.set(x, y, z); g.add(o); return o; };
     if (kind === 'bandits' || kind === 'king') {
       const big = kind === 'king';
       add(prop('ship-small', { h: big ? 3.6 : 2.8, ry: PI }), 1.1, -0.4);
-      addPerson(big ? 'king' : 'banditA', big ? 1.05 : 0.8, -0.7, 0.3);
-      addPerson('banditB', 0.78, -0.3, -0.9);
-      if (big) { addPerson('banditA', 0.8, -0.2, 1.2); add(prop('banner-red', { s: 2, ry: PI / 2 }), -1.2, -0.4); }
+      addChar('char-male-b', big ? 2.4 : 1.65, -0.7, 0.3, '#c58f80', -PI / 4, big ? { scarf: '#5e2a22', cloak: '#3e3028', patches: '#4e2620' } : RAGS.bandit);
+      addChar('char-female-f', 1.65, -0.3, -0.9, '#c58f80', -PI / 4, RAGS.bandit);
+      if (big) { addChar('char-male-f', 1.65, -0.2, 1.2, '#c58f80', -PI / 4, RAGS.bandit); add(prop('banner-red', { s: 2, ry: PI / 2 }), -1.2, -0.4); }
     } else if (kind === 'skeletons' || kind === 'legion') {
       const spots = kind === 'legion' ? [[-0.6, 0.4], [0.1, -0.6], [0.3, 1.0], [0.9, 0.1], [1.2, -1.1]] : [[-0.5, 0.4], [0.2, -0.6], [0.5, 1.0]];
       spots.forEach(([x, z]) => addChar('skeleton', kind === 'legion' ? 1.8 : 1.7, x, z));
@@ -1137,8 +1201,8 @@ const Scene = (() => {
       swirl.position.y = 0.04; g.add(swirl);
     } else if (kind === 'siege') {
       add(prop('siege-tower', { h: 3.6, ry: PI / 2 }), 0.6, 0);
-      addPerson('banditA', 0.8, -0.9, 0.9);
-      addPerson('banditB', 0.78, -0.9, -0.9);
+      addChar('char-male-b', 1.65, -0.9, 0.9, '#c58f80', -PI / 4, RAGS.bandit);
+      addChar('char-female-f', 1.65, -0.9, -0.9, '#c58f80', -PI / 4, RAGS.bandit);
     } else if (kind === 'sentinel') {
       colossus(g, 0.75);
     } else if (kind === 'warden') {
@@ -1220,7 +1284,9 @@ const Scene = (() => {
         m.userData.key = key;
         if (d.fresh) animateRoll(m, home, i); else { m.position.copy(home); m.rotation.set(0, 0.1, 0); }
       }
-      m.userData.ring.visible = d.held;
+      m.userData.ring.visible = d.held && R.phase === 'roll';
+      m.userData.lift = R.active === i ? 0.35 : 0;
+      if (!d.fresh) m.position.y = home.y + m.userData.lift;
     });
   }
 
@@ -1276,6 +1342,29 @@ const Scene = (() => {
         floatAt(pos(enemy, 2.6), f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk', land);
         if (f.absorbed) floatAt(pos(enemy, 1.7), `${f.absorbed} absorbed`, 't-shd small', land + 150);
         t = land + 150;
+      }
+      if (f.k === 'strike' && enemy) {
+        const c = crewEnt[f.id]; if (!c) continue;
+        oneShot(c, 'attack-melee-right', 120);
+        shot(pos(c, 0.9).add(new T.Vector3(0.9, 0, -0.4)), pos(enemy, 1.3), '#ef8a26', 260, () => {
+          bump(enemy.inner); burst(pos(enemy, 1.3), '#ef8a26'); Sfx.play('hit');
+          floatAt(pos(enemy, 2.6), f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk');
+          if (f.absorbed) floatAt(pos(enemy, 1.8), `${f.absorbed} absorbed`, 't-shd small', 120);
+        });
+      }
+      if (f.k === 'bell' && enemy) {
+        const fr = front();
+        if (fr) shot(pos(fr, 1.6), pos(enemy, 1.3), '#e0b23a', 0, () => {
+          bump(enemy.inner); Sfx.play('hit');
+          floatAt(pos(enemy, 2.6), `Bell −${f.dmg}`, 't-coin');
+        });
+      }
+      if (f.k === 'act') {
+        const c = crewEnt[f.id]; if (!c) continue;
+        oneShot(c, f.cls === 't-blank' ? 'emote-no' : 'interact-right', 60, 600);
+        if (f.burst) burst(pos(c, 0.7), f.burst, 150);
+        floatAt(pos(c, 1.9), f.text, f.cls, 150);
+        if (f.sfx) setTimeout(() => Sfx.play(f.sfx), 150);
       }
       if (f.k === 'gain') {
         const fr = front();
@@ -1338,7 +1427,7 @@ const Scene = (() => {
       setT(e, { x: -1.5 - i * 2.15, z: 0.5 });
     });
 
-    const crew = state ? state.crew : START_CREW.map((id) => ({ id }));
+    const crew = state ? state.crew : START_CREW.map((id) => ({ id, model: CREW_POOL[id].model }));
     for (const id of Object.keys(crewEnt)) if (!crew.some((c) => c.id === id)) {
       const e = crewEnt[id]; hitTargets.splice(hitTargets.indexOf(e.hit), 1); removeEntity(e); delete crewEnt[id];
     }
@@ -1349,13 +1438,14 @@ const Scene = (() => {
       const e = crewEnt[c.id] || (crewEnt[c.id] = buildCrew(c));
       let x = -7.0 + i * 0.8, z = 2.35, ry = PI / 4, base = 'idle';
       if (scr === 'camp' || scr === 'victory') {
-        const st = campSeat(i, scr === 'victory' ? 1.75 : 1.85);
-        x = st.x; z = st.z;
+        const a = (i / n) * PI * 2 + 0.4;
+        x = 2.6 + Math.cos(a) * 1.5; z = 1.0 + Math.sin(a) * 1.05;
         ry = Math.atan2(2.6 - x, 1.0 - z);
         base = scr === 'victory' ? 'emote-yes' : 'sit';
       } else if (scr === 'map') base = 'walk';
       else if (scr === 'defeat') base = 'die';
       else if (forward.includes(c.id)) z += 0.55;
+      if (R && R.active != null && R.dice[R.active] && R.dice[R.active].crew === c.id) { x += 1.1; z += 0.5; ry = PI / 2; }
       setT(e, { x, z, ry });
       e.wantBase = base;
       const sel = R && R.phase === 'pick' && R.selected.includes(c.id);
@@ -1516,19 +1606,20 @@ function fightHtml() {
     const dice = f.dice.map((d, i) => {
       const c = crewById(d.crew);
       const bonus = (d.face.t === 'atk' && c.role === 'Guard' && has('armory') ? 1 : 0) + (d.face.t === 'coin' && has('spice') ? 1 : 0);
-      return `<button class="die ${d.held ? 'held' : ''} ${d.fresh ? 'tumble' : ''}" data-act="hold" data-arg="${i}" ${f.phase === 'roll' ? '' : 'disabled'} aria-pressed="${d.held}" aria-label="${c.name}: ${faceLabel(d.face)}${d.held ? ', held' : ''}">
-        ${d.held ? '<span class="held-tag">Held</span>' : ''}${faceHtml(d.face, bonus)}<span class="who">${c.name}</span></button>`;
+      const st = f.active === i ? 'acting' : d.done ? 'spent' : '';
+      return `<button class="die ${d.held && f.phase === 'roll' ? 'held' : ''} ${d.fresh ? 'tumble' : ''} ${st}" data-act="hold" data-arg="${i}" ${f.phase === 'roll' ? '' : 'disabled'} aria-pressed="${d.held}" aria-label="${c.name}: ${faceLabel(d.face)}${d.held ? ', held' : ''}">
+        ${d.held && f.phase === 'roll' ? '<span class="held-tag">Held</span>' : ''}${faceHtml(d.face, bonus)}<span class="who">${c.name}</span></button>`;
     }).join('');
     const sum = [`<span class="t-atk">${icon('atk')}<span class="num">${Math.max(0, t.atk - f.enemy.block)}</span>&nbsp;damage</span>`,
       `<span class="t-shd">${icon('shd')}<span class="num">${t.shd}</span>&nbsp;block</span>`];
     if (t.coin) sum.push(`<span class="t-coin">${icon('coin')}+${t.coin}</span>`);
     if (t.heal) sum.push(`<span class="t-heal">${icon('heal')}+${t.heal}</span>`);
-    body = `<div class="label"><span>${f.phase === 'roll' ? 'Tap a die to keep it' : 'Enemy turn'}</span><span></span></div>
+    body = `<div class="label"><span>${f.phase === 'roll' ? 'Tap a die to keep it' : f.phase === 'resolving' ? 'Your crew acts' : 'Enemy turn'}</span><span></span></div>
       <div class="tray">${dice}</div><div class="preview">${sum.join('')}</div>`;
     actions = f.phase === 'roll'
       ? `<button class="btn" data-act="reroll" ${f.rerolls > 0 && f.dice.some((d) => !d.held) ? '' : 'disabled'}>Reroll<small>${f.rerolls} left</small></button>
          <button class="btn primary" data-act="end">End turn</button>`
-      : `<button class="btn primary" disabled>${f.phase === 'enemy' ? `${f.enemy.name} attacks…` : 'Fight over'}</button>`;
+      : `<button class="btn primary" disabled>${f.phase === 'resolving' ? 'Your crew acts…' : f.phase === 'enemy' ? `${f.enemy.name} attacks…` : 'Fight over'}</button>`;
   }
   return `
   <div class="intent ${f.phase === 'enemy' ? 'acting' : ''}">

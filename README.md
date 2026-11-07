@@ -15,7 +15,7 @@ Then open http://localhost:8000. It works on a phone. A web server is needed (ra
 ## How to play
 
 - **The route:** three legs, each a small branching map of Fights, Markets and Camps (heal 10), ending in a boss: The Bandit King, The Storm Mother, then The Gate Warden at the city gate.
-- **Fights:** the enemy shows its next move. Choose up to 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn.
+- **Fights:** the enemy shows its next move. Choose up to 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn. Your dice then resolve one at a time: each crew member steps up and attacks, blocks, collects coin or mends, before the enemy moves.
 - **Faces:** Attack hurts the enemy, Block stops its next hit, Coin buys things at markets, Mend repairs the caravan by 3.
 - **Health:** the caravan has one health bar. Each wagon adds health and a perk.
 - **Markets:** hire crew, buy wagons, upgrade faces and pay for repairs.
