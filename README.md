@@ -4,18 +4,13 @@ A roguelike dice game. You lead a desert caravan to a city on the far side of th
 
 ## Play
 
-Serve the folder with any static web server and open `index.html`. For example:
-
-```
-python3 -m http.server 8000
-```
-
-Then open http://localhost:8000. It works on a phone. A web server is needed (rather than opening the file directly) because the browser loads the 3D models from the `models/` folder. Everything the game needs is in this repository, so it works offline.
+Open `index.html` in a browser. It is a single file with no dependencies and works on a phone, offline too.
 
 ## How to play
 
 - **The route:** three legs, each a small branching map of Fights, Markets and Camps (heal 10), ending in a boss: The Bandit King, The Storm Mother, then The Gate Warden at the city gate.
-- **Fights:** the enemy shows its next move. Choose up to 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn. Your dice then resolve one at a time: each crew member steps up and attacks, blocks, collects coin or mends, before the enemy moves.
+- **Your crew:** four travellers, each a six-sided die: Amir the Guard (attack and block), Zane the Sellsword (big hits, two blank faces), Noor the Medic (mends) and Oskar the Trader (coin).
+- **Fights:** the enemy shows its next move. Choose 2 of your 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn. Your dice then resolve one at a time: each crew member steps up and attacks, blocks, collects coin or mends, before the enemy moves.
 - **Faces:** Attack hurts the enemy, Block stops its next hit, Coin buys things at markets, Mend repairs the caravan by 3.
 - **Health:** the caravan has one health bar. Each wagon adds health and a perk.
 - **Markets:** hire crew, buy wagons, upgrade faces and pay for repairs.
@@ -32,7 +27,6 @@ Then open http://localhost:8000. It works on a phone. A web server is needed (ra
 | Cook Wagon | 12 | Heal 4 after every fight |
 | Spice Wagon | 12 | Coin faces give +1 coin |
 
-## Credits
+## Art
 
-- 3D models: Kenney (https://kenney.nl), CC0. See `models/README.md`.
-- 3D engine: three.js r128, MIT. See `vendor/README.md`.
+Everything is drawn in code as flat SVG: a side-view desert scene, the wagons, the crew and the enemies. There are no image or model files.

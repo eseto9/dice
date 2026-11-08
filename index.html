@@ -74,20 +74,24 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .road .dot.here { background: var(--card); box-shadow: inset 0 0 0 3px var(--accent); }
 .road .dot.boss { border-radius: 3px; }
 
-/* Diorama */
-.scene {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  aspect-ratio: 16 / 10.2;
-  max-height: 360px;
-  margin-inline: auto;
-  touch-action: manipulation;
-}
-.scene canvas { display: block; width: 100% !important; height: 100% !important; cursor: pointer; }
-.scene .overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 2px 0; }
-.scene-status { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-weight: 700; font-size: 0.9rem; pointer-events: none; }
-.ctx { background: var(--card); box-shadow: var(--shadow); border-radius: 12px; padding: 7px 11px; display: flex; flex-direction: column; gap: 4px; min-width: 140px; max-width: 70%; }
+/* Stage: flat side-view scene */
+.scene { position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; touch-action: manipulation; }
+.scene svg.stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.scene .overlay { position: absolute; inset: 8px 8px auto 8px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.stage [data-crew] { cursor: pointer; }
+.stage .pos { transition: transform 320ms ease; }
+.stage .fig { animation: breathe 3.2s ease-in-out infinite; }
+.stage .walking .fig { animation: walk 0.55s ease-in-out infinite; }
+.stage .fallen .fig { animation: none; transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-84deg); opacity: 0.85; }
+.stage .swing { transform-box: fill-box; transform-origin: 50% 6%; }
+.stage .bob { animation: bob 2.4s ease-in-out infinite; }
+.stage .flicker { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 0.3s steps(2) infinite; }
+@keyframes breathe { 50% { transform: translateY(-0.8px); } }
+@keyframes walk { 50% { transform: translateY(-2.5px); } }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+@keyframes flicker { 50% { transform: scale(0.9, 1.14); } }
+@media (prefers-reduced-motion: reduce) { .stage *, .stage .fig { animation: none !important; transition: none !important; } }
+.ctx { background: color-mix(in srgb, var(--card) 94%, transparent); box-shadow: var(--shadow); border-radius: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; max-width: 48%; }
 .ctx .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .ctx b { font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
 .ctx .hp { font-weight: 700; color: var(--atk); font-variant-numeric: tabular-nums; font-size: 0.85rem; }
@@ -133,7 +137,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .intent.acting { box-shadow: 0 0 0 3px var(--atk), var(--shadow); }
 
 /* Dice tray */
-.tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tray { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 280px; width: 100%; margin-inline: auto; }
 .die {
   aspect-ratio: 1.15; width: 100%; max-width: 100%;
   border-radius: 16px; border: 0; background: var(--card);
@@ -160,12 +164,12 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .preview .hint { font-weight: 400; color: var(--muted); }
 
 /* Crew (compact) */
-.roster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.roster { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 @media (min-width: 560px) { .roster { grid-template-columns: repeat(4, 1fr); } }
 .crew { position: relative; text-align: left; padding: 8px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); border: 2px solid transparent; display: flex; flex-direction: column; gap: 6px; cursor: pointer; min-width: 0; }
 .crew .head { display: flex; gap: 7px; align-items: center; min-width: 0; }
-.crew .tile { width: 30px; height: 30px; border-radius: 9px; }
-.crew .tile svg { width: 21px; height: 21px; }
+.crew .tile { width: 34px; height: 34px; border-radius: 9px; overflow: hidden; align-items: flex-end; }
+.crew .tile svg { width: 26px; height: 30px; }
 .crew .nm { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .crew .nm b { font-family: var(--font-display); font-weight: 600; font-size: 0.88rem; line-height: 1.15; }
 .crew .role { font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -248,14 +252,10 @@ button.mini:not(:disabled):hover { box-shadow: 0 0 0 2px var(--accent); }
 <div class="shell" id="root">
   <div id="top"></div>
   <div class="scene" id="scene">
-    <div class="scene-status" id="scene-status">Unpacking the caravan…</div>
     <div class="overlay" id="overlay"></div>
   </div>
   <div class="stack" id="app"></div>
 </div>
-<script src="vendor/three.min.js"></script>
-<script src="vendor/GLTFLoader.js"></script>
-<script src="vendor/SkeletonUtils.js"></script>
 <script>
 'use strict';
 
@@ -293,63 +293,38 @@ const faceLabel = (f) => (hasValue(f) ? `${FACE_NAME[f.t]} ${f.v}` : FACE_NAME[f
    ========================================================= */
 const MEND = 3; // health restored by each Mend face
 
-// Each crew member uses a Kenney mini-character model; colours tint the card portraits.
+// The four members of the caravan. Each is a six-sided die; their looks are in LOOKS (flat art section).
 const CREW_POOL = {
-  amir: { name: 'Amir', role: 'Guard', model: 'char-male-a', color: '#4f7f9c', faces: ['a2', 'a3', 'a4', 's2', 's3', 's3'] },
-  lena: { name: 'Lena', role: 'Guard', model: 'char-female-b', color: '#3f6a86', faces: ['a2', 'a3', 'a3', 's2', 's3', 's4'] },
-  tavi: { name: 'Tavi', role: 'Scout', model: 'char-male-c', color: '#7f9c45', faces: ['a2', 'a3', 's2', 's2', 'c2', 'h'] },
-  oskar: { name: 'Oskar', role: 'Trader', model: 'char-male-d', color: '#d8a21d', faces: ['c2', 'c3', 'c4', 'c2', 'a1', 's1'] },
-  noor: { name: 'Noor', role: 'Medic', model: 'char-female-c', color: '#c9c2b4', faces: ['h', 'h', 's3', 's2', 'a1', 'a2'] },
-  zane: { name: 'Zane', role: 'Fire-eater', model: 'char-male-e', color: '#d4532d', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
-  ilse: { name: 'Ilse', role: 'Archer', model: 'char-female-a', color: '#a0522d', faces: ['a3', 'a3', 'a4', 'a2', 's1', 's2'] },
-  bram: { name: 'Bram', role: 'Smith', model: 'char-male-f', color: '#6b6f73', faces: ['s4', 's3', 's3', 'a3', 'c1', 'a2'] },
-  rhea: { name: 'Rhea', role: 'Healer', model: 'char-female-d', color: '#5f9334', faces: ['h', 'h', 'h', 's2', 'a2', 'c1'] },
-  dov: { name: 'Dov', role: 'Brawler', model: 'char-male-b', color: '#8f3328', faces: ['a4', 'a5', 'a5', '-', 's2', 's2'] },
-  sela: { name: 'Sela', role: 'Fortune-teller', model: 'char-female-e', color: '#8466ad', faces: ['c3', 'c3', 'a3', 's3', 'h', '-'] },
-  kito: { name: 'Kito', role: 'Lookout', model: 'char-female-f', color: '#6f9a3d', faces: ['a2', 'a3', 's3', 's3', 'h', 'c1'] },
+  amir: { name: 'Amir', role: 'Guard', faces: ['a3', 'a3', 'a4', 's3', 's3', 's4'] },
+  zane: { name: 'Zane', role: 'Sellsword', faces: ['-', '-', 'a5', 'a6', 'a7', 'a8'] },
+  noor: { name: 'Noor', role: 'Medic', faces: ['h', 'h', 's3', 's2', 'a2', 'a2'] },
+  oskar: { name: 'Oskar', role: 'Trader', faces: ['c2', 'c3', 'c4', 'c2', 'a2', 's2'] },
 };
-const START_CREW = ['amir', 'lena', 'tavi', 'oskar', 'noor', 'zane'];
-
-// Worn travelling gear, drawn on top of each character: tattered cloak, head wrap, neck rag, face cloth, patches.
-const RAGS = {
-  amir: { scarf: '#8a5a3c', cloak: '#6f6a60', patches: '#5a4a3a', bandage: 'right' },
-  lena: { wrap: '#b59a72', cloak: '#7a5a40' },
-  tavi: { wrap: '#7d776c', mask: '#7d776c', scarf: '#5e5446' },
-  oskar: { scarf: '#8f4a3a', patches: '#6b5a44' },
-  noor: { wrap: '#cfc2a8', patches: '#8a7a62' },
-  zane: { scarf: '#9a4a2c', patches: '#4e4236', eyepatch: true },
-  ilse: { wrap: '#7a5a40', cloak: '#b59a72' },
-  bram: { scarf: '#4e4236', patches: '#3e3a36', apron: '#5a4232', bandage: 'left' },
-  rhea: { wrap: '#b59a72', cloak: '#7d8466' },
-  dov: { scarf: '#3e3a36', patches: '#7a5a40', eyepatch: true, bandage: 'left' },
-  sela: { wrap: '#6e5a6e', cloak: '#3e3a36', scarf: '#8a6a50' },
-  kito: { wrap: '#7d776c', cloak: '#a88a62', mask: '#a88a62' },
-  bandit: { wrap: '#5e2a22', mask: '#4e2620', cloak: '#3e3028' },
-};
-const MAX_CREW = 8;
+const START_CREW = ['amir', 'zane', 'noor', 'oskar'];
+const MAX_CREW = 4;
 const MAX_WAGONS = 4;
 
 // Each wagon adds to the caravan's health and may have a perk.
 const WAGON_TYPES = {
-  supply: { name: 'Supply Cart', hp: 20, perk: 'Carries the supplies. No perk.', model: 'cart', props: 'barrels' },
-  armory: { name: 'Armoury', hp: 20, perk: 'Guards get +1 on Attack.', model: 'cart-high', props: 'none' },
-  bulwark: { name: 'Bulwark', hp: 18, perk: 'Start every turn with 2 block.', model: 'cart-high', props: 'banner' },
-  bell: { name: 'Bell Wagon', hp: 12, perk: 'Each matching pair of faces deals +3 damage.', model: 'cart', props: 'lantern' },
-  cook: { name: 'Cook Wagon', hp: 12, perk: 'Heal 4 after every fight.', model: 'cart', props: 'fire' },
-  spice: { name: 'Spice Wagon', hp: 12, perk: 'Coin faces give +1 coin.', model: 'cart', props: 'crates' },
+  supply: { name: 'Supply Cart', hp: 20, perk: 'Carries the supplies. No perk.' },
+  armory: { name: 'Armoury', hp: 20, perk: 'Guards get +1 on Attack.' },
+  bulwark: { name: 'Bulwark', hp: 18, perk: 'Start every turn with 2 block.' },
+  bell: { name: 'Bell Wagon', hp: 12, perk: 'Each matching pair of faces deals +3 damage.' },
+  cook: { name: 'Cook Wagon', hp: 12, perk: 'Heal 4 after every fight.' },
+  spice: { name: 'Spice Wagon', hp: 12, perk: 'Coin faces give +1 coin.' },
 };
 
 // Enemy moves: 'atk' hits the caravan; 'guard' absorbs some of your damage this turn, then hits.
 const ENEMY_TYPES = {
-  bandits: { name: 'Dune Bandits', hp: 20, loot: 5, pattern: [{ k: 'atk', v: 5 }, { k: 'atk', v: 7 }, { k: 'guard', v: 4, dmg: 3 }, { k: 'atk', v: 6 }] },
-  skeletons: { name: 'Tomb Guards', hp: 18, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 5 }, { k: 'guard', v: 3, dmg: 4 }, { k: 'atk', v: 5 }] },
-  king: { name: 'The Bandit King', boss: true, hp: 36, loot: 12, pattern: [{ k: 'guard', v: 5, dmg: 4 }, { k: 'atk', v: 8 }, { k: 'atk', v: 6 }, { k: 'atk', v: 10 }] },
-  wraith: { name: 'Sand Wraith', hp: 34, loot: 6, pattern: [{ k: 'atk', v: 8 }, { k: 'atk', v: 6 }, { k: 'atk', v: 11 }, { k: 'guard', v: 5, dmg: 5 }] },
-  siege: { name: 'Raider Siege Tower', hp: 36, loot: 6, pattern: [{ k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 13 }, { k: 'atk', v: 7 }, { k: 'atk', v: 8 }] },
-  storm: { name: 'The Storm Mother', boss: true, hp: 62, loot: 12, pattern: [{ k: 'atk', v: 9 }, { k: 'atk', v: 11 }, { k: 'guard', v: 8, dmg: 6 }, { k: 'atk', v: 14 }] },
-  sentinel: { name: 'Brass Sentinel', hp: 42, loot: 7, pattern: [{ k: 'atk', v: 11 }, { k: 'guard', v: 7, dmg: 7 }, { k: 'atk', v: 10 }, { k: 'atk', v: 14 }] },
-  legion: { name: 'Tomb Legion', hp: 40, loot: 7, pattern: [{ k: 'atk', v: 10 }, { k: 'atk', v: 10 }, { k: 'guard', v: 6, dmg: 8 }, { k: 'atk', v: 10 }] },
-  warden: { name: 'The Gate Warden', boss: true, hp: 75, loot: 0, pattern: [{ k: 'guard', v: 9, dmg: 6 }, { k: 'atk', v: 14 }, { k: 'atk', v: 11 }, { k: 'atk', v: 18 }, { k: 'atk', v: 8 }] },
+  bandits: { name: 'Dune Bandits', hp: 14, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 6 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 6 }] },
+  skeletons: { name: 'Tomb Guards', hp: 12, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 4 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 4 }] },
+  king: { name: 'The Bandit King', boss: true, hp: 25, loot: 12, pattern: [{ k: 'guard', v: 4, dmg: 4 }, { k: 'atk', v: 7 }, { k: 'atk', v: 6 }, { k: 'atk', v: 8 }] },
+  wraith: { name: 'Sand Wraith', hp: 24, loot: 6, pattern: [{ k: 'atk', v: 7 }, { k: 'atk', v: 6 }, { k: 'atk', v: 8 }, { k: 'guard', v: 4, dmg: 4 }] },
+  siege: { name: 'Raider Siege Tower', hp: 25, loot: 6, pattern: [{ k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 10 }, { k: 'atk', v: 6 }, { k: 'atk', v: 7 }] },
+  storm: { name: 'The Storm Mother', boss: true, hp: 42, loot: 12, pattern: [{ k: 'atk', v: 7 }, { k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 11 }] },
+  sentinel: { name: 'Brass Sentinel', hp: 29, loot: 7, pattern: [{ k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 8 }, { k: 'atk', v: 11 }] },
+  legion: { name: 'Tomb Legion', hp: 28, loot: 7, pattern: [{ k: 'atk', v: 8 }, { k: 'atk', v: 8 }, { k: 'guard', v: 4, dmg: 7 }, { k: 'atk', v: 8 }] },
+  warden: { name: 'The Gate Warden', boss: true, hp: 50, loot: 0, pattern: [{ k: 'guard', v: 6, dmg: 6 }, { k: 'atk', v: 11 }, { k: 'atk', v: 8 }, { k: 'atk', v: 14 }, { k: 'atk', v: 7 }] },
 };
 
 const LEGS = [
@@ -365,16 +340,16 @@ const NODE_INFO = {
   boss: { label: 'Boss', icon: 'crown' },
 };
 
-const DICE_PER_TURN = 4;
+const DICE_PER_TURN = 2;
 const REROLLS = 2;
 const CAMP_HEAL = 10;
-const PRICES = { hire: 9, wagon: 12, repair: 4 };
+const PRICES = { wagon: 12, repair: 4 };
 const REPAIR = 8;
 
 /* =========================================================
    State, saving, helpers
    ========================================================= */
-const SAVE_KEY = 'caravan-dice-save-v3';
+const SAVE_KEY = 'caravan-dice-save-v4';
 let S = null;
 let pendingFx = [];
 const rand = (n) => Math.floor(Math.random() * n);
@@ -406,7 +381,7 @@ function later(ms, fn) {
 
 function mkCrew(id) {
   const d = CREW_POOL[id];
-  return { id, name: d.name, role: d.role, model: d.model, color: d.color, faces: d.faces.map(parseFace) };
+  return { id, name: d.name, role: d.role, faces: d.faces.map(parseFace) };
 }
 
 function genLeg() {
@@ -621,9 +596,8 @@ function lose() { S.screen = 'defeat'; log(`The caravan fell to ${S.fight.enemy.
    Market and training
    ========================================================= */
 function genMarket() {
-  const hires = shuffle(Object.keys(CREW_POOL).filter((id) => !S.crew.some((c) => c.id === id))).slice(0, 2);
   const wagons = Object.keys(WAGON_TYPES).filter((t) => !has(t));
-  return { hires, wagon: wagons.length ? pick(wagons) : null, bought: [] };
+  return { wagon: wagons.length ? pick(wagons) : null, bought: [] };
 }
 function upgradeFace(c, i) {
   const f = c.faces[i];
@@ -684,11 +658,7 @@ const A = {
   end() { if (S.screen === 'fight' && S.fight.phase === 'roll') playerPhase(); },
 
   camp(kind) {
-    if (kind === 'recruit') {
-      const pool = Object.keys(CREW_POOL).filter((id) => !S.crew.some((c) => c.id === id));
-      if (!pool.length || S.crew.length >= MAX_CREW) return;
-      const c = mkCrew(pick(pool)); S.crew.push(c); log(`${c.name} the ${c.role} joined the caravan.`);
-    }
+    if (kind === 'spoils') { S.coin += 12; S.stats.coinEarned += 12; log('Took the spoils: +12 coin.'); }
     if (kind === 'train') { S.upgrade = { free: true, crew: null }; S.screen = 'upgrade'; return; }
     nextLeg();
   },
@@ -699,10 +669,7 @@ const A = {
     const [kind, arg] = key.split(':');
     const cost = kind === 'upgrade' ? S.upgradeCost : PRICES[kind];
     if (S.coin < cost) return;
-    if (kind === 'hire') {
-      if (S.crew.length >= MAX_CREW) return;
-      const c = mkCrew(arg); S.crew.push(c); log(`Hired ${c.name} the ${c.role}.`);
-    } else if (kind === 'wagon') {
+    if (kind === 'wagon') {
       if (S.wagons.length >= MAX_WAGONS) return;
       S.wagons.push({ type: arg }); S.hp += WAGON_TYPES[arg].hp; log(`Bought a ${WAGON_TYPES[arg].name}.`);
     } else if (kind === 'repair') {
@@ -710,7 +677,7 @@ const A = {
       log(`Repairs: +${heal(REPAIR)} health.`);
     } else if (kind === 'upgrade') { S.upgrade = { free: false, crew: null }; S.screen = 'upgrade'; Sfx.play('click'); return; }
     S.coin -= cost;
-    if (kind === 'hire' || kind === 'wagon') m.bought.push(key);
+    if (kind === 'wagon') m.bought.push(key);
     Sfx.play('coin');
   },
   leave() { S.screen = 'map'; },
@@ -793,742 +760,314 @@ const Sfx = (() => {
 })();
 
 /* =========================================================
-   3D diorama: three.js + Kenney low-poly models (CC0)
+   Flat art: characters, wagons and enemies drawn as SVG
+   ========================================================= */
+// Darken a hex colour (amt 0..1).
+function shade(hex, amt = 0.18) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (v) => Math.round(v * (1 - amt)).toString(16).padStart(2, '0');
+  return `#${f(n >> 16)}${f((n >> 8) & 255)}${f(n & 255)}`;
+}
+
+// How each person looks. Side view, facing right, feet at (0, 0), about 92 units tall.
+const LOOKS = {
+  amir: { skin: '#a8744f', hair: '#2a211b', beard: true, coat: '#56646b', pants: '#4a4038', boots: '#2b231d', belt: '#3a2c22', head: 'helmet', headC: '#8d8a82', scarf: '#8a4b32', cloak: '#6a5e4f', weapon: 'spear' },
+  zane: { skin: '#8a5a3c', hair: '#1d1713', beard: true, coat: '#3f3a36', pants: '#57493c', boots: '#2b231d', belt: '#6a3a28', head: 'wrap', headC: '#7a2f24', cloak: '#4a2a22', weapon: 'scimitar' },
+  noor: { skin: '#6e4630', hair: '#1d1713', coat: '#c9bca2', pants: '#6b5e4e', boots: '#3a2e24', belt: '#7a5a3c', head: 'hood', headC: '#9c8a6a', weapon: 'staff', bag: '#7a5a3c' },
+  oskar: { skin: '#c08a62', hair: '#8f8a80', beard: true, coat: '#7a3a2c', pants: '#4a3c30', boots: '#2b231d', belt: '#b08a3a', head: 'hat', headC: '#4f3e30', scarf: '#b08a3a', weapon: 'pouch' },
+  bandit: { skin: '#9a6644', hair: '#1d1713', coat: '#6e3a2c', pants: '#3a302a', boots: '#221b16', belt: '#2e241d', head: 'wrap', headC: '#3a2a22', mask: '#5a2a22', weapon: 'scimitar' },
+  king: { skin: '#8a5a3c', hair: '#141010', beard: true, coat: '#4a1f1a', pants: '#2e2420', boots: '#1a1410', belt: '#b08a3a', head: 'wrap', headC: '#b08a3a', cloak: '#2a1a16', weapon: 'scimitar' },
+  tomb: { skin: '#d6cdb8', hair: '#bdb39c', eye: '#e8a83a', coat: '#6a5a48', pants: '#4a4038', boots: '#2e2620', belt: '#3e3228', head: 'helmet', headC: '#7a5e44', weapon: 'spear', thin: true },
+};
+
+const WEAPONS = {
+  spear: '<g transform="rotate(28 0 27)"><rect x="-1.1" y="-24" width="2.2" height="70" fill="#6e4b30"/><path d="M-3.2 -24l3.2 -11l3.2 11z" fill="#9a968e"/></g>',
+  scimitar: '<path d="M1 26q17 -2 25 -13q-4 13 -24 17z" fill="#aaa69d"/><rect x="-2.5" y="24" width="5" height="5" fill="#3a2c22"/>',
+  staff: '<rect x="-1.2" y="-10" width="2.4" height="60" fill="#6e4b30"/><circle cx="0" cy="-11" r="3.4" fill="#b0a17e"/>',
+  pouch: '<circle cx="1" cy="34" r="4.6" fill="#7a5a3c"/><rect x="-1" y="28.5" width="4" height="2" fill="#b08a3a"/>',
+};
+
+function figure(L) {
+  const hw = L.thin ? 10.5 : 13, sw = L.thin ? 8.5 : 10;
+  const coat2 = shade(L.coat, 0.2);
+  const s = [];
+  s.push('<ellipse cx="0" cy="0" rx="16" ry="3" fill="#000" opacity=".14"/>');
+  if (L.cloak) s.push(`<path d="M-7 -64C-19 -52 -24 -34 -23 -16L-19.5 -20L-16.5 -13L-13 -19L-9.5 -13L-6 -21L-4 -62Z" fill="${L.cloak}"/>`);
+  s.push(`<g transform="translate(-2,-61) rotate(14)"><rect x="-3.4" y="0" width="6.8" height="25" rx="3.4" fill="${coat2}"/><circle cx="0" cy="27" r="3.2" fill="${L.skin}"/></g>`);
+  s.push(`<rect x="-7" y="-36" width="7.5" height="30" fill="${shade(L.pants)}"/><path d="M-8 -7h10v7h-11z" fill="${L.boots}"/>`);
+  s.push(`<rect x="0" y="-36" width="7.5" height="30" fill="${L.pants}"/><path d="M-1 -7h9q5 0 5 4v3h-14z" fill="${L.boots}"/>`);
+  // Long coat with a frayed hem and a patch, so it reads as worn travelling clothes.
+  s.push(`<path d="M${-sw} -66L${sw} -66L${hw} -24L${hw - 3} -21L${hw - 6} -24L${hw - 9} -21.5L${-hw + 3} -22L${-hw} -24Z" fill="${L.coat}"/>`);
+  s.push(`<rect x="1.5" y="-35" width="5" height="5" fill="${coat2}"/>`);
+  s.push(`<rect x="${-hw + 1.5}" y="-43" width="${2 * hw - 3}" height="4" fill="${L.belt}"/>`);
+  if (L.bag) s.push(`<rect x="-13" y="-41" width="9" height="11" rx="2" fill="${L.bag}"/>`);
+  s.push(`<rect x="-3" y="-71" width="6" height="6" fill="${L.skin}"/>`);
+  if (L.scarf) s.push(`<path d="M-8 -69h16v6h-16z" fill="${L.scarf}"/><path d="M-7 -66l-10 11l3 2l10 -10z" fill="${L.scarf}"/>`);
+  s.push(`<rect x="-8" y="-87" width="17" height="18" rx="5" fill="${L.skin}"/><path d="M8.5 -80l3.5 4l-3.5 1z" fill="${L.skin}"/>`);
+  s.push(`<rect x="3.5" y="-81" width="2.2" height="2.6" fill="${L.eye || '#231b16'}"/><rect x="2.5" y="-84" width="5" height="1.4" fill="${shade(L.hair, 0.1)}"/>`);
+  if (L.beard) s.push(`<path d="M-3 -75h12.5q0 8 -7 9q-6 0 -5.5 -9z" fill="${L.hair}"/>`);
+  if (L.mask) s.push(`<path d="M0 -77h12.5v6h-12.5z" fill="${L.mask}"/>`);
+  const hc = L.headC;
+  if (L.head === 'helmet') s.push(`<path d="M-9 -79q0 -12 9.5 -12q9.5 0 9.5 12z" fill="${hc}"/><rect x="7.5" y="-80" width="2" height="7" fill="${hc}"/>`);
+  else if (L.head === 'wrap') s.push(`<path d="M-10 -79q0 -12 10.5 -12q10 0 10 10l-0.5 3h-20z" fill="${hc}"/><rect x="-10" y="-83" width="20" height="2" fill="${shade(hc)}"/><path d="M-9 -81l-9 13l3 1.5l8 -11z" fill="${shade(hc)}"/>`);
+  else if (L.head === 'hood') s.push(`<path d="M-11 -66q-3 -26 11.5 -26q12 0 12 13h-4q0 -7 -7 -7h-5v20z" fill="${hc}"/>`);
+  else if (L.head === 'hat') s.push(`<rect x="-15" y="-90" width="30" height="3.5" rx="1.7" fill="${hc}"/><path d="M-8 -90q0 -9 8 -9q8 0 8 9z" fill="${hc}"/>`);
+  else s.push(`<path d="M-9 -79q0 -10 9 -10q9 0 9 6h-11v5z" fill="${L.hair}"/>`);
+  s.push(`<g transform="translate(3,-61)"><g class="swing"><rect x="-3.5" y="0" width="7" height="25" rx="3.5" fill="${coat2}"/><circle cx="0" cy="27" r="3.4" fill="${L.skin}"/>${WEAPONS[L.weapon] || ''}</g></g>`);
+  return s.join('');
+}
+
+// Head-and-shoulders crop of a figure, for crew cards.
+function portrait(id) {
+  return `<svg viewBox="-13 -96 27 31" aria-hidden="true">${figure(LOOKS[id])}</svg>`;
+}
+
+const WAGON_LOOK = {
+  supply: { cargo: 'barrels' },
+  armory: { cover: '#6b6458', cargo: 'spears' },
+  bulwark: { cover: '#5a554e', plates: true },
+  bell: { cover: '#c8b48c', bell: true },
+  cook: { cover: '#b7a283', chimney: true },
+  spice: { cargo: 'crates' },
+};
+function wagonSvg(type) {
+  const t = WAGON_LOOK[type] || {};
+  const wood = '#6e4b30', dark = '#3b2c22';
+  const wheel = (x) => `<g transform="translate(${x},-11)"><circle r="11" fill="${dark}"/><circle r="7.5" fill="${wood}"/><path d="M-7.5 0h15M0 -7.5v15" stroke="${dark}" stroke-width="1.6"/><circle r="2.4" fill="${dark}"/></g>`;
+  const s = ['<ellipse cx="0" cy="0" rx="40" ry="3.5" fill="#000" opacity=".12"/>'];
+  if (t.cargo === 'spears') s.push('<path d="M-26 -34l-6 -26M-18 -34l-3 -28" stroke="#6e4b30" stroke-width="2"/>');
+  if (t.cover) {
+    s.push(`<path d="M-32 -34C-32 -68 32 -68 32 -34Z" fill="${t.cover}"/>`);
+    s.push(`<path d="M-16 -34C-16 -58 -14 -61 -10 -62M10 -62C14 -61 16 -58 16 -34" stroke="${shade(t.cover)}" stroke-width="2" fill="none"/>`);
+    s.push(`<rect x="2" y="-50" width="9" height="8" fill="${shade(t.cover, 0.12)}"/>`);
+  }
+  if (t.plates) s.push('<rect x="-30" y="-48" width="16" height="13" fill="#4a4640"/><rect x="-8" y="-50" width="16" height="15" fill="#4a4640"/><rect x="14" y="-48" width="16" height="13" fill="#4a4640"/>');
+  if (t.bell) s.push('<path d="M-36 -40v6M-40 -40q4 -8 8 0z" stroke="#7a5a2a" stroke-width="1.5" fill="#b08a3a"/>');
+  if (t.chimney) s.push('<rect x="12" y="-74" width="5" height="14" fill="#3e3a36"/><circle cx="18" cy="-80" r="4" fill="#d8cdb8" opacity=".7"/><circle cx="23" cy="-88" r="3" fill="#d8cdb8" opacity=".5"/>');
+  if (t.cargo === 'barrels') s.push('<rect x="-28" y="-54" width="15" height="20" rx="3" fill="#8a5e3a"/><rect x="-28" y="-49" width="15" height="2" fill="#4a3426"/><rect x="-28" y="-41" width="15" height="2" fill="#4a3426"/><rect x="-9" y="-52" width="15" height="18" rx="3" fill="#7a5233"/><rect x="-9" y="-47" width="15" height="2" fill="#4a3426"/><rect x="10" y="-46" width="18" height="12" fill="#a08660"/>');
+  if (t.cargo === 'crates') s.push('<rect x="-28" y="-50" width="18" height="16" fill="#8a6a44"/><rect x="-8" y="-46" width="14" height="12" fill="#a8553a"/><rect x="8" y="-52" width="18" height="18" fill="#7a5a3c"/><rect x="-6" y="-58" width="10" height="12" fill="#c49a4a"/>');
+  s.push(`<rect x="-36" y="-34" width="72" height="16" fill="${wood}"/><rect x="-36" y="-27" width="72" height="2" fill="#5c3e27"/><rect x="34" y="-24" width="22" height="3" fill="#5c3e27"/>`);
+  s.push(wheel(-23), wheel(22));
+  return s.join('');
+}
+
+function automaton(big) {
+  const b = '#b08a4a', b2 = '#8a6a36';
+  return `<g transform="scale(${big ? 1.5 : 1.05})">
+    <ellipse cx="0" cy="0" rx="20" ry="3.5" fill="#000" opacity=".15"/>
+    <rect x="-11" y="-40" width="9" height="36" fill="${b2}"/><rect x="2" y="-40" width="9" height="36" fill="${b}"/>
+    <rect x="-13" y="-6" width="12" height="6" fill="#3e3228"/><rect x="1" y="-6" width="14" height="6" fill="#3e3228"/>
+    <rect x="-24" y="-78" width="8" height="34" fill="${b2}"/>
+    <path d="M-17 -80L17 -80L13 -40L-13 -40Z" fill="${b}"/>
+    <circle cx="2" cy="-62" r="6" fill="#e0872a"/><circle cx="2" cy="-62" r="3" fill="#ffd27a"/>
+    <rect x="-8" y="-98" width="20" height="17" rx="2" fill="${b}"/><rect x="3" y="-92" width="9" height="2.6" fill="#ff9d3b"/>
+    <rect x="-3" y="-104" width="4" height="7" fill="${b2}"/>
+    <g transform="translate(15,-77)"><g class="swing"><rect x="-4" y="0" width="8" height="32" fill="${b2}"/><rect x="-6" y="30" width="12" height="11" fill="${b}"/></g></g>
+  </g>`;
+}
+function wraith(big) {
+  return `<g transform="scale(${big ? 1.6 : 1.1})"><g class="bob">
+    <ellipse cx="0" cy="0" rx="30" ry="4" fill="#000" opacity=".12"/>
+    <path d="M-34 -6Q0 -22 34 -6Q22 -40 8 -64Q2 -84 14 -104Q-14 -96 -20 -66Q-26 -36 -34 -6Z" fill="${big ? '#b8925e' : '#cfae7c'}"/>
+    <path d="M-24 -18Q0 -28 22 -18M-16 -44Q0 -52 16 -42M-8 -70Q4 -76 12 -68" stroke="${big ? '#9a7748' : '#b8925e'}" stroke-width="4" fill="none"/>
+    <rect x="2" y="-86" width="4.5" height="3" fill="#f08a2a"/><rect x="10" y="-86" width="4.5" height="3" fill="#f08a2a"/>
+  </g></g>`;
+}
+function siegeTower() {
+  const w = '#6e4b30', d = '#5c3e27';
+  let planks = '';
+  for (const y of [-100, -80, -60, -40]) planks += `<rect x="-26" y="${y}" width="52" height="2" fill="${d}"/>`;
+  return `<ellipse cx="0" cy="0" rx="34" ry="4" fill="#000" opacity=".14"/>
+    <rect x="-26" y="-118" width="52" height="104" fill="${w}"/>${planks}
+    <path d="M-32 -118L0 -136L32 -118Z" fill="${d}"/>
+    <rect x="-10" y="-112" width="20" height="14" fill="#2e2219"/>
+    <rect x="-3" y="-108" width="8" height="8" rx="2" fill="#9a6644"/><rect x="-4" y="-111" width="10" height="3" fill="#3a2a22"/>
+    <g transform="translate(-15,-10)"><circle r="10" fill="#3b2c22"/><circle r="6" fill="${w}"/></g><g transform="translate(15,-10)"><circle r="10" fill="#3b2c22"/><circle r="6" fill="${w}"/></g>`;
+}
+
+// One enemy group. Drawn facing right, then mirrored so it faces the caravan.
+function enemySvg(kind) {
+  const at = (x, y, sc, inner) => `<g transform="translate(${x},${y}) scale(${sc})">${inner}</g>`;
+  let g = '';
+  if (kind === 'bandits') g = at(-26, -6, 0.92, figure(LOOKS.bandit)) + at(0, 0, 1, figure(LOOKS.bandit));
+  else if (kind === 'king') g = at(-40, -6, 0.9, figure(LOOKS.bandit)) + at(0, 0, 1.3, figure(LOOKS.king));
+  else if (kind === 'skeletons') g = at(-26, -6, 0.92, figure(LOOKS.tomb)) + at(0, 0, 1, figure(LOOKS.tomb));
+  else if (kind === 'legion') g = at(-48, -8, 0.86, figure(LOOKS.tomb)) + at(-24, -4, 0.93, figure(LOOKS.tomb)) + at(0, 0, 1, figure(LOOKS.tomb));
+  else if (kind === 'wraith') g = wraith(false);
+  else if (kind === 'storm') g = wraith(true);
+  else if (kind === 'siege') g = at(-26, 0, 1, siegeTower()) + at(16, 0, 1, figure(LOOKS.bandit));
+  else if (kind === 'sentinel') g = automaton(false);
+  else if (kind === 'warden') g = `<rect x="-112" y="-170" width="20" height="170" fill="#cdb894"/><rect x="-46" y="-170" width="20" height="170" fill="#cdb894"/><path d="M-116 -170h94v-14h-94z" fill="#b8a27c"/><path d="M-92 -150q23 -26 46 0z" fill="#b8a27c"/>${automaton(true)}`;
+  return `<g transform="scale(-1,1)">${g}</g>`;
+}
+
+/* =========================================================
+   The stage: a flat side-view scene (SVG) that follows the game state
    ========================================================= */
 const Scene = (() => {
-  const T = window.THREE;
   const host = document.getElementById('scene');
-  const status = document.getElementById('scene-status');
-  if (!T || !T.GLTFLoader || !T.SkeletonUtils) { host.hidden = true; return null; }
-  let renderer;
-  try { renderer = new T.WebGLRenderer({ antialias: true, alpha: true }); } catch (err) { host.hidden = true; return null; }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.outputEncoding = T.sRGBEncoding;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = T.PCFSoftShadowMap;
-  host.insertBefore(renderer.domElement, host.firstChild);
-
-  const PI = Math.PI;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const scene = new T.Scene();
-  const cam = new T.OrthographicCamera(-1, 1, 1, -1, -60, 100);
-  // Aim a little left of centre, where the crew, wagons and dice are.
-  const camTarget = new T.Vector3(-0.2, 0.3, 1.2);
-  cam.position.copy(camTarget).add(new T.Vector3(14, 11.5, 14));
-  cam.lookAt(camTarget);
-  scene.add(new T.HemisphereLight(0xfff8ee, 0xc8a878, 0.85));
-  const sun = new T.DirectionalLight(0xfff1dc, 1.25);
-  sun.position.set(5, 14, 9);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
-  Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 40 });
-  sun.shadow.bias = -0.0008;
-  scene.add(sun);
+  const VW = 480, VH = 270, BASE = 250;
+  const CREW_X = [58, 104, 150, 196];
+  const WAGON_X = [246, 176, 106, 36]; // front wagon first
+  const WAGON_Y = 216;
+  const ENEMY_X = 396;
 
-  // World group: turned 45° so local x runs left→right on screen and local z runs toward the viewer.
-  const W = new T.Group();
-  W.rotation.y = PI / 4;
-  scene.add(W);
+  const background = `<rect width="480" height="270" fill="#f1e2c4"/>
+    <circle cx="398" cy="58" r="24" fill="#f3c27c"/>
+    <path d="M0 150L40 138L70 142L95 118L150 118L170 140L240 146L300 130L340 136L380 124L420 140L480 132V270H0Z" fill="#e2c193"/>
+    <path d="M0 186Q60 158 130 174T262 168T400 166T480 170V270H0Z" fill="#d7ac76"/>
+    <rect y="200" width="480" height="70" fill="#c99a63"/>
+    <rect y="232" width="480" height="28" fill="#d3a873"/>
+    <rect x="60" y="208" width="6" height="3" fill="#b4864f"/><rect x="300" y="214" width="9" height="3" fill="#b4864f"/><rect x="430" y="262" width="7" height="3" fill="#b4864f"/><rect x="190" y="264" width="10" height="3" fill="#b4864f"/>`;
 
-  const mats = {};
-  const mat = (c) => mats[c] || (mats[c] = new T.MeshStandardMaterial({ color: new T.Color(c).convertSRGBToLinear(), flatShading: true, roughness: 0.95, metalness: 0 }));
-  const basic = (c, extra = {}) => new T.MeshBasicMaterial({ color: new T.Color(c).convertSRGBToLinear(), ...extra });
-  function mesh(geo, color, opts = {}) {
-    const m = new T.Mesh(geo, Array.isArray(color) ? color.map(mat) : mat(color));
-    m.castShadow = opts.cast !== false;
-    m.receiveShadow = !!opts.receive;
-    return m;
-  }
-  let seed = 11;
-  const sr = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const C = {
-    sand: '#dcb478', sandDark: '#c99c5c', road: '#e8cf9c', dirt: '#b98457', rock: '#8e6748',
-    stone: '#a59d92', woodDark: '#6e4a2b', orange: '#ef8a26', water: '#5d9dbb', leafDark: '#557d2c',
-    brass: '#c9953a', brassDark: '#9d7128', ember: '#ff9d3b',
+  const PROPS = {
+    market: `<rect x="372" y="168" width="4" height="56" fill="#5c3e27"/><rect x="452" y="168" width="4" height="56" fill="#5c3e27"/>
+      <path d="M364 166h100l-8 14h-84z" fill="#a8553a"/><path d="M380 166h12l-2 14h-10zM404 166h12l-1 14h-11zM428 166h12l1 14h-12z" fill="#d8c3a0"/>
+      <rect x="372" y="200" width="84" height="24" fill="#7a5a3c"/><rect x="380" y="190" width="12" height="10" fill="#c49a4a"/><circle cx="410" cy="195" r="6" fill="#8a4a2a"/><rect x="424" y="188" width="16" height="12" fill="#a08660"/>`,
+    camp: `<path d="M398 222L428 176L458 222Z" fill="#8f7d60"/><path d="M420 222L428 196L436 222Z" fill="#5a4a38"/>
+      <rect x="320" y="246" width="26" height="5" rx="2" fill="#5c3e27" transform="rotate(-12 333 248)"/><rect x="320" y="246" width="26" height="5" rx="2" fill="#4a3426" transform="rotate(14 333 248)"/>
+      <path class="flicker" d="M324 246q9 -30 9 -30q9 18 9 30z" fill="#e8892e"/><path class="flicker" d="M328 246q5 -18 5 -18q5 10 5 18z" fill="#f6c454"/>`,
+    victory: `<rect x="372" y="120" width="108" height="104" fill="#cdb894"/><path d="M372 120h108v-10h-108z" fill="#b8a27c"/>
+      <path d="M372 110h10v-8h-10zM394 110h10v-8h-10zM416 110h10v-8h-10zM438 110h10v-8h-10zM460 110h10v-8h-10z" fill="#b8a27c"/>
+      <path d="M404 224v-50q22 -26 44 0v50z" fill="#4a3a2c"/>`,
   };
 
-  /* Island base (procedural) */
-  function slab(rx, rz, depth, top, side, y, jitter) {
-    const pts = [];
-    for (let i = 0; i < 18; i++) {
-      const a = (i / 18) * PI * 2, r = 1 + (sr() - 0.5) * jitter;
-      pts.push(new T.Vector2(Math.cos(a) * rx * r, Math.sin(a) * rz * r));
-    }
-    const m = mesh(new T.ExtrudeGeometry(new T.Shape(pts), { depth, bevelEnabled: false }), [top, side], { receive: true });
-    m.rotation.x = -PI / 2;
-    m.position.y = y - depth;
-    return m;
-  }
-  W.add(slab(8.6, 5.3, 1.1, C.sand, C.dirt, 0, 0.12));
-  W.add(slab(8.0, 4.8, 0.9, C.rock, C.rock, -1.1, 0.16));
-  const road = mesh(new T.BoxGeometry(15.6, 0.04, 1.6), C.road, { cast: false, receive: true });
-  road.position.set(0, 0.02, 0.5);
-  W.add(road);
-  const pond = mesh(new T.CylinderGeometry(1.5, 1.5, 0.08, 9), C.water, { cast: false, receive: true });
-  pond.scale.z = 0.7; pond.position.set(-1.4, 0.03, -3.0); W.add(pond);
-  const shore = mesh(new T.CylinderGeometry(1.75, 1.75, 0.05, 9), C.road, { cast: false, receive: true });
-  shore.scale.z = 0.72; shore.position.set(-1.4, 0.01, -3.0); W.add(shore);
-  for (let i = 0; i < 5; i++) { const reed = mesh(new T.ConeGeometry(0.05, 0.6, 4), C.leafDark); reed.position.set(-0.3 + sr() * 0.4, 0.3, -2.4 - sr() * 0.5); W.add(reed); }
-  function dune(x, z, s) {
-    const m = mesh(new T.SphereGeometry(1, 7, 4, 0, PI * 2, 0, PI / 2), C.sandDark, { receive: true });
-    m.scale.set(1.6 * s, 0.5 * s, 1.1 * s); m.rotation.y = sr() * PI; m.position.set(x, 0, z); W.add(m);
-  }
-  dune(3.2, -3.1, 1.1); dune(6.0, -1.6, 0.8); dune(-6.2, -1.8, 0.9); dune(1.4, 3.6, 0.6);
+  host.insertAdjacentHTML('afterbegin', `<svg class="stage" viewBox="0 0 ${VW} ${VH}" role="img" aria-label="Your caravan on the road">
+    ${background}<g id="st-props"></g><g id="st-wagons"></g><g id="st-enemy"></g><g id="st-crew"></g></svg>`);
+  const L = (id) => host.querySelector(`#${id}`);
+  const layers = { props: L('st-props'), wagons: L('st-wagons'), enemy: L('st-enemy'), crew: L('st-crew') };
+  const keys = { props: null, wagons: null, enemy: null, crew: null };
+  const crewPos = {};
+  let enemyEl = null, dying = false;
+  const handlers = { crew: null };
 
-  /* Model loading */
-  const CHAR_MODELS = ['male-a', 'male-b', 'male-c', 'male-d', 'male-e', 'male-f', 'female-a', 'female-b', 'female-c', 'female-d', 'female-e', 'female-f'].map((c) => `chars/char-${c}`);
-  const MODEL_FILES = [
-    'town/cart', 'town/cart-high', 'town/stall-red', 'town/lantern', 'town/banner-red',
-    'pirate/ship-small', 'pirate/palm-bend', 'pirate/palm-straight', 'pirate/barrel', 'pirate/crate', 'pirate/chest', 'pirate/rocks-sand-a', 'pirate/rocks-sand-b',
-    'survival/tent', 'survival/campfire', 'survival/signpost',
-    'nature/cactus-tall', 'nature/cactus-short', 'nature/statue-head', 'nature/stone-tall',
-    'castle/gate', 'castle/tower', 'castle/siege-tower',
-    'graveyard/skeleton', 'graveyard/ghost', 'graveyard/pillar',
-    ...CHAR_MODELS,
-  ];
-  const M = {};
-  let loaded = false;
-  const MODEL_EXT = 'glb'; // the published copy uses JSON glTF files instead
-  const loader = new T.GLTFLoader();
-  let done = 0;
-  const loads = MODEL_FILES.map((file) => new Promise((res) => {
-    loader.load(`models/${file}.${MODEL_EXT}`, (g) => {
-      g.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-      const box = new T.Box3().setFromObject(g.scene);
-      M[file.split('/')[1]] = { g, size: box.getSize(new T.Vector3()) };
-      done++; status.textContent = `Unpacking the caravan… ${Math.round((100 * done) / MODEL_FILES.length)}%`;
-      res();
-    }, undefined, () => { done++; res(); });
-  }));
+  const tr = (x, y) => `transform:translate(${x}px,${y}px)`;
+  const anim = (el, frames, opts) => { if (!el || reduced) return null; return el.animate(frames, opts); };
 
-  function cloneModel(name) {
-    const m = M[name];
-    if (!m) return new T.Group();
-    return m.g.animations.length ? T.SkeletonUtils.clone(m.g.scene) : m.g.scene.clone(true);
-  }
-  function prop(name, { h, s, ry = 0 } = {}) {
-    const m = M[name];
-    const o = cloneModel(name);
-    o.scale.setScalar(s != null ? s : (h && m ? h / m.size.y : 1));
-    o.rotation.y = ry;
-    const g = new T.Group(); g.add(o);
-    return g;
-  }
-  function tintObj(o, color) {
-    const c = new T.Color(color);
-    o.traverse((m) => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.multiply(c); } });
-  }
-
-  /* Worn look: fade colours toward dusty tones, add grime blotches and specks, dirtier near the feet. */
-  function wornMaterial(base, heavy) {
-    const w = base.clone();
-    // Heavy wear for clothes and bodies, light dust for faces so they stay readable.
-    const k = heavy ? { desat: '0.6', blot: '0.3', freq: '13.0', speck: '0.32', dirt: '0.5', dirtTop: '0.26' } : { desat: '0.35', blot: '0.12', freq: '9.0', speck: '0.0', dirt: '1.0', dirtTop: '0.01' };
-    w.onBeforeCompile = (sh) => {
-      sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vWorn;')
-        .replace('#include <skinning_vertex>', '#include <skinning_vertex>\nvWorn = transformed;');
-      sh.fragmentShader = sh.fragmentShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vWorn;\nfloat wornHash(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }')
-        .replace('#include <map_fragment>', `#include <map_fragment>
-          {
-            vec3 c = diffuseColor.rgb;
-            float l = dot(c, vec3(0.299, 0.587, 0.114));
-            c = mix(c, vec3(l) * vec3(1.1, 0.95, 0.78), ${k.desat});
-            c *= (1.0 - ${k.blot}) + ${k.blot} * wornHash(floor(vWorn * ${k.freq}));
-            c *= 1.0 - ${k.speck} * step(0.9, wornHash(floor(vWorn * 36.0) + 3.1));
-            c *= mix(${k.dirt}, 1.0, smoothstep(0.0, ${k.dirtTop}, vWorn.y));
-            diffuseColor.rgb = c;
-          }`);
-    };
-    w.customProgramCacheKey = () => (heavy ? 'worn-heavy' : 'worn-light');
-    return w;
-  }
-  function wearOut(o) {
-    o.traverse((m) => { if (m.isMesh && !m.userData.rag) m.material = wornMaterial(m.material, !/head/i.test(m.name)); });
-  }
-
-  /* Rags: simple flat-shaded pieces parented to the head and torso bones, so they move with the animation. */
-  const ragMat = (c) => { const m = mat(c).clone(); m.side = T.DoubleSide; return m; };
-  function ragMesh(geo, color, parent, pos, rot = [0, 0, 0], scale = [1, 1, 1]) {
-    const m = new T.Mesh(geo, ragMat(color));
-    m.position.set(...pos); m.rotation.set(...rot); m.scale.set(...scale);
-    m.castShadow = true; m.userData.rag = true;
-    parent.add(m);
-    return m;
-  }
-  function cloakGeo() {
-    // Jagged, uneven hem so it reads as torn cloth.
-    const pts = [[-0.13, 0.2], [0.13, 0.2], [0.17, -0.12], [0.14, -0.17], [0.1, -0.12], [0.06, -0.19], [0.01, -0.13], [-0.04, -0.2], [-0.08, -0.13], [-0.12, -0.18], [-0.17, -0.11]];
-    return new T.ExtrudeGeometry(new T.Shape(pts.map(([x, y]) => new T.Vector2(x, y))), { depth: 0.012, bevelEnabled: false });
-  }
-  function dressUp(o, rag) {
-    if (!rag) return;
-    const head = o.getObjectByName('head'), torso = o.getObjectByName('torso');
-    if (!head || !torso) return;
-    // A strip of cloth wrapped around the (boxy) head, tilted across it.
-    const headBand = (color, h, y, tilt) => ragMesh(new T.CylinderGeometry(0.243, 0.243, h, 10, 1, true), color, head, [0, y, 0], [0, 0, tilt], [1, 1, 0.8]);
-    if (rag.cloak) {
-      ragMesh(cloakGeo(), rag.cloak, torso, [0, 0, -0.115], [0.16, 0, 0]);
-      // Ragged shoulder mantle: an open, low-poly cone draped over the shoulders, visible from the front.
-      ragMesh(new T.ConeGeometry(0.27, 0.2, 7, 1, true), rag.cloak, torso, [0, 0.13, -0.01], [0, 0.3, 0], [1.05, 1, 0.8]);
-    }
-    if (rag.wrap) {
-      ragMesh(new T.CylinderGeometry(0.242, 0.25, 0.085, 9), rag.wrap, head, [0, 0.215, 0], [0.08, 0, 0], [1, 1, 0.82]);
-      ragMesh(new T.BoxGeometry(0.06, 0.16, 0.02), rag.wrap, head, [0.07, 0.13, -0.165], [0.1, 0, 0.35]);
-      ragMesh(new T.BoxGeometry(0.05, 0.12, 0.02), rag.wrap, head, [0.13, 0.15, -0.15], [0.1, 0, 0.6]);
-    }
-    if (rag.mask) ragMesh(new T.BoxGeometry(0.4, 0.11, 0.05), rag.mask, head, [0, 0.085, 0.16], [-0.15, 0, 0]);
-    if (rag.scarf) {
-      ragMesh(new T.TorusGeometry(0.1, 0.032, 5, 9), rag.scarf, torso, [0, 0.18, 0], [PI / 2, 0, 0], [1, 0.85, 1]);
-      ragMesh(new T.BoxGeometry(0.05, 0.13, 0.02), rag.scarf, torso, [0.05, 0.11, 0.095], [0.05, 0, 0.25]);
-    }
-    if (rag.bandage) {
-      const arm = o.getObjectByName(rag.bandage === 'left' ? 'arm-left' : 'arm-right');
-      const side = rag.bandage === 'left' ? 1 : -1;
-      if (arm) for (let i = 0; i < 2; i++) ragMesh(new T.BoxGeometry(0.075, 0.05, 0.095), '#d8ccb4', arm, [side * (0.09 + i * 0.08), -0.02, 0], [0, 0, side * 0.2]);
-      headBand('#d8ccb4', 0.05, 0.25, side * 0.3);
-    }
-    if (rag.eyepatch) {
-      headBand('#1e1a16', 0.022, 0.18, 0.28);
-      ragMesh(new T.BoxGeometry(0.085, 0.08, 0.025), '#1e1a16', head, [0.075, 0.15, 0.172]);
-    }
-    if (rag.apron) ragMesh(new T.BoxGeometry(0.2, 0.22, 0.012), rag.apron, torso, [0, 0.03, 0.1]);
-    if (rag.patches) {
-      ragMesh(new T.BoxGeometry(0.055, 0.05, 0.012), rag.patches, torso, [-0.05, 0.08, 0.092], [0, 0, 0.2]);
-      ragMesh(new T.BoxGeometry(0.04, 0.045, 0.012), rag.patches, torso, [0.06, 0.03, 0.092], [0, 0, -0.3]);
-    }
-  }
-
-  /* Animated characters */
-  const mixers = new Set();
-  function charObj(model, s, tint, rag) {
-    const o = cloneModel(model);
-    o.scale.setScalar(s);
-    if (tint) tintObj(o, tint);
-    if (rag !== undefined) { wearOut(o); dressUp(o, rag); }
-    const mixer = new T.AnimationMixer(o);
-    mixers.add(mixer);
-    const actions = {};
-    ((M[model] && M[model].g.animations) || []).forEach((clip) => { actions[clip.name] = mixer.clipAction(clip); });
-    const holder = { obj: o, ch: { mixer, actions, cur: null, curA: null, base: 'idle' } };
-    setAnim(holder, 'idle');
-    return holder;
-  }
-  function setAnim(h, name, once = false) {
-    const ch = h.ch; if (!ch) return;
-    const a = ch.actions[name]; if (!a) return;
-    if (ch.cur === name && !once) return;
-    a.reset();
-    a.setLoop(once ? T.LoopOnce : T.LoopRepeat, Infinity);
-    a.clampWhenFinished = once;
-    if (ch.curA && ch.curA !== a) ch.curA.fadeOut(0.18);
-    a.fadeIn(0.18).play();
-    ch.cur = name; ch.curA = a;
-  }
-  function oneShot(h, name, delay = 0, dur = 650) {
-    if (!h.ch || h.ch.base === 'die') return;
+  function floatAt(x, y, text, cls, delay = 0) {
     setTimeout(() => {
-      if (h.ch.base === 'die') return;
-      setAnim(h, name, true);
-      setTimeout(() => { if (h.ch.cur === name) setAnim(h, h.ch.base, h.ch.base === 'die'); }, dur);
-    }, delay);
-  }
-
-  /* Entities: outer group eases toward a target; inner group takes hit animations */
-  const ents = new Set();
-  function entity() {
-    const outer = new T.Group(), inner = new T.Group();
-    outer.add(inner); W.add(outer);
-    const e = { outer, inner, t: { x: 0, y: 0, z: 0, ry: 0, rx: 0 }, lock: 0, snapped: false };
-    ents.add(e);
-    return e;
-  }
-  function setT(e, o) {
-    Object.assign(e.t, o);
-    if (!e.snapped) { e.outer.position.set(e.t.x, e.t.y, e.t.z); e.outer.rotation.set(e.t.rx, e.t.ry, 0); e.snapped = true; }
-  }
-  function removeEntity(e) {
-    W.remove(e.outer); ents.delete(e);
-    (e.chars || []).forEach((h) => mixers.delete(h.ch.mixer));
-    if (e.ch) mixers.delete(e.ch.mixer);
-  }
-  const pos = (e, dy) => new T.Vector3(e.outer.position.x, dy, e.outer.position.z);
-
-  const ringGeo = new T.RingGeometry(0.34, 0.46, 28);
-  const ringMats = { sel: basic('#ef8a26') };
-  function ring() { const r = new T.Mesh(ringGeo, ringMats.sel); r.rotation.x = -PI / 2; r.position.y = 0.03; r.visible = false; return r; }
-
-  /* Scenery and location sets, built once the models arrive */
-  const groups = {};
-  let flames = [];
-  function flame(parent, x, y, z, s = 1) {
-    const f1 = new T.Mesh(new T.ConeGeometry(0.16 * s, 0.5 * s, 5), basic(C.ember));
-    f1.position.set(x, y + 0.22 * s, z);
-    const f2 = new T.Mesh(new T.ConeGeometry(0.09 * s, 0.32 * s, 5), basic('#ffd36b'));
-    f2.position.set(x, y + 0.17 * s, z);
-    parent.add(f1, f2); flames.push(f1, f2);
-  }
-  function addAt(parent, obj, x, z, y = 0) { obj.position.set(x, y, z); parent.add(obj); return obj; }
-
-  function buildWorld() {
-    addAt(W, prop('palm-straight', { h: 2.8 }), -3.2, -3.5);
-    addAt(W, prop('palm-bend', { h: 2.6, ry: 2.2 }), 0.4, -3.7);
-    addAt(W, prop('palm-straight', { h: 2.1, ry: 1 }), -2.3, -1.9);
-    addAt(W, prop('cactus-tall', { h: 1.3 }), 6.3, -2.4);
-    addAt(W, prop('cactus-tall', { h: 1.1, ry: 1.3 }), 5.6, 2.5);
-    addAt(W, prop('cactus-short', { h: 0.8 }), 4.6, 3.3);
-    addAt(W, prop('cactus-tall', { h: 1.0, ry: 2 }), -7.2, 1.6);
-    addAt(W, prop('cactus-short', { h: 0.9, ry: 0.5 }), 4.6, -3.6);
-    addAt(W, prop('rocks-sand-a', { h: 0.55, ry: 1 }), 3.2, 3.4);
-    addAt(W, prop('rocks-sand-b', { h: 0.6 }), -4.9, 3.5);
-    addAt(W, prop('rocks-sand-a', { h: 0.45, ry: 2.5 }), 6.8, 0.7);
-    addAt(W, prop('rocks-sand-b', { h: 0.4, ry: 0.4 }), -0.6, -1.3);
-    addAt(W, prop('signpost', { h: 1.1, ry: -PI / 2 }), 0.7, -0.6);
-
-    const camp = groups.camp = new T.Group();
-    addAt(camp, prop('tent', { h: 1.3, ry: 0.6 }), 4.8, -1.6);
-    addAt(camp, prop('tent', { h: 1.1, ry: -0.4 }), 1.4, -1.9);
-    const pit = addAt(camp, prop('campfire', { s: 3.2 }), 2.6, 1.0);
-    flame(camp, 2.6, 0.12, 1.0, 1.4);
-    addAt(camp, prop('lantern', { h: 1.4 }), 4.2, 2.4);
-    void pit;
-
-    const market = groups.market = new T.Group();
-    addAt(market, prop('stall-red', { h: 1.9, ry: -PI / 2 }), 2.6, -1.4);
-    addAt(market, prop('stall-red', { h: 1.9, ry: -PI / 2 }), 4.6, 0.2);
-    addAt(market, prop('chest', { h: 0.5, ry: -0.6 }), 3.3, 1.8);
-    addAt(market, prop('crate', { h: 0.5, ry: 0.3 }), 1.6, 1.6);
-    addAt(market, prop('crate', { h: 0.42, ry: 1.1 }), 1.9, 2.2);
-    addAt(market, prop('barrel', { h: 0.6 }), 5.4, 1.7);
-    addAt(market, prop('banner-red', { s: 1.6, ry: -PI / 2 }), 3.6, -0.6);
-
-    const ruins = groups.ruins = new T.Group();
-    addAt(ruins, prop('statue-head', { h: 2.2, ry: -PI / 2 }), 5.6, -1.4);
-    addAt(ruins, prop('stone-tall', { h: 1.6, ry: 0.4 }), 2.5, -2.0);
-    addAt(ruins, prop('stone-tall', { h: 1.2, ry: 1.9 }), 6.4, 1.6);
-    addAt(ruins, prop('pillar', { h: 1.7 }), 2.0, 1.9);
-    addAt(ruins, prop('pillar', { h: 1.2 }), 3.1, 2.7);
-    addAt(ruins, prop('pillar', { h: 1.5 }), 4.6, -2.7);
-
-    for (const g of Object.values(groups)) { g.visible = false; W.add(g); }
-  }
-
-  /* Wagons */
-  const wagonEnt = {};
-  function buildWagon(type) {
-    const e = entity();
-    const def = WAGON_TYPES[type];
-    const cart = prop(def.model, { s: 1.55, ry: PI / 2 });
-    e.inner.add(cart);
-    const deck = def.model === 'cart' ? 0.62 : 0.75;
-    const add = (o, x, y, z) => { o.position.set(x, y, z); e.inner.add(o); return o; };
-    if (def.props === 'barrels') { add(prop('barrel', { h: 0.55 }), -0.38, deck, 0); add(prop('barrel', { h: 0.55, ry: 1 }), 0.38, deck, 0); }
-    if (def.props === 'crates') { add(prop('crate', { h: 0.45 }), -0.35, deck, 0); add(prop('chest', { h: 0.42, ry: PI / 2 }), 0.38, deck, 0); }
-    if (def.props === 'lantern') { add(prop('lantern', { h: 1.2 }), 0, deck, 0); }
-    if (def.props === 'fire') { add(prop('campfire', { s: 2.2 }), 0, deck, 0); flame(e.inner, 0, deck + 0.05, 0, 0.9); }
-    if (def.props === 'banner') { add(prop('crate', { h: 0.45 }), -0.4, deck, 0); add(prop('crate', { h: 0.45, ry: 0.4 }), 0.1, deck, 0); add(prop('barrel', { h: 0.5 }), 0.55, deck, 0); }
-    const hit = new T.Mesh(new T.BoxGeometry(1.9, 1.4, 1.2), basic('#fff', { visible: false }));
-    hit.position.y = 0.7; e.inner.add(hit);
-    return e;
-  }
-
-  /* Crew */
-  const crewEnt = {};
-  const hitTargets = [];
-  function buildCrew(c) {
-    const e = entity();
-    const h = charObj(c.model, 1.65, null, RAGS[c.id]);
-    e.inner.add(h.obj);
-    e.ch = h.ch; e.obj = h.obj;
-    e.ring = ring(); e.outer.add(e.ring);
-    const hit = new T.Mesh(new T.CylinderGeometry(0.38, 0.38, 1.3, 8), basic('#fff', { visible: false }));
-    hit.position.y = 0.65; hit.userData.pick = { crew: c.id };
-    e.inner.add(hit); hitTargets.push(hit); e.hit = hit;
-    e.wantBase = 'idle';
-    return e;
-  }
-
-  /* Enemies */
-  let enemy = null, enemyFightId = null;
-  function colossus(parent, s) {
-    const body = new T.Group();
-    for (const z of [-0.35, 0.35]) { const leg = mesh(new T.BoxGeometry(0.45, 1.1, 0.42), C.brassDark); leg.position.set(0, 0.55, z); body.add(leg); }
-    const torso = mesh(new T.BoxGeometry(1.0, 1.25, 1.4), C.brass); torso.position.y = 1.72; body.add(torso);
-    const belt = mesh(new T.BoxGeometry(1.04, 0.18, 1.44), C.brassDark); belt.position.y = 1.2; body.add(belt);
-    for (const z of [-0.9, 0.9]) {
-      const arm = mesh(new T.BoxGeometry(0.4, 1.2, 0.36), C.brassDark); arm.position.set(0, 1.65, z); body.add(arm);
-      const fist = mesh(new T.BoxGeometry(0.46, 0.4, 0.42), C.brass); fist.position.set(0, 0.95, z); body.add(fist);
-    }
-    const head = mesh(new T.BoxGeometry(0.7, 0.6, 0.7), C.brass); head.position.y = 2.65; body.add(head);
-    for (const z of [-0.16, 0.16]) { const eye = new T.Mesh(new T.BoxGeometry(0.08, 0.1, 0.14), basic(C.ember)); eye.position.set(-0.36, 2.7, z); body.add(eye); }
-    const crest = mesh(new T.ConeGeometry(0.2, 0.4, 4), C.orange); crest.position.y = 3.15; body.add(crest);
-    body.scale.setScalar(s);
-    parent.add(body);
-  }
-  function orbitRocks(e, n, r, y) {
-    const orbit = new T.Group(); orbit.position.y = y;
-    for (let i = 0; i < n; i++) {
-      const m = mesh(new T.DodecahedronGeometry(0.15 + sr() * 0.12, 0), i % 2 ? C.stone : C.sandDark);
-      const a = (i / n) * PI * 2; m.position.set(Math.cos(a) * r, (sr() - 0.5) * 1.4, Math.sin(a) * r); orbit.add(m);
-    }
-    e.inner.add(orbit); e.spin = orbit;
-  }
-  function buildEnemy(kind) {
-    const e = entity();
-    e.chars = []; e.kind = kind;
-    const g = e.inner;
-    const addChar = (model, s, x, z, tint, ry = -PI / 4, rag) => {
-      const h = charObj(model, s, tint, rag); h.obj.position.set(x, 0, z); h.obj.rotation.y = ry; g.add(h.obj); e.chars.push(h); return h;
-    };
-    const add = (o, x, z, y = 0) => { o.position.set(x, y, z); g.add(o); return o; };
-    if (kind === 'bandits' || kind === 'king') {
-      const big = kind === 'king';
-      add(prop('ship-small', { h: big ? 3.6 : 2.8, ry: PI }), 1.1, -0.4);
-      addChar('char-male-b', big ? 2.4 : 1.65, -0.7, 0.3, '#c58f80', -PI / 4, big ? { scarf: '#5e2a22', cloak: '#3e3028', patches: '#4e2620' } : RAGS.bandit);
-      addChar('char-female-f', 1.65, -0.3, -0.9, '#c58f80', -PI / 4, RAGS.bandit);
-      if (big) { addChar('char-male-f', 1.65, -0.2, 1.2, '#c58f80', -PI / 4, RAGS.bandit); add(prop('banner-red', { s: 2, ry: PI / 2 }), -1.2, -0.4); }
-    } else if (kind === 'skeletons' || kind === 'legion') {
-      const spots = kind === 'legion' ? [[-0.6, 0.4], [0.1, -0.6], [0.3, 1.0], [0.9, 0.1], [1.2, -1.1]] : [[-0.5, 0.4], [0.2, -0.6], [0.5, 1.0]];
-      spots.forEach(([x, z]) => addChar('skeleton', kind === 'legion' ? 1.8 : 1.7, x, z));
-      if (kind === 'legion') add(prop('pillar', { h: 1.6 }), 1.6, 0.9);
-    } else if (kind === 'wraith' || kind === 'storm') {
-      const big = kind === 'storm';
-      addChar('ghost', big ? 4.4 : 2.9, 0, 0, '#ecd3a2');
-      if (big) { addChar('ghost', 1.7, -0.4, 1.4, '#e3c48f'); addChar('ghost', 1.7, 0.4, -1.4, '#e3c48f'); }
-      orbitRocks(e, big ? 9 : 6, big ? 2.1 : 1.5, big ? 1.8 : 1.2);
-      const swirl = mesh(new T.CylinderGeometry(big ? 2 : 1.4, big ? 2.2 : 1.6, 0.08, 10), C.sandDark, { cast: false });
-      swirl.position.y = 0.04; g.add(swirl);
-    } else if (kind === 'siege') {
-      add(prop('siege-tower', { h: 3.6, ry: PI / 2 }), 0.6, 0);
-      addChar('char-male-b', 1.65, -0.9, 0.9, '#c58f80', -PI / 4, RAGS.bandit);
-      addChar('char-female-f', 1.65, -0.9, -0.9, '#c58f80', -PI / 4, RAGS.bandit);
-    } else if (kind === 'sentinel') {
-      colossus(g, 0.75);
-    } else if (kind === 'warden') {
-      add(prop('tower', { s: 1.5 }), 1.6, -1.6);
-      add(prop('tower', { s: 1.5 }), 1.6, 1.6);
-      add(prop('gate', { s: 2.4, ry: 0 }), 1.6, 0);
-      colossus(g, 1);
-    }
-    setT(e, { x: 3.7, z: 0.2 });
-    return e;
-  }
-
-  /* 3D dice */
-  const diceGroup = new T.Group(); W.add(diceGroup);
-  const dieGeo = new T.BoxGeometry(0.68, 0.68, 0.68);
-  const faceMats = {};
-  function faceMat(f) {
-    const key = f.t + f.v;
-    if (faceMats[key]) return faceMats[key];
-    const cv = document.createElement('canvas'); cv.width = cv.height = 128;
-    const x = cv.getContext('2d');
-    x.fillStyle = '#fffcf6'; x.fillRect(0, 0, 128, 128);
-    x.strokeStyle = '#ead9bf'; x.lineWidth = 10; x.strokeRect(5, 5, 118, 118);
-    const col = FACE_COLOR[f.t];
-    x.strokeStyle = col; x.lineCap = 'round'; x.lineJoin = 'round';
-    x.save();
-    if (hasValue(f)) { x.translate(64 - 22, 12); x.scale(44 / 24, 44 / 24); } else { x.translate(64 - 36, 28); x.scale(72 / 24, 72 / 24); }
-    x.lineWidth = 2.6; x.stroke(new Path2D(ICON_D[f.t]));
-    x.restore();
-    if (hasValue(f)) { x.fillStyle = col; x.font = '700 56px Poppins, "Segoe UI", sans-serif'; x.textAlign = 'center'; x.fillText(String(f.v), 64, 114); }
-    const tex = new T.CanvasTexture(cv);
-    tex.encoding = T.sRGBEncoding; tex.anisotropy = 4;
-    return (faceMats[key] = new T.MeshStandardMaterial({ map: tex, roughness: 0.7 }));
-  }
-  const dieMeshes = [];
-  function makeDie() {
-    const m = new T.Mesh(dieGeo, Array(6).fill(faceMat({ t: 'blank', v: 0 })));
-    m.castShadow = true;
-    const r = ring(); r.scale.setScalar(1.1); r.position.y = -0.31; m.add(r); m.userData.ring = r;
-    diceGroup.add(m); hitTargets.push(m);
-    return m;
-  }
-  function setDieFaces(m, d, crew) {
-    const others = crew ? crew.faces.slice() : [];
-    const idx = others.findIndex((f) => f.t === d.face.t && f.v === d.face.v);
-    if (idx >= 0) others.splice(idx, 1);
-    while (others.length < 5) others.push({ t: 'blank', v: 0 });
-    const o = others.map(faceMat);
-    m.material = [o[0], o[1], faceMat(d.face), o[2], o[3], o[4]];
-  }
-  const dieHome = (i) => new T.Vector3(-0.6 + i * 0.95, 0.34, 1.95);
-  function animateRoll(m, home, i) {
-    const start = home.clone().add(new T.Vector3(-1.6 + sr() * 0.4, 2.4, 0.8));
-    const spin = new T.Vector3((sr() - 0.5) * 14, (sr() - 0.5) * 10, (sr() - 0.5) * 14);
-    const finalY = (sr() - 0.5) * 0.4;
-    m.position.copy(start);
-    tween(reduced ? 1 : 720, (p) => {
-      const e = 1 - Math.pow(1 - p, 3);
-      m.position.x = start.x + (home.x - start.x) * e;
-      m.position.z = start.z + (home.z - start.z) * e;
-      m.position.y = home.y + (start.y - home.y) * (1 - e) * Math.abs(Math.cos(e * PI * 1.5));
-      m.rotation.set(spin.x * (1 - e), finalY + spin.y * (1 - e), spin.z * (1 - e));
-    }, () => { m.position.copy(home); m.rotation.set(0, finalY, 0); if (i === 0) Sfx.play('land'); }, i * 70);
-  }
-  function syncDice(R) {
-    const scr = S ? S.screen : '';
-    const show = R && R.phase !== 'pick' && R.dice.length && scr === 'fight';
-    diceGroup.visible = !!show;
-    dieMeshes.forEach((m) => { m.visible = false; m.userData.pick = null; });
-    if (!show) return;
-    R.dice.forEach((d, i) => {
-      const m = dieMeshes[i] || (dieMeshes[i] = makeDie());
-      m.visible = true;
-      m.userData.pick = R.phase === 'roll' ? { die: i } : null;
-      const key = `${d.crew}:${d.face.t}${d.face.v}`;
-      const home = dieHome(i);
-      if (d.fresh || m.userData.key !== key) {
-        setDieFaces(m, d, S.crew.find((c) => c.id === d.crew));
-        m.userData.key = key;
-        if (d.fresh) animateRoll(m, home, i); else { m.position.copy(home); m.rotation.set(0, 0.1, 0); }
-      }
-      m.userData.ring.visible = d.held && R.phase === 'roll';
-      m.userData.lift = R.active === i ? 0.35 : 0;
-      if (!d.fresh) m.position.y = home.y + m.userData.lift;
-    });
-  }
-
-  /* Tweens and effects */
-  const tweens = [];
-  function tween(dur, fn, doneFn, delay = 0) { tweens.push({ t0: performance.now() + delay, dur, fn, done: doneFn }); }
-  function bump(obj, delay = 0) { tween(320, (p) => obj.scale.setScalar(1 + Math.sin(p * PI) * 0.14), () => obj.scale.setScalar(1), delay); }
-  function shake(obj, delay = 0) { tween(440, (p) => { obj.rotation.z = Math.sin(p * PI * 6) * 0.12 * (1 - p); }, () => { obj.rotation.z = 0; }, delay); }
-  function burst(p, color, delay = 0) {
-    const m = new T.Mesh(new T.IcosahedronGeometry(0.6, 1), basic(color, { transparent: true, opacity: 0.5 }));
-    m.position.copy(p); m.visible = false; W.add(m);
-    tween(380, (q) => { m.visible = true; m.scale.setScalar(0.4 + q * 1.2); m.material.opacity = 0.5 * (1 - q); }, () => { W.remove(m); m.geometry.dispose(); m.material.dispose(); }, delay);
-  }
-  function shot(from, to, color, delay, onHit) {
-    const m = new T.Mesh(new T.OctahedronGeometry(0.18, 0), basic(color));
-    m.visible = false; W.add(m);
-    tween(460, (p) => {
-      m.visible = true;
-      m.position.lerpVectors(from, to, p);
-      m.position.y += Math.sin(p * PI) * 1.8;
-      m.rotation.x += 0.25; m.rotation.y += 0.2;
-    }, () => { W.remove(m); m.geometry.dispose(); m.material.dispose(); if (onHit) onHit(); }, delay);
-  }
-  function floatAt(localPos, text, cls, delay = 0) {
-    setTimeout(() => {
-      const v = W.localToWorld(localPos.clone()).project(cam);
       const el = document.createElement('div');
       el.className = `float ${cls || ''}`;
       el.textContent = text;
-      el.style.left = `${((v.x + 1) / 2) * 100}%`;
-      el.style.top = `${((1 - v.y) / 2) * 100}%`;
+      el.style.left = `${(x / VW) * 100}%`;
+      el.style.top = `${(y / VH) * 100}%`;
       host.appendChild(el);
       el.addEventListener('animationend', () => el.remove());
       setTimeout(() => el.remove(), 2000);
     }, delay);
   }
-  const front = () => { const w = S && S.wagons[0]; return w && wagonEnt[w.type]; };
+
+  const crewEl = (id) => layers.crew.querySelector(`[data-crew="${id}"]`);
+  const wagonEl = (type) => layers.wagons.querySelector(`[data-wagon="${type}"]`);
+
+  function swing(el, delay = 0) {
+    const arm = el && el.querySelector('.swing');
+    anim(arm, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-165deg)', offset: 0.4 }, { transform: 'rotate(-35deg)', offset: 0.75 }, { transform: 'rotate(0deg)' }], { duration: 420, delay, easing: 'ease-out' });
+  }
+  function knock(el, dx, delay = 0) {
+    anim(el && el.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: `translateX(${dx}px)`, offset: 0.3 }, { transform: 'translateX(0)' }], { duration: 360, delay });
+  }
 
   function play(list) {
-    if (!loaded) return;
-    let t = 0;
-    const now = performance.now();
     for (const f of list) {
-      if (f.k === 'pshot' && enemy) {
-        f.ids.forEach((id, i) => {
-          const c = crewEnt[id]; if (!c) return;
-          const d = i * 120;
-          oneShot(c, 'attack-melee-right', d);
-          shot(pos(c, 0.9), pos(enemy, 1.3), '#ef8a26', d + 150, () => { bump(enemy.inner); burst(pos(enemy, 1.3), '#ef8a26'); });
-        });
-        const land = (f.ids.length - 1) * 120 + 610;
-        setTimeout(() => Sfx.play('hit'), land);
-        floatAt(pos(enemy, 2.6), f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk', land);
-        if (f.absorbed) floatAt(pos(enemy, 1.7), `${f.absorbed} absorbed`, 't-shd small', land + 150);
-        t = land + 150;
-      }
-      if (f.k === 'strike' && enemy) {
-        const c = crewEnt[f.id]; if (!c) continue;
-        oneShot(c, 'attack-melee-right', 120);
-        shot(pos(c, 0.9).add(new T.Vector3(0.9, 0, -0.4)), pos(enemy, 1.3), '#ef8a26', 260, () => {
-          bump(enemy.inner); burst(pos(enemy, 1.3), '#ef8a26'); Sfx.play('hit');
-          floatAt(pos(enemy, 2.6), f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk');
-          if (f.absorbed) floatAt(pos(enemy, 1.8), `${f.absorbed} absorbed`, 't-shd small', 120);
-        });
-      }
-      if (f.k === 'bell' && enemy) {
-        const fr = front();
-        if (fr) shot(pos(fr, 1.6), pos(enemy, 1.3), '#e0b23a', 0, () => {
-          bump(enemy.inner); Sfx.play('hit');
-          floatAt(pos(enemy, 2.6), `Bell −${f.dmg}`, 't-coin');
-        });
+      if (f.k === 'strike') {
+        const el = crewEl(f.id);
+        swing(el, 260);
+        setTimeout(() => {
+          knock(enemyEl, 10);
+          Sfx.play('hit');
+          floatAt(ENEMY_X - 6, 128, f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk');
+          if (f.absorbed) floatAt(ENEMY_X - 6, 156, `${f.absorbed} absorbed`, 't-shd small', 120);
+        }, 430);
       }
       if (f.k === 'act') {
-        const c = crewEnt[f.id]; if (!c) continue;
-        oneShot(c, f.cls === 't-blank' ? 'emote-no' : 'interact-right', 60, 600);
-        if (f.burst) burst(pos(c, 0.7), f.burst, 150);
-        floatAt(pos(c, 1.9), f.text, f.cls, 150);
-        if (f.sfx) setTimeout(() => Sfx.play(f.sfx), 150);
+        setTimeout(() => {
+          const el = crewEl(f.id), p = crewPos[f.id] || { x: 150, y: BASE };
+          anim(el && el.querySelector('.mover'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-7px)', offset: 0.4 }, { transform: 'translateY(0)' }], { duration: 380 });
+          floatAt(p.x, p.y - 104, f.text, f.cls);
+          if (f.sfx) Sfx.play(f.sfx);
+        }, 320);
       }
+      if (f.k === 'bell') { knock(enemyEl, 8); Sfx.play('hit'); floatAt(ENEMY_X - 6, 128, `Bell −${f.dmg}`, 't-coin'); }
       if (f.k === 'gain') {
-        const fr = front();
-        if (fr) floatAt(pos(fr, 1.8), f.text, f.cls, (f.delay || 0) + t);
-        if (f.sfx) setTimeout(() => Sfx.play(f.sfx), (f.delay || 0) + t);
+        floatAt(WAGON_X[0], 150, f.text, f.cls, f.delay || 0);
+        if (f.sfx) setTimeout(() => Sfx.play(f.sfx), f.delay || 0);
       }
       if (f.k === 'eshot') {
-        const target = wagonEnt[f.id];
-        if (!target) continue;
-        const tp = pos(target, 1.0);
-        const d = t;
-        const onHit = () => {
-          if (f.blocked) { burst(tp, '#6fa8d0'); floatAt(pos(target, 1.9), 'Blocked', 't-shd'); Sfx.play('block'); }
+        anim(enemyEl && enemyEl.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-46px)', offset: 0.45 }, { transform: 'translateX(0)' }], { duration: 560, easing: 'ease-in-out' });
+        if (enemyEl) enemyEl.querySelectorAll('.swing').forEach((a, i) => anim(a, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-165deg)', offset: 0.4 }, { transform: 'rotate(-35deg)', offset: 0.75 }, { transform: 'rotate(0deg)' }], { duration: 420, delay: 80 + i * 60 }));
+        setTimeout(() => {
+          const w = wagonEl(f.id);
+          const x = WAGON_X[Math.max(0, S.wagons.findIndex((v) => v.type === f.id))];
+          if (f.blocked) { floatAt(x, 140, 'Blocked', 't-shd'); Sfx.play('block'); }
           else {
-            shake(target.inner); burst(tp, '#d4532d');
-            floatAt(pos(target, 1.9), `−${f.dmg}`, 't-atk');
+            anim(w && w.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(-2px)' }, { transform: 'translateX(0)' }], { duration: 360 });
+            floatAt(x, 140, `−${f.dmg}`, 't-atk');
             Sfx.play('hurt');
           }
-        };
-        if (!enemy) { onHit(); continue; }
-        target.lock = now + d + 640;
-        tween(300, (p) => { enemy.inner.position.x = -Math.sin(p * PI) * 0.5; }, () => { enemy.inner.position.x = 0; }, d);
-        enemy.chars.forEach((h, i) => oneShot(h, 'attack-melee-right', d + i * 60));
-        shot(pos(enemy, 1.6), tp, f.blocked ? '#2f8ea6' : '#8f3328', d + 120, onHit);
-        t += 320;
+        }, 300);
       }
-      if (f.k === 'edown' && enemy) {
-        const e = enemy;
-        e.dying = true;
-        setTimeout(() => e.chars.forEach((h) => { h.ch.base = 'die'; setAnim(h, 'die', true); }), t + 300);
-        tween(900, (p) => { e.inner.position.y = -p * 1.6; e.inner.rotation.z = p * 0.5; },
-          () => { e.outer.visible = false; e.dying = false; }, t + 900);
+      if (f.k === 'edown' && enemyEl) {
+        dying = true;
+        const el = enemyEl;
+        const done = () => { el.style.opacity = '0'; dying = false; };
+        const a = anim(el.querySelector('.mover'), [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(16px)' }], { duration: 900, delay: 500, fill: 'forwards' });
+        if (a) a.finished.then(done); else setTimeout(done, 600);
       }
     }
   }
 
-  /* Sync scene to game state */
-  let lastS = null;
   function sync(state) {
-    lastS = state;
-    if (!loaded) return;
     const scr = state ? state.screen : 'title';
     const f = state && state.fight;
 
-    groups.camp.visible = scr === 'camp' || scr === 'victory';
-    groups.market.visible = scr === 'market' || (scr === 'upgrade' && state.upgrade && !state.upgrade.free);
-    groups.ruins.visible = scr === 'fight' && f && (f.kind === 'skeletons' || f.kind === 'legion');
+    const propKey = scr === 'market' || (scr === 'upgrade' && state.upgrade && !state.upgrade.free) ? 'market' : scr === 'camp' ? 'camp' : scr === 'victory' ? 'victory' : '';
+    if (propKey !== keys.props) { layers.props.innerHTML = PROPS[propKey] || ''; keys.props = propKey; }
 
-    if (f && scr === 'fight' && f.id !== enemyFightId) {
-      if (enemy) removeEntity(enemy);
-      enemy = buildEnemy(f.kind);
-      enemyFightId = f.id;
+    const wagons = state ? state.wagons.map((w) => w.type) : ['supply', 'armory'];
+    const wk = wagons.join(',');
+    if (wk !== keys.wagons) {
+      layers.wagons.innerHTML = wagons.map((t, i) => `<g data-wagon="${t}" style="${tr(WAGON_X[i], WAGON_Y)}"><g class="mover">${wagonSvg(t)}</g></g>`).reverse().join('');
+      keys.wagons = wk;
     }
-    if (enemy && !enemy.dying) enemy.outer.visible = scr === 'fight' && f && f.id === enemyFightId && f.enemy.hp > 0;
 
-    const wagons = state ? state.wagons : [{ type: 'supply' }, { type: 'armory' }];
-    for (const type of Object.keys(wagonEnt)) if (!wagons.some((w) => w.type === type)) { removeEntity(wagonEnt[type]); delete wagonEnt[type]; }
-    wagons.forEach((w, i) => {
-      const e = wagonEnt[w.type] || (wagonEnt[w.type] = buildWagon(w.type));
-      setT(e, { x: -1.5 - i * 2.15, z: 0.5 });
+    const ek = scr === 'fight' && f ? f.id : null;
+    if (ek && ek !== keys.enemy) {
+      layers.enemy.innerHTML = `<g class="enemy" style="${tr(ENEMY_X, BASE)}"><g class="mover"><g class="fig">${enemySvg(f.kind)}</g></g></g>`;
+      enemyEl = layers.enemy.firstElementChild; dying = false; keys.enemy = ek;
+    }
+    if (enemyEl && !dying) enemyEl.style.opacity = scr === 'fight' && f && f.enemy.hp > 0 ? '1' : '0';
+
+    const crew = state ? state.crew.map((c) => c.id) : START_CREW;
+    const ck = crew.join(',');
+    if (ck !== keys.crew) {
+      layers.crew.innerHTML = crew.map((id) => `<g class="pos" data-crew="${id}" style="${tr(150, BASE)}"><g class="mover">
+          <ellipse class="ring" cx="0" cy="1" rx="17" ry="4.5" fill="none" stroke="#ef8a26" stroke-width="2.5" opacity="0"/>
+          <g class="fig">${figure(LOOKS[id])}</g></g></g>`).join('');
+      keys.crew = ck;
+    }
+    const R = scr === 'fight' ? f : null;
+    const activeDie = R && R.active != null ? R.dice[R.active] : null;
+    crew.forEach((id, i) => {
+      const el = crewEl(id); if (!el) return;
+      let x = CREW_X[i], y = BASE;
+      const picked = R && R.phase === 'pick' && R.selected.includes(id);
+      const rolled = R && R.phase !== 'pick' && R.dice.some((d) => d.crew === id);
+      if (picked || rolled) y += 6;
+      if (activeDie && activeDie.crew === id) { x = activeDie.face.t === 'atk' ? ENEMY_X - 58 : 270; y = BASE + 4; }
+      if (scr === 'camp') { x = [262, 294, 372, 404][i] || 300; y = BASE - (i % 2) * 5; }
+      crewPos[id] = { x, y };
+      el.style.transform = `translate(${x}px,${y}px)`;
+      el.classList.toggle('walking', scr === 'map');
+      el.classList.toggle('fallen', scr === 'defeat');
+      el.querySelector('.ring').setAttribute('opacity', picked ? '1' : '0');
     });
-
-    const crew = state ? state.crew : START_CREW.map((id) => ({ id, model: CREW_POOL[id].model }));
-    for (const id of Object.keys(crewEnt)) if (!crew.some((c) => c.id === id)) {
-      const e = crewEnt[id]; hitTargets.splice(hitTargets.indexOf(e.hit), 1); removeEntity(e); delete crewEnt[id];
-    }
-    const R = state && scr === 'fight' ? f : null;
-    const forward = R ? (R.phase === 'pick' ? R.selected : R.dice.map((d) => d.crew)) : [];
-    const n = crew.length;
-    crew.forEach((c, i) => {
-      const e = crewEnt[c.id] || (crewEnt[c.id] = buildCrew(c));
-      let x = -7.0 + i * 0.8, z = 2.35, ry = PI / 4, base = 'idle';
-      if (scr === 'camp' || scr === 'victory') {
-        const a = (i / n) * PI * 2 + 0.4;
-        x = 2.6 + Math.cos(a) * 1.5; z = 1.0 + Math.sin(a) * 1.05;
-        ry = Math.atan2(2.6 - x, 1.0 - z);
-        base = scr === 'victory' ? 'emote-yes' : 'sit';
-      } else if (scr === 'map') base = 'walk';
-      else if (scr === 'defeat') base = 'die';
-      else if (forward.includes(c.id)) z += 0.55;
-      if (R && R.active != null && R.dice[R.active] && R.dice[R.active].crew === c.id) { x += 1.1; z += 0.5; ry = PI / 2; }
-      setT(e, { x, z, ry });
-      e.wantBase = base;
-      const sel = R && R.phase === 'pick' && R.selected.includes(c.id);
-      e.ring.visible = !!sel;
-      e.hit.userData.pick = R && R.phase === 'pick' ? { crew: c.id } : null;
-    });
-    syncDice(R);
   }
 
-  /* Tapping figures and dice */
-  const ray = new T.Raycaster();
-  let down = null;
-  const handlers = { crew: null, die: null };
-  renderer.domElement.addEventListener('pointerdown', (ev) => { down = { x: ev.clientX, y: ev.clientY }; });
-  renderer.domElement.addEventListener('pointerup', (ev) => {
-    if (!down || Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > 10) return;
-    const r = renderer.domElement.getBoundingClientRect();
-    ray.setFromCamera({ x: ((ev.clientX - r.left) / r.width) * 2 - 1, y: -((ev.clientY - r.top) / r.height) * 2 + 1 }, cam);
-    const hits = ray.intersectObjects(hitTargets.filter((h) => h.userData.pick), false);
-    if (!hits.length) return;
-    const p = hits[0].object.userData.pick;
-    if (p.crew && handlers.crew) handlers.crew(p.crew);
-    if (p.die != null && handlers.die) handlers.die(p.die);
-  });
-
-  /* Size and render loop */
-  function resize() {
-    const w = host.clientWidth, h = host.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    const aspect = w / h;
-    let worldW = 14.2, worldH = worldW / aspect;
-    if (worldH < 8.2) { worldH = 8.2; worldW = worldH * aspect; }
-    cam.left = -worldW / 2; cam.right = worldW / 2; cam.top = worldH / 2 + 0.5; cam.bottom = -worldH / 2 + 0.5;
-    cam.updateProjectionMatrix();
-  }
-  new ResizeObserver(resize).observe(host);
-  resize();
-
-  let last = performance.now();
-  function angleLerp(a, b, k) { let d = b - a; while (d > PI) d -= 2 * PI; while (d < -PI) d += 2 * PI; return a + d * k; }
-  function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    for (let i = tweens.length - 1; i >= 0; i--) {
-      const tw = tweens[i];
-      const p = (now - tw.t0) / tw.dur;
-      if (p < 0) continue;
-      tw.fn(Math.min(p, 1));
-      if (p >= 1) { tweens.splice(i, 1); if (tw.done) tw.done(); }
-    }
-    mixers.forEach((m) => m.update(dt));
-    const k = 1 - Math.pow(0.002, dt);
-    for (const e of ents) {
-      if (now < e.lock) continue;
-      const o = e.outer, t = e.t;
-      o.position.x += (t.x - o.position.x) * k;
-      o.position.y += (t.y - o.position.y) * k;
-      o.position.z += (t.z - o.position.z) * k;
-      o.rotation.y = angleLerp(o.rotation.y, t.ry, k);
-      o.rotation.x += (t.rx - o.rotation.x) * k;
-      if (e.ch && e.wantBase && e.ch.base !== e.wantBase) {
-        e.ch.base = e.wantBase;
-        setAnim(e, e.wantBase, e.wantBase === 'die');
-      }
-    }
-    if (!reduced) {
-      const t = now / 1000;
-      if (enemy && !enemy.dying) {
-        if (enemy.spin) enemy.spin.rotation.y = t * 1.3;
-        if (enemy.kind === 'wraith' || enemy.kind === 'storm') enemy.inner.position.y = 0.2 + Math.sin(t * 1.6) * 0.15;
-      }
-      flames.forEach((fl, i) => fl.scale.set(1 + Math.sin(t * 13 + i) * 0.08, 1 + Math.sin(t * 9 + i * 2) * 0.16, 1));
-    }
-    renderer.render(scene, cam);
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-
-  Promise.all(loads).then(() => {
-    loaded = true;
-    buildWorld();
-    status.hidden = true;
-    sync(lastS);
+  host.addEventListener('click', (ev) => {
+    const g = ev.target.closest('[data-crew]');
+    if (g && handlers.crew) handlers.crew(g.dataset.crew);
   });
 
   return { sync, play, handlers };
@@ -1537,10 +1076,6 @@ const Scene = (() => {
 /* =========================================================
    Rendering (DOM)
    ========================================================= */
-function personSvg(color) {
-  return `<svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="8" r="4.2" fill="#c99a72"/><path d="M7 23c0-6 2.6-10 6-10s6 4 6 10z" fill="${color}" stroke="#00000018"/></svg>`;
-}
-
 function headerHtml() {
   const muteBtn = `<button class="iconbtn" data-act="mute" aria-label="${Sfx.muted ? 'Turn sound on' : 'Turn sound off'}">${icon(Sfx.muted ? 'mute' : 'sound')}</button>`;
   if (!S) return `<header class="top"><div class="brand">Caravan</div><div class="res">${muteBtn}</div></header>`;
@@ -1589,7 +1124,7 @@ function miniFaces(c, act) {
 function crewCard(c, act, opts = {}) {
   return `<button class="crew ${opts.sel ? 'sel' : ''}" data-act="${act}" data-arg="${c.id}" ${opts.disabled ? 'disabled' : ''} ${opts.sel != null ? `aria-pressed="${!!opts.sel}"` : ''}>
     ${opts.sel ? '<span class="badge">Rolling</span>' : ''}
-    <span class="head"><span class="tile">${personSvg(c.color)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
+    <span class="head"><span class="tile">${portrait(c.id)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
     <span class="faces">${miniFaces(c)}</span>
   </button>`;
 }
@@ -1598,7 +1133,7 @@ function fightHtml() {
   const f = S.fight, it = intentText(f.intent);
   let body, actions;
   if (f.phase === 'pick') {
-    body = `<div class="label"><span>Choose who rolls</span><span>${f.selected.length}/${Math.min(DICE_PER_TURN, S.crew.length)}</span></div>
+    body = `<div class="label"><span>Choose two to roll</span><span>${f.selected.length}/${Math.min(DICE_PER_TURN, S.crew.length)}</span></div>
       <div class="roster">${S.crew.map((c) => crewCard(c, 'pick', { sel: f.selected.includes(c.id) })).join('')}</div>`;
     actions = `<button class="btn primary" data-act="roll" ${f.selected.length ? '' : 'disabled'}>Roll ${f.selected.length} crew</button>`;
   } else {
@@ -1671,24 +1206,19 @@ function choice(act, arg, ic, cls, title, desc, opts = {}) {
 }
 
 function campHtml() {
-  const full = S.crew.length >= MAX_CREW;
   return `<section class="panel">
     <h1>${ENEMY_TYPES[S.fight.kind].name} is beaten</h1>
     <p>The caravan is fully repaired. Choose one before you set out for ${LEGS[S.leg + 1].name}.</p>
     <div class="choices">
-      ${choice('camp', 'recruit', personSvg('#ef8a26'), '', 'Recruit a traveller', full ? 'Your caravan is full.' : 'A random new crew member joins.', { disabled: full })}
       ${choice('camp', 'train', 'atk', 't-atk', 'Train', 'Upgrade any one face.')}
+      ${choice('camp', 'spoils', 'coin', 't-coin', 'Take the spoils', '+12 coin for the markets ahead.')}
     </div>
   </section>`;
 }
 
 function marketHtml() {
   const m = S.market;
-  const items = m.hires.map((id) => {
-    const d = CREW_POOL[id], key = `hire:${id}`, bought = m.bought.includes(key);
-    return choice('buy', key, personSvg(d.color), '', `Hire ${d.name} the ${d.role}`, bought ? 'Hired.' : d.faces.map(parseFace).map(faceLabel).join(', '),
-      { price: PRICES.hire, done: bought, disabled: bought || S.coin < PRICES.hire || S.crew.length >= MAX_CREW });
-  });
+  const items = [];
   if (m.wagon) {
     const key = `wagon:${m.wagon}`, bought = m.bought.includes(key), def = WAGON_TYPES[m.wagon];
     items.push(choice('buy', key, 'cart', '', `Buy a ${def.name}`, bought ? 'Bought.' : `+${def.hp} caravan health. ${def.perk}`,
@@ -1726,7 +1256,7 @@ function upgradeHtml() {
 function endHtml(won) {
   return `<section class="panel">
     <h1>${won ? 'You reached the city' : 'The caravan fell'}</h1>
-    <p>${won ? 'The Gate Warden fell and the caravan rolled through the gate.' : `${S.log[0]} Every run starts fresh, so try a different route and crew.`}</p>
+    <p>${won ? 'The Gate Warden fell and the caravan rolled through the gate.' : `${S.log[0]} Every run starts fresh, so try a different route.`}</p>
     <div class="stats">
       <div class="stat"><b class="num">${S.stats.fights}</b><span>fights</span></div>
       <div class="stat"><b class="num">${S.stats.dmg}</b><span>damage dealt</span></div>
@@ -1741,9 +1271,8 @@ function titleHtml() {
   const cont = s ? `<button class="btn primary solo" data-act="resume">Continue<small>Leg ${s.leg + 1}: ${LEGS[s.leg].name}</small></button>` : '';
   return `<section class="panel hero">
     <h1>Cross the desert, one roll at a time</h1>
-    <p>Your crew are your dice. In each fight, choose who rolls, keep the faces you like, reroll the rest, then end your turn. Attack hurts the enemy, Block stops its next hit, Coin buys things at markets and Mend repairs the caravan.</p>
+    <p>Four travellers, four dice. Each turn, choose two of them to roll, keep the faces you like, reroll the rest, then watch them act one by one. Attack hurts the enemy, Block stops its next hit, Coin pays at markets and Mend repairs the caravan.</p>
     <div class="cta">${cont}<button class="btn ${s ? '' : 'primary'} solo" data-act="newRun">${s ? 'New run' : 'Start'}</button></div>
-    <p class="credit">3D models by Kenney (kenney.nl), CC0.</p>
   </section>`;
 }
 
