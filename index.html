@@ -7,28 +7,38 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: everything on one screen, no page scroll. Phones: header, flat scene, then a control panel that fills the rest.
+/* Layout: everything on one screen, no page scroll. Phones: header, scene, then a control panel that fills the rest.
    Wide screens: the scene on the left, the control panel on the right.
-   Single light look on purpose: clean white page, beige icon tiles, orange accent, soft shadows. */
+   One dark look on purpose (a blood-red wasteland): worn leather panels in riveted iron frames, bone-coloured text,
+   blood-red for danger and action. */
 :root {
-  --bg: #fafaf8;
-  --card: #ffffff;
-  --tile: #f3ede3;
-  --line: #e9e4db;
-  --ink: #262b29;
-  --muted: #6a6f6b;
-  --accent: #ef8a26;
-  --accent-ink: #ffffff;
-  --atk: #d4532d;
-  --shd: #477b9b;
-  --coin: #b9860c;
-  --heal: #5f9334;
-  --shadow: 0 1px 0 rgba(70, 50, 20, 0.05), 0 6px 18px rgba(70, 50, 20, 0.08);
-  --font-display: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  color-scheme: light;
+  --bg: #120d0b;
+  --card: #211915;
+  --card-hi: #2b211b;
+  --tile: #302520;
+  --line: #45382f;
+  --iron: #514841;
+  --rivet: #8a7d70;
+  --ink: #ebdfcb;
+  --muted: #a8937c;
+  --accent: #a3241b;
+  --accent-hi: #d0392b;
+  --accent-ink: #f7ebdb;
+  --atk: #e2593c;
+  --shd: #7fa6c6;
+  --coin: #d9a93e;
+  --heal: #8bb661;
+  --blank: #6f635a;
+  --rivets: radial-gradient(circle at 6px 6px, var(--rivet) 1.3px, transparent 2px),
+            radial-gradient(circle at calc(100% - 6px) 6px, var(--rivet) 1.3px, transparent 2px),
+            radial-gradient(circle at 6px calc(100% - 6px), var(--rivet) 1.3px, transparent 2px),
+            radial-gradient(circle at calc(100% - 6px) calc(100% - 6px), var(--rivet) 1.3px, transparent 2px);
+  --frame-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 235, 210, 0.05), 0 3px 0 #000, 0 8px 18px rgba(0, 0, 0, 0.5);
+  --font-display: 'Grenze Gotisch', 'Times New Roman', serif;
+  --font-body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -43,7 +53,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 button { font: inherit; color: inherit; }
-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button:focus-visible { outline: 3px solid var(--accent-hi); outline-offset: 2px; }
 .ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .num { font-variant-numeric: tabular-nums; }
 
@@ -61,27 +71,35 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   overflow: hidden;
 }
 #app { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-
 .stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* Riveted iron frame shared by panels, cards, dice and buttons */
+.ctx, .intent, .die, .crew, .btn, .choice, .stat, .card, .map {
+  background-color: var(--card);
+  background-image: var(--rivets);
+  border: 2px solid var(--iron);
+  border-radius: 6px;
+  box-shadow: var(--frame-shadow);
+}
 
 /* Header */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; flex-wrap: wrap; }
-.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; line-height: 1; letter-spacing: -0.01em; display: flex; flex-direction: column; gap: 6px; }
-.brand::after { content: ""; width: 34px; height: 4px; border-radius: 3px; background: var(--accent); }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 0.9; letter-spacing: 0.01em; display: flex; flex-direction: column; gap: 6px; color: var(--ink); }
+.brand::after { content: ""; width: 36px; height: 3px; background: var(--accent-hi); }
 .res { display: flex; gap: 6px; align-items: center; }
-.chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-weight: 700; font-variant-numeric: tabular-nums; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 4px; background: var(--card); border: 2px solid var(--iron); font-weight: 700; font-variant-numeric: tabular-nums; }
 .chip.coin .ic { color: var(--coin); }
-.iconbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--card); box-shadow: var(--shadow); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 1.05rem; }
-.road { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 0.8rem; color: var(--muted); }
+.iconbtn { width: 36px; height: 36px; border-radius: 4px; border: 2px solid var(--iron); background: var(--card); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 1.05rem; }
+.road { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 .road b { color: var(--ink); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .road .dots { display: flex; gap: 5px; margin-left: auto; flex: none; }
-.road .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-.road .dot.done { background: var(--accent); }
-.road .dot.here { background: var(--card); box-shadow: inset 0 0 0 3px var(--accent); }
-.road .dot.boss { border-radius: 3px; }
+.road .dot { width: 10px; height: 10px; transform: rotate(45deg) scale(0.8); background: var(--line); }
+.road .dot.done { background: var(--accent-hi); }
+.road .dot.here { background: var(--bg); box-shadow: inset 0 0 0 2px var(--accent-hi); }
+.road .dot.boss { transform: none; width: 12px; height: 12px; }
 
 /* Stage: flat side-view scene */
-.scene { position: relative; width: min(100%, 60vh); justify-self: center; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; touch-action: manipulation; }
+.scene { position: relative; width: min(100%, 60vh); justify-self: center; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; touch-action: manipulation; border: 3px solid var(--iron); box-shadow: inset 0 0 0 1px #000, 0 6px 18px rgba(0, 0, 0, 0.6); }
 .scene svg.stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .scene .overlay { position: absolute; inset: 8px 8px auto 8px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .stage [data-crew] { cursor: pointer; }
@@ -89,34 +107,36 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .stage .fig { animation: breathe 3.2s ease-in-out infinite; }
 .stage .walking .fig { animation: walk 0.55s ease-in-out infinite; }
 .stage .fallen .fig { animation: none; transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-84deg); opacity: 0.85; }
+.stage .wounded .fig { animation: none; transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(7deg) translateY(2px); }
 .stage .swing { transform-box: fill-box; transform-origin: 50% 6%; }
+.stage .cairn, .stage .dead .fig { display: none; }
+.stage .dead .cairn { display: inline; }
 .stage .bob { animation: bob 2.4s ease-in-out infinite; }
 .stage .flicker { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 0.3s steps(2) infinite; }
+.stage .circle { animation: circle 9s linear infinite; }
+.stage .circle.slow { animation-duration: 13s; animation-direction: reverse; }
 @keyframes breathe { 50% { transform: translateY(-0.8px); } }
 @keyframes walk { 50% { transform: translateY(-2.5px); } }
 @keyframes bob { 50% { transform: translateY(-4px); } }
 @keyframes flicker { 50% { transform: scale(0.9, 1.14); } }
+@keyframes circle { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .stage *, .stage .fig { animation: none !important; transition: none !important; } }
-.ctx { background: color-mix(in srgb, var(--card) 94%, transparent); box-shadow: var(--shadow); border-radius: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; max-width: 48%; }
+.ctx { background-color: rgba(28, 21, 17, 0.9); padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; max-width: 48%; }
 .ctx .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-.ctx b { font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
+.ctx b { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.05; letter-spacing: 0.01em; }
 .ctx .hp { font-weight: 700; color: var(--atk); font-variant-numeric: tabular-nums; font-size: 0.85rem; }
-.ctx .block { font-size: 0.75rem; color: var(--shd); font-weight: 700; display: flex; align-items: center; gap: 4px; }
-.wchips { display: flex; flex-wrap: wrap; gap: 5px; }
-.wchip { background: color-mix(in srgb, var(--card) 92%, transparent); box-shadow: var(--shadow); border-radius: 9px; padding: 4px 7px; font-size: 0.68rem; font-weight: 700; display: flex; flex-direction: column; gap: 3px; min-width: 70px; border: 1.5px solid transparent; }
-.wchip.rear { border-color: color-mix(in srgb, var(--atk) 45%, transparent); }
-.wchip.dead { opacity: 0.5; }
-.wchip .bar { height: 4px; }
-.bar { height: 7px; border-radius: 4px; background: var(--tile); overflow: hidden; }
-.bar > span { display: block; height: 100%; background: var(--atk); border-radius: 4px; transition: width 400ms ease; }
+.bar { height: 6px; background: #0b0807; box-shadow: inset 0 0 0 1px #000; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent-hi); transition: width 400ms ease; }
 .bar.fill-ok > span { background: var(--heal); }
 .float {
   position: absolute; z-index: 3; pointer-events: none; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; line-height: 1;
-  text-shadow: 0 2px 0 #fff, 0 0 6px #fff, 0 0 2px #fff;
+  font-family: var(--font-body); font-weight: 700; font-size: 1.35rem; line-height: 1; text-transform: uppercase; letter-spacing: 0.03em;
+  text-shadow: 0 2px 0 #000, 0 0 6px #000, 0 0 2px #000;
   transform: translate(-50%, -50%);
   animation: floatUp 1.1s ease-out forwards;
 }
+.float.small { font-size: 0.9rem; }
+.float.big { font-size: 1.7rem; }
 @keyframes floatUp {
   0% { opacity: 0; transform: translate(-50%, -20%) scale(0.6); }
   15% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
@@ -125,42 +145,38 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 }
 
 /* Shared */
-.label { font-size: 0.78rem; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.label { font-size: 0.76rem; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 8px; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.08em; }
 .label > span:first-child { display: flex; align-items: center; gap: 8px; color: var(--ink); }
-.label > span:first-child::before { content: ""; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); flex: none; }
-.tile { background: var(--tile); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
-.card { background: var(--card); box-shadow: var(--shadow); border-radius: 16px; }
+.label > span:first-child::before { content: ""; width: 7px; height: 7px; transform: rotate(45deg); background: var(--accent-hi); flex: none; }
+.tile { background: var(--tile); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex: none; box-shadow: inset 0 0 0 1px #000; }
 
 /* Intent */
-.intent { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); transition: box-shadow 200ms; }
+.intent { display: flex; gap: 10px; align-items: center; padding: 8px 12px; transition: box-shadow 200ms, border-color 200ms; }
 .intent .tile { width: 40px; height: 40px; font-size: 1.3rem; color: var(--atk); }
 .intent .txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.intent .eyebrow { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
-.intent strong { font-family: var(--font-display); font-weight: 600; font-size: 1rem; line-height: 1.25; }
+.intent .eyebrow { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.intent strong { font-weight: 700; font-size: 1.02rem; line-height: 1.2; }
 .intent .detail { font-size: 0.8rem; color: var(--muted); }
-.intent.cancelled { opacity: 0.55; }
-.intent.cancelled strong { text-decoration: line-through; }
-.intent.acting { box-shadow: 0 0 0 3px var(--atk), var(--shadow); }
+.intent.acting { border-color: var(--accent-hi); box-shadow: 0 0 0 2px var(--accent), var(--frame-shadow); }
 
 /* Dice tray */
 .tray { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 280px; width: 100%; margin-inline: auto; }
 .die {
   aspect-ratio: 1.15; width: 100%; max-width: 100%;
-  border-radius: 16px; border: 0; background: var(--card);
-  box-shadow: 0 4px 0 #e6dccb, 0 10px 20px rgba(70, 50, 20, 0.1);
+  background-color: #2e241e;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   cursor: pointer; position: relative; padding: 4px;
 }
-.die .face { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.35rem, 6.4vw, 2rem); line-height: 1; }
+.die .face { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: clamp(1.4rem, 6.4vw, 2.1rem); line-height: 1; }
 .die .face .ic { font-size: 0.75em; }
-.die .who { font-size: 0.7rem; color: var(--muted); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.die.acting { transform: translateY(-6px) scale(1.06); box-shadow: 0 0 0 3px var(--accent), 0 10px 22px rgba(239, 138, 38, 0.35); transition: transform 150ms; }
-.die.spent { opacity: 0.45; }
-.die.held { box-shadow: 0 0 0 3px var(--accent), 0 4px 0 3px #f3c08d, 0 10px 20px rgba(70, 50, 20, 0.1); }
-.die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-ink); font-size: 0.64rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
+.die .who { font-size: 0.7rem; color: var(--muted); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-transform: uppercase; letter-spacing: 0.08em; }
+.die.acting { transform: translateY(-5px); border-color: var(--accent-hi); box-shadow: 0 0 0 2px var(--accent), var(--frame-shadow); transition: transform 150ms; }
+.die.spent { opacity: 0.4; }
+.die.held { border-color: var(--coin); box-shadow: 0 0 0 2px #6b5220, var(--frame-shadow); }
+.die .held-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--coin); color: #1a120c; font-size: 0.62rem; font-weight: 700; padding: 1px 8px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.08em; }
 .die:disabled { cursor: default; }
 .t-atk { color: var(--atk); } .t-shd { color: var(--shd); } .t-coin { color: var(--coin); }
-.t-heal { color: var(--heal); } .t-blank { color: #b9b2a6; }
+.t-heal { color: var(--heal); } .t-blank { color: var(--blank); }
 .tumble { animation: tumble 420ms cubic-bezier(.3,1.4,.5,1); }
 @keyframes tumble { 0% { transform: rotate(-160deg) scale(.6); opacity: 0.2; } 100% { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .tumble, .float { animation-duration: 1ms; } .bar > span { transition: none; } }
@@ -171,78 +187,80 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 /* Crew (compact) */
 .roster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.crew { position: relative; text-align: left; padding: 7px 6px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); border: 2px solid transparent; display: flex; flex-direction: column; gap: 6px; cursor: pointer; min-width: 0; }
+.crew { position: relative; text-align: left; padding: 8px 6px 7px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; min-width: 0; }
 .crew .head { display: flex; gap: 7px; align-items: center; min-width: 0; }
-.crew .tile { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; align-items: flex-end; }
+.crew .tile { width: 30px; height: 30px; overflow: hidden; align-items: flex-end; background: #3a2c24; }
 .crew .tile svg { width: 24px; height: 28px; }
 @media (max-width: 420px) { .crew .head { flex-direction: column; align-items: flex-start; gap: 3px; } }
 .crew .nm { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.crew .nm b { font-family: var(--font-display); font-weight: 600; font-size: 0.88rem; line-height: 1.15; }
-.crew .role { font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.crew .badge { position: absolute; top: -8px; right: 6px; font-size: 0.62rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--accent); color: #fff; }
-.crew.sel { border-color: var(--accent); }
+.crew .nm b { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1; letter-spacing: 0.01em; }
+.crew .role { font-size: 0.66rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.06em; }
+.crew .badge { position: absolute; top: -8px; right: 5px; font-size: 0.6rem; font-weight: 700; padding: 1px 6px; border-radius: 2px; background: var(--coin); color: #1a120c; text-transform: uppercase; letter-spacing: 0.06em; }
+.crew .badge.red { background: var(--accent); color: var(--accent-ink); }
+.crew .badge.grey { background: #4a403a; color: #cbbba8; }
+.crew.sel { border-color: var(--coin); }
+.crew.targeted { border-color: var(--accent-hi); box-shadow: 0 0 0 2px var(--accent), var(--frame-shadow); }
+.crew.wounded { background-color: #2a1714; }
+.crew.dead { opacity: 0.38; filter: grayscale(1); }
 .crew:disabled { cursor: default; }
 .faces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-.mini { height: 22px; border-radius: 6px; background: var(--tile); display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.7rem; font-weight: 700; border: 0; padding: 0; }
+.mini { height: 22px; border-radius: 3px; background: #2f241f; box-shadow: inset 0 0 0 1px #000; display: flex; align-items: center; justify-content: center; gap: 1px; font-size: 0.72rem; font-weight: 700; border: 0; padding: 0; }
 .mini .ic { font-size: 0.76rem; }
 button.mini { cursor: pointer; height: 34px; font-size: 0.85rem; }
 button.mini:disabled { cursor: default; opacity: 0.4; }
-button.mini:not(:disabled):hover { box-shadow: 0 0 0 2px var(--accent); }
+button.mini:not(:disabled):hover { box-shadow: inset 0 0 0 1px #000, 0 0 0 2px var(--accent-hi); }
 
 /* Actions */
 .actions { display: flex; gap: 8px; margin-top: auto; padding-top: 2px; }
-.btn { flex: 1; min-height: 50px; border-radius: 14px; border: 0; background: var(--card); box-shadow: var(--shadow); font-family: var(--font-display); font-weight: 600; font-size: 0.98rem; cursor: pointer; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; }
-.btn small { font-family: var(--font-body); font-weight: 500; font-size: 0.74rem; color: var(--muted); }
-.btn.primary { background: var(--accent); color: var(--accent-ink); flex: 1.4; box-shadow: 0 4px 0 #c96d14, 0 8px 16px rgba(239, 138, 38, 0.25); }
-.btn.primary small { color: inherit; opacity: 0.85; }
+.btn { flex: 1; min-height: 50px; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; }
+.btn small { font-weight: 500; font-size: 0.7rem; color: var(--muted); text-transform: none; letter-spacing: 0; }
+.btn.primary { background-color: var(--accent); border-color: #5e130e; color: var(--accent-ink); flex: 1.4; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 210, 190, 0.18), 0 3px 0 #2b0604, 0 8px 18px rgba(0, 0, 0, 0.5); }
+.btn.primary small { color: inherit; opacity: 0.8; }
 .btn:disabled { opacity: 0.4; cursor: default; }
 .btn:not(:disabled):active { transform: translateY(2px); }
 .btn.solo { flex: none; }
 
-
 /* Panels (map, market, camp...) */
 .panel { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
-.panel h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.45rem; margin: 0; line-height: 1.12; letter-spacing: -0.01em; text-wrap: balance; }
+.panel h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; margin: 0; line-height: 1; letter-spacing: 0.01em; text-wrap: balance; }
 .panel p { margin: 0; color: var(--muted); max-width: 60ch; }
 .choices { display: grid; gap: 10px; }
-.choice { text-align: left; padding: 11px; border-radius: 16px; border: 2px solid transparent; background: var(--card); box-shadow: var(--shadow); cursor: pointer; display: flex; gap: 12px; align-items: center; width: 100%; }
-.choice .tile { width: 46px; height: 46px; font-size: 1.35rem; }
+.choice { text-align: left; padding: 10px 12px; cursor: pointer; display: flex; gap: 12px; align-items: center; width: 100%; }
+.choice .tile { width: 44px; height: 44px; font-size: 1.3rem; }
 .choice .txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.choice b { font-family: var(--font-display); font-weight: 600; font-size: 0.98rem; }
+.choice b { font-weight: 700; font-size: 1rem; }
 .choice span.d { color: var(--muted); font-size: 0.86rem; }
 .choice .price { font-weight: 700; display: inline-flex; align-items: center; gap: 4px; color: var(--coin); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.choice:not(:disabled):hover { border-color: var(--accent); }
+.choice:not(:disabled):hover { border-color: var(--accent-hi); }
 .choice:disabled { opacity: 0.45; cursor: default; }
 .choice.done { opacity: 0.55; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.stat { padding: 12px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
-.stat b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; }
-.stat span { font-size: 0.78rem; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { padding: 10px; }
+.stat b { display: block; font-weight: 700; font-size: 1.4rem; }
+.stat span { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
 /* Route map */
-.map { position: relative; width: 100%; max-width: 100%; flex: 1 1 auto; min-height: 230px; margin-inline: auto; border-radius: 20px; background: linear-gradient(#f6efe2, #efe3cc); box-shadow: var(--shadow); overflow: hidden; }
+.map { position: relative; width: 100%; max-width: 100%; flex: 1 1 auto; min-height: 230px; margin-inline: auto; background-color: #1b1411; overflow: hidden; }
 .map svg.lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .node { position: absolute; transform: translate(-50%, -50%); width: 64px; border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: default; }
-.node .disc { width: 50px; height: 50px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: var(--muted); }
-.node .nl { font-size: 0.68rem; font-weight: 700; color: var(--muted); background: color-mix(in srgb, var(--card) 85%, transparent); padding: 0 5px; border-radius: 6px; white-space: nowrap; }
+.node .disc { width: 46px; height: 46px; border-radius: 4px; background: var(--card); border: 2px solid var(--iron); box-shadow: 0 3px 0 #000; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--muted); }
+.node .nl { font-size: 0.64rem; font-weight: 700; color: var(--muted); background: rgba(18, 13, 11, 0.85); padding: 0 5px; border-radius: 2px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.06em; }
 .node.reach { cursor: pointer; }
-.node.reach .disc { box-shadow: 0 0 0 3px var(--accent), var(--shadow); color: var(--ink); animation: pulse 1.6s ease-in-out infinite; }
+.node.reach .disc { border-color: var(--accent-hi); box-shadow: 0 0 0 2px var(--accent), 0 3px 0 #000; color: var(--ink); animation: pulse 1.6s ease-in-out infinite; }
 .node.reach .nl { color: var(--ink); }
-.node.visited .disc { background: var(--tile); box-shadow: none; color: #b5a98f; }
-.node.here .disc { background: var(--accent); color: #fff; box-shadow: 0 4px 0 #c96d14; }
-.node.far { opacity: 0.5; }
-.node.boss .disc { width: 60px; height: 60px; border-radius: 18px; color: var(--atk); }
-.node.boss.reach .disc { color: var(--atk); }
-.node[data-t="ambush"] .disc { color: var(--atk); } .node[data-t="camp"] .disc { color: var(--accent); }
+.node.visited .disc { background: #161110; box-shadow: none; color: #5e5048; }
+.node.here .disc { background: var(--accent); border-color: #5e130e; color: var(--accent-ink); }
+.node.far { opacity: 0.45; }
+.node.boss .disc { width: 56px; height: 56px; color: var(--atk); }
+.node[data-t="ambush"] .disc { color: var(--atk); } .node[data-t="camp"] .disc { color: #e08a3a; }
 .node[data-t="market"] .disc { color: var(--coin); }
 .node.visited .disc, .node.here .disc { color: inherit; }
 @keyframes pulse { 50% { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .node.reach .disc { animation: none; } }
 
 /* Title */
-.hero h1 { font-size: 2rem; }
+.hero h1 { font-size: 2.6rem; }
 .hero .cta { display: flex; flex-direction: column; gap: 10px; }
-.credit { font-size: 0.75rem; color: var(--muted); }
 @media (min-width: 700px) and (min-aspect-ratio: 5/4) {
   .shell { max-width: 1200px; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 18px; }
   #top { grid-column: 1 / -1; }
@@ -250,12 +268,21 @@ button.mini:not(:disabled):hover { box-shadow: 0 0 0 2px var(--accent); }
   #app { grid-column: 2; grid-row: 2; }
   .roster { grid-template-columns: repeat(2, 1fr) !important; }
 }
+/* Shorter phones: tighter lists so the market and camp fit without scrolling. */
+@media (max-height: 740px) {
+  .panel { gap: 8px; }
+  .panel h1 { font-size: 1.5rem; }
+  .choices { gap: 6px; }
+  .choice { padding: 6px 10px; gap: 10px; }
+  .choice .tile { width: 36px; height: 36px; font-size: 1.15rem; }
+  .choice span.d { font-size: 0.8rem; line-height: 1.25; }
+}
 /* Phones held sideways: little height, so a one-line header, a wider panel and all four crew in one row. */
 @media (max-height: 520px) and (min-aspect-ratio: 5/4) {
   .shell { grid-template-columns: minmax(0, 1fr) minmax(380px, 1.05fr); padding-block: 6px; row-gap: 6px; }
   #scene { width: min(100%, calc((100vh - 64px) * 16 / 9)); }
   .top { flex-wrap: nowrap; }
-  .brand { font-size: 1.1rem; }
+  .brand { font-size: 1.3rem; }
   .brand::after { display: none; }
   .road { order: 1; width: auto; flex: 1; min-width: 0; }
   .res { order: 2; }
@@ -263,7 +290,7 @@ button.mini:not(:disabled):hover { box-shadow: 0 0 0 2px var(--accent); }
   .intent .detail { display: none; }
   .crew .head { flex-direction: column; align-items: flex-start; gap: 3px; }
   .panel { gap: 8px; }
-  .panel h1 { font-size: 1.15rem; }
+  .panel h1 { font-size: 1.4rem; }
   .choices { gap: 6px; }
   .choice { padding: 6px 8px; }
   .choice .tile { width: 34px; height: 34px; font-size: 1.1rem; }
@@ -339,20 +366,20 @@ const WAGON_TYPES = {
 
 // Enemy moves: 'atk' hits the caravan; 'guard' absorbs some of your damage this turn, then hits.
 const ENEMY_TYPES = {
-  bandits: { name: 'Dune Bandits', hp: 14, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 6 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 6 }] },
-  skeletons: { name: 'Tomb Guards', hp: 12, loot: 5, pattern: [{ k: 'atk', v: 4 }, { k: 'atk', v: 4 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 4 }] },
-  king: { name: 'The Bandit King', boss: true, hp: 25, loot: 12, pattern: [{ k: 'guard', v: 4, dmg: 4 }, { k: 'atk', v: 7 }, { k: 'atk', v: 6 }, { k: 'atk', v: 8 }] },
-  wraith: { name: 'Sand Wraith', hp: 24, loot: 6, pattern: [{ k: 'atk', v: 7 }, { k: 'atk', v: 6 }, { k: 'atk', v: 8 }, { k: 'guard', v: 4, dmg: 4 }] },
-  siege: { name: 'Raider Siege Tower', hp: 25, loot: 6, pattern: [{ k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 10 }, { k: 'atk', v: 6 }, { k: 'atk', v: 7 }] },
-  storm: { name: 'The Storm Mother', boss: true, hp: 42, loot: 12, pattern: [{ k: 'atk', v: 7 }, { k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 11 }] },
-  sentinel: { name: 'Brass Sentinel', hp: 29, loot: 7, pattern: [{ k: 'atk', v: 8 }, { k: 'guard', v: 5, dmg: 6 }, { k: 'atk', v: 8 }, { k: 'atk', v: 11 }] },
-  legion: { name: 'Tomb Legion', hp: 28, loot: 7, pattern: [{ k: 'atk', v: 8 }, { k: 'atk', v: 8 }, { k: 'guard', v: 4, dmg: 7 }, { k: 'atk', v: 8 }] },
-  warden: { name: 'The Gate Warden', boss: true, hp: 50, loot: 0, pattern: [{ k: 'guard', v: 6, dmg: 6 }, { k: 'atk', v: 11 }, { k: 'atk', v: 8 }, { k: 'atk', v: 14 }, { k: 'atk', v: 7 }] },
+  bandits: { name: 'Dune Bandits', hp: 14, loot: 5, pattern: [{ k: 'atk', v: 3 }, { k: 'atk', v: 5 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 5 }] },
+  skeletons: { name: 'Tomb Guards', hp: 12, loot: 5, pattern: [{ k: 'atk', v: 3 }, { k: 'atk', v: 3 }, { k: 'guard', v: 2, dmg: 3 }, { k: 'atk', v: 3 }] },
+  king: { name: 'The Bandit King', boss: true, hp: 25, loot: 12, pattern: [{ k: 'guard', v: 4, dmg: 3 }, { k: 'atk', v: 6 }, { k: 'atk', v: 5 }, { k: 'atk', v: 7 }] },
+  wraith: { name: 'Sand Wraith', hp: 24, loot: 6, pattern: [{ k: 'atk', v: 6 }, { k: 'atk', v: 5 }, { k: 'atk', v: 7 }, { k: 'guard', v: 4, dmg: 3 }] },
+  siege: { name: 'Raider Siege Tower', hp: 25, loot: 6, pattern: [{ k: 'guard', v: 5, dmg: 5 }, { k: 'atk', v: 8 }, { k: 'atk', v: 5 }, { k: 'atk', v: 6 }] },
+  storm: { name: 'The Storm Mother', boss: true, hp: 42, loot: 12, pattern: [{ k: 'atk', v: 6 }, { k: 'atk', v: 7 }, { k: 'guard', v: 5, dmg: 5 }, { k: 'atk', v: 9 }] },
+  sentinel: { name: 'Brass Sentinel', hp: 29, loot: 7, pattern: [{ k: 'atk', v: 7 }, { k: 'guard', v: 5, dmg: 5 }, { k: 'atk', v: 7 }, { k: 'atk', v: 9 }] },
+  legion: { name: 'Tomb Legion', hp: 28, loot: 7, pattern: [{ k: 'atk', v: 7 }, { k: 'atk', v: 7 }, { k: 'guard', v: 4, dmg: 6 }, { k: 'atk', v: 7 }] },
+  warden: { name: 'The Gate Warden', boss: true, hp: 50, loot: 0, pattern: [{ k: 'guard', v: 6, dmg: 5 }, { k: 'atk', v: 9 }, { k: 'atk', v: 7 }, { k: 'atk', v: 12 }, { k: 'atk', v: 6 }] },
 };
 
 const LEGS = [
-  { name: 'The Salt Flats', normals: ['bandits', 'skeletons'], boss: 'king' },
-  { name: 'The Shifting Sea', normals: ['wraith', 'siege'], boss: 'storm' },
+  { name: 'The Bone Flats', normals: ['bandits', 'skeletons'], boss: 'king' },
+  { name: 'The Scorched Sea', normals: ['wraith', 'siege'], boss: 'storm' },
   { name: 'The Brass Road', normals: ['sentinel', 'legion'], boss: 'warden' },
 ];
 
@@ -364,21 +391,30 @@ const NODE_INFO = {
 };
 
 const DICE_PER_TURN = 2;
+const WOUND_AT = 4; // damage that must get through your block to wound the named crew member
 const REROLLS = 2;
 const CAMP_HEAL = 10;
-const PRICES = { wagon: 12, repair: 4 };
+const PRICES = { wagon: 12, repair: 4, physician: 5 };
 const REPAIR = 8;
 
 /* =========================================================
    State, saving, helpers
    ========================================================= */
-const SAVE_KEY = 'caravan-dice-save-v4';
+const SAVE_KEY = 'caravan-dice-save-v5';
 let S = null;
 let pendingFx = [];
 const rand = (n) => Math.floor(Math.random() * n);
 const pick = (arr) => arr[rand(arr.length)];
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = rand(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const crewById = (id) => S.crew.find((c) => c.id === id);
+const living = () => S.crew.filter((c) => !c.dead);
+const perTurn = () => Math.min(DICE_PER_TURN, living().length);
+// Treat wounds: the given crew member, or everyone if no id. Returns who was patched up.
+function patchWounds(id) {
+  const out = [];
+  for (const c of S.crew) if (c.wounded && !c.dead && (!id || c.id === id)) { c.wounded = false; out.push(c); }
+  return out;
+}
 const has = (type) => S.wagons.some((w) => w.type === type);
 const maxHp = () => S.wagons.reduce((s, w) => s + WAGON_TYPES[w.type].hp, 0);
 const heal = (n) => { const before = S.hp; S.hp = Math.min(maxHp(), S.hp + n); return S.hp - before; };
@@ -456,7 +492,8 @@ function enterNode(type) {
   else if (type === 'market') { S.market = genMarket(); S.screen = 'market'; }
   else if (type === 'camp') {
     const got = heal(CAMP_HEAL);
-    log(`Rested at camp: +${got} health.`);
+    const patched = patchWounds();
+    log(`Made camp: +${got} health${patched.length ? `, ${patched.map((c) => c.name).join(' and ')} patched up` : ''}.`);
     fx({ k: 'gain', text: `+${got} health`, cls: 't-heal', sfx: 'block' });
   }
 }
@@ -473,10 +510,10 @@ function nextLeg() {
    ========================================================= */
 const rollFace = (id) => ({ ...pick(crewById(id).faces) });
 function defaultSel() {
-  const ids = S.crew.map((c) => c.id);
+  const ids = living().map((c) => c.id);
   const sel = (S.lastSel || []).filter((id) => ids.includes(id));
-  for (const id of ids) if (sel.length < DICE_PER_TURN && !sel.includes(id)) sel.push(id);
-  return sel.slice(0, DICE_PER_TURN);
+  for (const id of ids) if (sel.length < perTurn() && !sel.includes(id)) sel.push(id);
+  return sel.slice(0, perTurn());
 }
 
 function totals(f) {
@@ -512,14 +549,17 @@ function nextIntent() {
   const base = pattern[e.step % pattern.length];
   const bump = Math.floor(e.step / pattern.length); // a little meaner each time the pattern repeats
   e.step++;
-  f.intent = { k: base.k, v: base.v + bump, dmg: (base.dmg || 0) + bump };
+  f.intent = { k: base.k, v: base.v + bump, dmg: (base.dmg || 0) + bump, target: pick(living()).id };
   e.block = f.intent.k === 'guard' ? f.intent.v : 0;
 }
 
 function intentText(it) {
+  const c = crewById(it.target);
+  const who = c ? c.name : 'the caravan';
+  const risk = c ? (c.wounded ? `${who} is already wounded: if ${WOUND_AT} or more gets through your block, ${who} dies.` : `If ${WOUND_AT} or more gets through your block, ${who} is wounded.`) : '';
   return it.k === 'guard'
-    ? { icon: 'shd', title: `Brace, then attack for ${it.dmg}`, detail: `Absorbs ${it.v} of your damage this turn.` }
-    : { icon: 'atk', title: `Attack for ${it.v}`, detail: 'Your block reduces it.' };
+    ? { icon: 'shd', title: `Brace, then strike ${who} for ${it.dmg}`, detail: `Absorbs ${it.v} of your damage. ${risk}` }
+    : { icon: 'atk', title: `Strike ${who} for ${it.v}`, detail: risk };
 }
 
 // Your turn resolves one die at a time, in roll order: that crew member steps up and acts, then the next.
@@ -578,7 +618,9 @@ function nextStep() {
       fx({ k: 'act', id: c.id, text: `+${n} coin`, cls: 't-coin', sfx: 'coin', burst: '#e0b23a' });
     } else if (t === 'heal') {
       const got = heal(MEND);
-      fx({ k: 'act', id: c.id, text: `+${got} health`, cls: 't-heal', sfx: 'block', burst: '#7fbf5a' });
+      const hurt = S.crew.find((x) => x.wounded && !x.dead);
+      if (hurt) { hurt.wounded = false; log(`${c.name} bound ${hurt.name}'s wound.`); }
+      fx({ k: 'act', id: c.id, text: hurt ? `${hurt.name} patched` : `+${got} health`, cls: 't-heal', sfx: 'block', burst: '#7fbf5a' });
     } else {
       fx({ k: 'act', id: c.id, text: 'Nothing', cls: 't-blank' });
       wait = 450;
@@ -593,11 +635,19 @@ function enemyPhase() {
   const dmg = it.k === 'guard' ? it.dmg : it.v;
   const taken = Math.max(0, dmg - f.shield);
   S.hp = Math.max(0, S.hp - taken);
-  fx({ k: 'eshot', to: 'wagon', id: S.wagons[S.wagons.length - 1].type, dmg: taken, blocked: taken === 0 });
-  if (S.hp <= 0) { f.phase = 'done'; later(1300, lose); return; }
+  const c = crewById(it.target);
+  let fate = null;
+  if (taken >= WOUND_AT && c && !c.dead) {
+    if (c.wounded) { c.dead = true; fate = 'killed'; S.stats.lost = (S.stats.lost || 0) + 1; log(`${c.name} is dead.`); }
+    else { c.wounded = true; fate = 'wounded'; log(`${c.name} is wounded.`); }
+  }
+  fx({ k: 'eshot', id: it.target, dmg: taken, blocked: taken === 0, fate });
+  if (S.hp <= 0) { f.phase = 'done'; later(1500, () => lose('The caravan was overrun.')); return; }
+  if (!living().length) { f.phase = 'done'; later(1500, () => lose('No one is left to drive the wagons.')); return; }
   f.dice = [];
   f.phase = 'pick';
   f.turn++;
+  f.selected = f.selected.filter((id) => !crewById(id).dead);
   nextIntent();
 }
 
@@ -606,14 +656,16 @@ function winFight() {
   S.lastSel = f.selected.slice();
   S.coin += e.loot; S.stats.coinEarned += e.loot;
   let note = `Beat ${e.name}.${e.loot ? ` +${e.loot} coin.` : ''}`;
+  const bound = patchWounds();
+  if (bound.length) note += ` ${bound.map((c) => c.name).join(' and ')} bound ${bound.length > 1 ? 'their wounds' : 'the wound'}.`;
   if (has('cook')) { const got = heal(4); if (got) note += ` Cook Wagon: +${got} health.`; }
   log(note);
   Sfx.play('win');
   if (f.kind === LEGS[LEGS.length - 1].boss) { S.screen = 'victory'; return; }
-  if (e.boss) { S.hp = maxHp(); S.screen = 'camp'; return; }
+  if (e.boss) { S.hp = maxHp(); patchWounds(); S.screen = 'camp'; return; }
   S.screen = 'map';
 }
-function lose() { S.screen = 'defeat'; log(`The caravan fell to ${S.fight.enemy.name}.`); Sfx.play('lose'); }
+function lose(why) { S.screen = 'defeat'; log(why || `${S.fight.enemy.name} finished the caravan.`); Sfx.play('lose'); }
 
 /* =========================================================
    Market and training
@@ -649,10 +701,11 @@ const A = {
 
   pick(id) {
     const f = S.fight;
-    if (!f || f.phase !== 'pick' || !crewById(id)) return;
+    const c = crewById(id);
+    if (!f || f.phase !== 'pick' || !c || c.dead) return;
     const i = f.selected.indexOf(id);
     if (i >= 0) f.selected.splice(i, 1);
-    else if (f.selected.length < DICE_PER_TURN) f.selected.push(id);
+    else if (f.selected.length < perTurn()) f.selected.push(id);
     else { f.selected.shift(); f.selected.push(id); }
     Sfx.play('click');
   },
@@ -695,6 +748,10 @@ const A = {
     if (kind === 'wagon') {
       if (S.wagons.length >= MAX_WAGONS) return;
       S.wagons.push({ type: arg }); S.hp += WAGON_TYPES[arg].hp; log(`Bought a ${WAGON_TYPES[arg].name}.`);
+    } else if (kind === 'physician') {
+      const patched = patchWounds();
+      if (!patched.length) return;
+      log(`The physician patched up ${patched.map((c) => c.name).join(' and ')}.`);
     } else if (kind === 'repair') {
       if (S.hp >= maxHp()) return;
       log(`Repairs: +${heal(REPAIR)} health.`);
@@ -767,6 +824,7 @@ const Sfx = (() => {
     roll() { for (let i = 0; i < 7; i++) noise(0.045, 0.35, i * 0.055 + Math.random() * 0.03, 2200 + Math.random() * 1800); },
     land() { noise(0.06, 0.4, 0, 1100); },
     hit() { tone(150, 0.25, 'sine', 0.35, 0, 0.4); noise(0.12, 0.3, 0, 700); },
+    death() { tone(160, 0.7, 'sawtooth', 0.09, 0, 0.35); noise(0.35, 0.3, 0.05, 300); },
     hurt() { tone(95, 0.35, 'triangle', 0.3, 0, 0.5); noise(0.22, 0.25, 0, 420); },
     block() { tone(880, 0.18, 'triangle', 0.12); tone(1320, 0.24, 'sine', 0.08, 0.02); },
     coin() { tone(1568, 0.08, 'square', 0.05); tone(2093, 0.16, 'square', 0.045, 0.07); },
@@ -936,30 +994,54 @@ const Scene = (() => {
   const WAGON_Y = 216;
   const ENEMY_X = 396;
 
-  const background = `<rect width="480" height="270" fill="#f1e2c4"/>
-    <circle cx="398" cy="58" r="24" fill="#f3c27c"/>
-    <path d="M0 150L40 138L70 142L95 118L150 118L170 140L240 146L300 130L340 136L380 124L420 140L480 132V270H0Z" fill="#e2c193"/>
-    <path d="M0 186Q60 158 130 174T262 168T400 166T480 170V270H0Z" fill="#d7ac76"/>
-    <rect y="200" width="480" height="70" fill="#c99a63"/>
-    <rect y="232" width="480" height="28" fill="#d3a873"/>
-    <rect x="60" y="208" width="6" height="3" fill="#b4864f"/><rect x="300" y="214" width="9" height="3" fill="#b4864f"/><rect x="430" y="262" width="7" height="3" fill="#b4864f"/><rect x="190" y="264" width="10" height="3" fill="#b4864f"/>`;
+  // Blood-red dusk over the waste: flat colour bands, a low swollen sun, black mesas, bones and a wreck by the road.
+  const vulture = (x, y, r, dur, rev) => `<g transform="translate(${x},${y})"><g>
+      <path d="M${r} 0l-7 -3.5l-3 2.5l-3 -2.5l-7 3.5l7 -1.5l3 2l3 -2z" fill="#120605"/>
+      <animateTransform attributeName="transform" type="rotate" from="${rev ? 360 : 0}" to="${rev ? 0 : 360}" dur="${dur}s" repeatCount="indefinite"/></g></g>`;
+  const background = `<defs><radialGradient id="vig" cx="50%" cy="45%" r="75%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.55"/></radialGradient></defs>
+    <rect width="480" height="270" fill="#240b09"/>
+    <rect y="38" width="480" height="40" fill="#3a110c"/>
+    <rect y="78" width="480" height="34" fill="#561a10"/>
+    <rect y="112" width="480" height="34" fill="#7a2513"/>
+    <circle cx="384" cy="134" r="42" fill="#c43c1d"/>
+    <path d="M66 146q-8 -20 4 -36q10 -14 0 -32q-6 -12 6 -26" stroke="#2e1714" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.8"/>
+    ${vulture(120, 58, 26, 11, false)}${vulture(150, 70, 18, 8, true)}${vulture(330, 44, 22, 14, false)}
+    <path d="M0 150L40 138L70 142L95 118L150 118L170 140L240 146L300 130L340 136L380 124L420 140L480 132V270H0Z" fill="#1a0a08"/>
+    <path d="M300 131v-16M300 121l-7 -6M300 118l6 -7M300 124l5 -3" stroke="#1a0a08" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M0 186Q60 158 130 174T262 168T400 166T480 170V270H0Z" fill="#371410"/>
+    <g fill="#24100c"><path d="M128 176l34 -6l2 5l-34 6z"/><circle cx="134" cy="181" r="6"/><path d="M160 166l6 -14l3 1l-5 14z"/></g>
+    <rect y="200" width="480" height="70" fill="#461b12"/>
+    <rect y="232" width="480" height="28" fill="#521f15"/>
+    <g fill="#c9bba2" opacity="0.75">
+      <path d="M298 262q8 -10 16 0M302 262q6 -7 12 0M306 262q4 -4 8 0" stroke="#c9bba2" stroke-width="1.6" fill="none"/>
+      <rect x="292" y="261" width="28" height="2"/>
+      <path d="M452 260q0 -8 7 -8q7 0 7 8z"/><rect x="455" y="260" width="8" height="3"/>
+      <rect x="20" y="246" width="16" height="2" transform="rotate(-18 28 247)"/><rect x="236" y="266" width="14" height="2" transform="rotate(12 243 267)"/>
+    </g>
+    <g fill="#33130d"><rect x="60" y="208" width="6" height="3"/><rect x="300" y="214" width="9" height="3"/><rect x="430" y="262" width="7" height="3"/><rect x="190" y="264" width="10" height="3"/></g>`;
 
   const PROPS = {
-    market: `<rect x="372" y="168" width="4" height="56" fill="#5c3e27"/><rect x="452" y="168" width="4" height="56" fill="#5c3e27"/>
-      <path d="M364 166h100l-8 14h-84z" fill="#a8553a"/><path d="M380 166h12l-2 14h-10zM404 166h12l-1 14h-11zM428 166h12l1 14h-12z" fill="#d8c3a0"/>
-      <rect x="372" y="200" width="84" height="24" fill="#7a5a3c"/><rect x="380" y="190" width="12" height="10" fill="#c49a4a"/><circle cx="410" cy="195" r="6" fill="#8a4a2a"/><rect x="424" y="188" width="16" height="12" fill="#a08660"/>`,
-    camp: `<path d="M398 222L428 176L458 222Z" fill="#8f7d60"/><path d="M420 222L428 196L436 222Z" fill="#5a4a38"/>
-      <rect x="320" y="246" width="26" height="5" rx="2" fill="#5c3e27" transform="rotate(-12 333 248)"/><rect x="320" y="246" width="26" height="5" rx="2" fill="#4a3426" transform="rotate(14 333 248)"/>
-      <path class="flicker" d="M324 246q9 -30 9 -30q9 18 9 30z" fill="#e8892e"/><path class="flicker" d="M328 246q5 -18 5 -18q5 10 5 18z" fill="#f6c454"/>`,
-    victory: `<rect x="372" y="120" width="108" height="104" fill="#cdb894"/><path d="M372 120h108v-10h-108z" fill="#b8a27c"/>
-      <path d="M372 110h10v-8h-10zM394 110h10v-8h-10zM416 110h10v-8h-10zM438 110h10v-8h-10zM460 110h10v-8h-10z" fill="#b8a27c"/>
-      <path d="M404 224v-50q22 -26 44 0v50z" fill="#4a3a2c"/>`,
+    market: `<rect x="372" y="168" width="4" height="56" fill="#2e1d14"/><rect x="452" y="168" width="4" height="56" fill="#2e1d14"/>
+      <path d="M364 166h100l-8 14h-84z" fill="#6e2018"/><path d="M380 166h12l-2 14h-10zM404 166h12l-1 14h-11zM428 166h12l1 14h-12z" fill="#9c8868"/>
+      <rect x="372" y="200" width="84" height="24" fill="#3e2a1c"/><rect x="380" y="190" width="12" height="10" fill="#8a6a30"/><circle cx="410" cy="195" r="6" fill="#5a2a1a"/><rect x="424" y="188" width="16" height="12" fill="#6e5a40"/>`,
+    camp: `<path d="M398 222L428 176L458 222Z" fill="#3e3024"/><path d="M420 222L428 196L436 222Z" fill="#1e1610"/>
+      <rect x="320" y="246" width="26" height="5" rx="2" fill="#2e1d14" transform="rotate(-12 333 248)"/><rect x="320" y="246" width="26" height="5" rx="2" fill="#24170f" transform="rotate(14 333 248)"/>
+      <path class="flicker" d="M324 246q9 -30 9 -30q9 18 9 30z" fill="#e8762e"/><path class="flicker" d="M328 246q5 -18 5 -18q5 10 5 18z" fill="#f6c454"/>`,
+    victory: `<rect x="372" y="120" width="108" height="104" fill="#5e4a38"/><path d="M372 120h108v-10h-108z" fill="#4e3c2c"/>
+      <path d="M372 110h10v-8h-10zM394 110h10v-8h-10zM416 110h10v-8h-10zM438 110h10v-8h-10zM460 110h10v-8h-10z" fill="#4e3c2c"/>
+      <path d="M404 224v-50q22 -26 44 0v50z" fill="#120a07"/><rect x="420" y="96" width="2" height="16" fill="#2a1a12"/><path d="M422 96h12l-3 4l3 4h-12z" fill="#7a2018"/>`,
   };
+  // Stones and a planted spear where a crew member fell.
+  const CAIRN = '<g class="cairn"><rect x="7" y="-40" width="2" height="40" fill="#3a2a1e" transform="rotate(8 8 0)"/><path d="M-13 0h26l-4 -7h-18z" fill="#3e332c"/><path d="M-9 -7h18l-3 -7h-12z" fill="#4c4038"/><path d="M-5 -14h10l-2 -6h-6z" fill="#5a4c42"/></g>';
 
   host.insertAdjacentHTML('afterbegin', `<svg class="stage" viewBox="0 0 ${VW} ${VH}" role="img" aria-label="Your caravan on the road">
-    ${background}<g id="st-props"></g><g id="st-wagons"></g><g id="st-enemy"></g><g id="st-crew"></g></svg>`);
+    ${background}<g id="st-props"></g><g id="st-wagons"></g><g id="st-enemy"></g><g id="st-crew"></g><g id="st-fx"></g>
+    <rect width="480" height="270" fill="#3a0503" opacity="0.16" pointer-events="none"/><rect width="480" height="270" fill="url(#vig)" pointer-events="none"/></svg>`);
   const L = (id) => host.querySelector(`#${id}`);
-  const layers = { props: L('st-props'), wagons: L('st-wagons'), enemy: L('st-enemy'), crew: L('st-crew') };
+  const layers = { props: L('st-props'), wagons: L('st-wagons'), enemy: L('st-enemy'), crew: L('st-crew'), fx: L('st-fx') };
+  const svg = host.querySelector('svg.stage');
+  const deathAt = {};
+  let lastState = null;
   const keys = { props: null, wagons: null, enemy: null, crew: null };
   const crewPos = {};
   let enemyEl = null, dying = false;
@@ -992,6 +1074,18 @@ const Scene = (() => {
     anim(el && el.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: `translateX(${dx}px)`, offset: 0.3 }, { transform: 'translateX(0)' }], { duration: 360, delay });
   }
 
+  // A sharp white impact star and a jolt of the whole scene. No blood: the violence is implied.
+  function impact(x, y, big) {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', `translate(${x},${y})`);
+    g.innerHTML = '<path d="M0 -16L4 -5L15 -8L7 1L13 12L1 6L-6 15L-5 3L-16 0L-5 -4Z" fill="#f4ead8"/><path d="M0 -8L2 -2L8 -3L3 1L5 6L0 3L-3 7L-2 1L-8 0L-2 -2Z" fill="#d0392b"/>';
+    layers.fx.appendChild(g);
+    const inner = g;
+    const a = anim(inner, [{ opacity: 1 }, { opacity: 1, offset: 0.4 }, { opacity: 0 }], { duration: 380 });
+    if (a) a.finished.then(() => g.remove()); else setTimeout(() => g.remove(), 300);
+    anim(svg, [{ transform: 'translate(0,0)' }, { transform: `translate(${big ? 6 : 3}px,${big ? -3 : -1}px)` }, { transform: `translate(${big ? -5 : -2}px,${big ? 3 : 1}px)` }, { transform: 'translate(0,0)' }], { duration: big ? 320 : 220 });
+  }
+
   function play(list) {
     for (const f of list) {
       if (f.k === 'strike') {
@@ -999,6 +1093,7 @@ const Scene = (() => {
         swing(el, 260);
         setTimeout(() => {
           knock(enemyEl, 10);
+          impact(ENEMY_X - 14, 196, f.dmg >= 6);
           Sfx.play('hit');
           floatAt(ENEMY_X - 6, 128, f.dmg > 0 ? `−${f.dmg}` : '0', 't-atk');
           if (f.absorbed) floatAt(ENEMY_X - 6, 156, `${f.absorbed} absorbed`, 't-shd small', 120);
@@ -1018,18 +1113,19 @@ const Scene = (() => {
         if (f.sfx) setTimeout(() => Sfx.play(f.sfx), f.delay || 0);
       }
       if (f.k === 'eshot') {
-        anim(enemyEl && enemyEl.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-46px)', offset: 0.45 }, { transform: 'translateX(0)' }], { duration: 560, easing: 'ease-in-out' });
+        anim(enemyEl && enemyEl.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-70px)', offset: 0.45 }, { transform: 'translateX(0)' }], { duration: 600, easing: 'ease-in-out' });
         if (enemyEl) enemyEl.querySelectorAll('.swing').forEach((a, i) => anim(a, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-165deg)', offset: 0.4 }, { transform: 'rotate(-35deg)', offset: 0.75 }, { transform: 'rotate(0deg)' }], { duration: 420, delay: 80 + i * 60 }));
+        if (f.fate === 'killed') deathAt[f.id] = performance.now() + 1300;
         setTimeout(() => {
-          const w = wagonEl(f.id);
-          const x = WAGON_X[Math.max(0, S.wagons.findIndex((v) => v.type === f.id))];
-          if (f.blocked) { floatAt(x, 140, 'Blocked', 't-shd'); Sfx.play('block'); }
-          else {
-            anim(w && w.querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(-2px)' }, { transform: 'translateX(0)' }], { duration: 360 });
-            floatAt(x, 140, `−${f.dmg}`, 't-atk');
-            Sfx.play('hurt');
-          }
-        }, 300);
+          const p = crewPos[f.id] || { x: WAGON_X[0], y: BASE };
+          if (f.blocked) { floatAt(p.x, p.y - 104, 'Blocked', 't-shd'); Sfx.play('block'); return; }
+          impact(p.x + 4, p.y - 52, f.fate === 'killed');
+          anim(crewEl(f.id) && crewEl(f.id).querySelector('.mover'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)', offset: 0.3 }, { transform: 'translateX(0)' }], { duration: 300 });
+          floatAt(WAGON_X[0], 150, `−${f.dmg}`, 't-atk small', 80);
+          if (f.fate) floatAt(p.x, p.y - 108, f.fate === 'killed' ? 'Killed' : 'Wounded', f.fate === 'killed' ? 't-atk big' : 't-atk');
+          Sfx.play(f.fate === 'killed' ? 'death' : 'hurt');
+          if (f.fate === 'killed') setTimeout(() => sync(lastState), 1050);
+        }, 320);
       }
       if (f.k === 'edown' && enemyEl) {
         dying = true;
@@ -1042,6 +1138,7 @@ const Scene = (() => {
   }
 
   function sync(state) {
+    lastState = state;
     const scr = state ? state.screen : 'title';
     const f = state && state.fight;
 
@@ -1066,25 +1163,33 @@ const Scene = (() => {
     const ck = crew.join(',');
     if (ck !== keys.crew) {
       layers.crew.innerHTML = crew.map((id) => `<g class="pos" data-crew="${id}" style="${tr(150, BASE)}"><g class="mover">
-          <ellipse class="ring" cx="0" cy="1" rx="17" ry="4.5" fill="none" stroke="#ef8a26" stroke-width="2.5" opacity="0"/>
-          <g class="fig">${figure(LOOKS[id])}</g></g></g>`).join('');
+          <ellipse class="ring" cx="0" cy="1" rx="17" ry="4.5" fill="none" stroke="#d9a93e" stroke-width="2.5" opacity="0"/>
+          <g class="fig">${figure(LOOKS[id])}</g>${CAIRN}</g></g>`).join('');
       keys.crew = ck;
     }
     const R = scr === 'fight' ? f : null;
     const activeDie = R && R.active != null ? R.dice[R.active] : null;
     crew.forEach((id, i) => {
       const el = crewEl(id); if (!el) return;
+      const c = state && state.crew.find((m) => m.id === id);
+      const dead = !!(c && c.dead), falling = dead && (deathAt[id] || 0) > performance.now();
+      const targeted = R && R.intent && R.intent.target === id && R.phase !== 'done' && !dead;
       let x = CREW_X[i], y = BASE;
       const picked = R && R.phase === 'pick' && R.selected.includes(id);
       const rolled = R && R.phase !== 'pick' && R.dice.some((d) => d.crew === id);
       if (picked || rolled) y += 6;
       if (activeDie && activeDie.crew === id) { x = activeDie.face.t === 'atk' ? ENEMY_X - 58 : 270; y = BASE + 4; }
-      if (scr === 'camp') { x = [262, 294, 372, 404][i] || 300; y = BASE - (i % 2) * 5; }
+      if (scr === 'camp' && !dead) { x = [262, 294, 372, 404][i] || 300; y = BASE - (i % 2) * 5; }
+      if (dead) { x = CREW_X[i]; y = BASE; }
       crewPos[id] = { x, y };
       el.style.transform = `translate(${x}px,${y}px)`;
       el.classList.toggle('walking', scr === 'map');
-      el.classList.toggle('fallen', scr === 'defeat');
-      el.querySelector('.ring').setAttribute('opacity', picked ? '1' : '0');
+      el.classList.toggle('fallen', scr === 'defeat' || falling);
+      el.classList.toggle('dead', dead && !falling);
+      el.classList.toggle('wounded', !!(c && c.wounded && !dead) && scr !== 'defeat');
+      const ring = el.querySelector('.ring');
+      ring.setAttribute('opacity', picked || targeted ? '1' : '0');
+      ring.setAttribute('stroke', targeted && !picked ? '#d0392b' : '#d9a93e');
     });
   }
 
@@ -1145,8 +1250,12 @@ function miniFaces(c, act) {
   }).join('');
 }
 function crewCard(c, act, opts = {}) {
-  return `<button class="crew ${opts.sel ? 'sel' : ''}" data-act="${act}" data-arg="${c.id}" ${opts.disabled ? 'disabled' : ''} ${opts.sel != null ? `aria-pressed="${!!opts.sel}"` : ''}>
-    ${opts.sel ? '<span class="badge">Rolling</span>' : ''}
+  const f = S.screen === 'fight' ? S.fight : null;
+  const targeted = f && f.intent && f.intent.target === c.id && f.phase !== 'done' && !c.dead;
+  const badge = c.dead ? '<span class="badge grey">Dead</span>' : opts.sel ? '<span class="badge">Rolling</span>' : targeted ? '<span class="badge red">Targeted</span>' : c.wounded ? '<span class="badge red">Wounded</span>' : '';
+  const cls = [opts.sel ? 'sel' : '', targeted ? 'targeted' : '', c.wounded ? 'wounded' : '', c.dead ? 'dead' : ''].join(' ');
+  return `<button class="crew ${cls}" data-act="${act}" data-arg="${c.id}" ${opts.disabled || c.dead ? 'disabled' : ''} ${opts.sel != null ? `aria-pressed="${!!opts.sel}"` : ''} aria-label="${c.name}, ${c.role}${c.dead ? ', dead' : c.wounded ? ', wounded' : ''}${targeted ? ', targeted' : ''}">
+    ${badge}
     <span class="head"><span class="tile">${portrait(c.id)}</span><span class="nm"><b>${c.name}</b><span class="role">${c.role}</span></span></span>
     <span class="faces">${miniFaces(c)}</span>
   </button>`;
@@ -1156,7 +1265,7 @@ function fightHtml() {
   const f = S.fight, it = intentText(f.intent);
   let body, actions;
   if (f.phase === 'pick') {
-    body = `<div class="label"><span>Choose two to roll</span><span>${f.selected.length}/${Math.min(DICE_PER_TURN, S.crew.length)}</span></div>
+    body = `<div class="label"><span>${perTurn() > 1 ? 'Choose two to roll' : 'Only one left to roll'}</span><span>${f.selected.length}/${perTurn()}</span></div>
       <div class="roster">${S.crew.map((c) => crewCard(c, 'pick', { sel: f.selected.includes(c.id) })).join('')}</div>`;
     actions = `<button class="btn primary" data-act="roll" ${f.selected.length ? '' : 'disabled'}>Roll ${f.selected.length} crew</button>`;
   } else {
@@ -1194,7 +1303,7 @@ function mapHtml() {
   const X = (lane) => ((lane + 0.5) / 3) * 100;
   const Y = (row) => ((4 - (row + 1) + 0.5) / 5) * 100; // start at the bottom, boss at the top
   const lines = [];
-  const link = (r1, l1, r2, l2, hot) => lines.push(`<line x1="${X(l1) * 3}" y1="${Y(r1) * 3.4}" x2="${X(l2) * 3}" y2="${Y(r2) * 3.4}" stroke="${hot ? '#ef8a26' : '#d6c5a5'}" stroke-width="${hot ? 3 : 2}" stroke-dasharray="${hot ? '0' : '5 5'}" stroke-linecap="round"/>`);
+  const link = (r1, l1, r2, l2, hot) => lines.push(`<line x1="${X(l1) * 3}" y1="${Y(r1) * 3.4}" x2="${X(l2) * 3}" y2="${Y(r2) * 3.4}" stroke="${hot ? '#d0392b' : '#4e3f35'}" stroke-width="${hot ? 3 : 2}" stroke-dasharray="${hot ? '0' : '5 5'}" stroke-linecap="round"/>`);
   leg.rows[0].forEach((n) => link(-1, 1, 0, n.lane, p.row === -1));
   for (let r = 0; r < 2; r++) for (const a of leg.rows[r]) for (const b of leg.rows[r + 1]) if (Math.abs(a.lane - b.lane) <= 1) link(r, a.lane, r + 1, b.lane, p.row === r && p.lane === a.lane);
   leg.rows[2].forEach((n) => link(2, n.lane, 3, 1, p.row === 2 && p.lane === n.lane));
@@ -1231,7 +1340,7 @@ function choice(act, arg, ic, cls, title, desc, opts = {}) {
 function campHtml() {
   return `<section class="panel">
     <h1>${ENEMY_TYPES[S.fight.kind].name} is beaten</h1>
-    <p>The caravan is fully repaired. Choose one before you set out for ${LEGS[S.leg + 1].name}.</p>
+    <p>The wagons are repaired and the wounded are bound. Choose one before you set out for ${LEGS[S.leg + 1].name}.</p>
     <div class="choices">
       ${choice('camp', 'train', 'atk', 't-atk', 'Train', 'Upgrade any one face.')}
       ${choice('camp', 'spoils', 'coin', 't-coin', 'Take the spoils', '+12 coin for the markets ahead.')}
@@ -1248,7 +1357,9 @@ function marketHtml() {
       { price: PRICES.wagon, done: bought, disabled: bought || S.coin < PRICES.wagon || S.wagons.length >= MAX_WAGONS }));
   }
   items.push(choice('buy', 'upgrade', 'atk', 't-atk', 'Upgrade a face', '+2 to one face, or a blank becomes Attack 3.', { price: S.upgradeCost, disabled: S.coin < S.upgradeCost }));
-  items.push(choice('buy', 'repair', 'heal', 't-heal', 'Repairs', `+${REPAIR} caravan health.`, { price: PRICES.repair, disabled: S.coin < PRICES.repair || S.hp >= maxHp() }));
+  const hurt = S.crew.filter((c) => c.wounded && !c.dead);
+  items.push(choice('buy', 'physician', 'heal', 't-heal', 'Physician', hurt.length ? `Treat ${hurt.map((c) => c.name).join(' and ')}.` : 'No one is wounded.', { price: PRICES.physician, disabled: !hurt.length || S.coin < PRICES.physician }));
+  items.push(choice('buy', 'repair', 'cart', '', 'Repairs', `+${REPAIR} caravan health.`, { price: PRICES.repair, disabled: S.coin < PRICES.repair || S.hp >= maxHp() }));
   return `<section class="panel">
     <h1>Market</h1>
     <div class="choices">${items.join('')}</div>
@@ -1278,12 +1389,13 @@ function upgradeHtml() {
 
 function endHtml(won) {
   return `<section class="panel">
-    <h1>${won ? 'You reached the city' : 'The caravan fell'}</h1>
-    <p>${won ? 'The Gate Warden fell and the caravan rolled through the gate.' : `${S.log[0]} Every run starts fresh, so try a different route.`}</p>
+    <h1>${won ? 'You reached the city' : 'The caravan is lost'}</h1>
+    <p>${won ? `The Gate Warden fell and the wagons rolled through the gate. ${living().length} of ${S.crew.length} made it.` : `${S.log[0]} The sand takes what is left.`}</p>
     <div class="stats">
       <div class="stat"><b class="num">${S.stats.fights}</b><span>fights</span></div>
       <div class="stat"><b class="num">${S.stats.dmg}</b><span>damage dealt</span></div>
       <div class="stat"><b class="num">${S.stats.coinEarned}</b><span>coin earned</span></div>
+      <div class="stat"><b class="num">${S.stats.lost || 0}</b><span>crew lost</span></div>
     </div>
     <button class="btn primary solo" data-act="newRun">Ride again</button>
   </section>`;
@@ -1293,8 +1405,9 @@ function titleHtml() {
   const s = loadSave();
   const cont = s ? `<button class="btn primary solo" data-act="resume">Continue<small>Leg ${s.leg + 1}: ${LEGS[s.leg].name}</small></button>` : '';
   return `<section class="panel hero">
-    <h1>Cross the desert, one roll at a time</h1>
-    <p>Four travellers, four dice. Each turn, choose two of them to roll, keep the faces you like, reroll the rest, then watch them act one by one. Attack hurts the enemy, Block stops its next hit, Coin pays at markets and Mend repairs the caravan.</p>
+    <h1>Cross the red waste</h1>
+    <p>Four travellers, four dice. Each turn two of them roll and step up to fight. Every enemy names who it is coming for: block the blow, or that one is wounded. Wounded twice in one fight, they do not get up.</p>
+    <p>Attack hurts the enemy. Block stops its next strike. Mend binds a wound and repairs the caravan. Coin buys what the markets sell.</p>
     <div class="cta">${cont}<button class="btn ${s ? '' : 'primary'} solo" data-act="newRun">${s ? 'New run' : 'Start'}</button></div>
   </section>`;
 }
