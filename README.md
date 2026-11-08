@@ -13,7 +13,7 @@ Open `index.html` in a browser. It is a single file with no dependencies and wor
 - **Fights:** the enemy shows its next move. Choose 2 of your 4 crew to roll. Keep the dice you like and reroll the rest (2 rerolls), then end your turn. Your dice then resolve one at a time: each crew member steps up and attacks, blocks, collects coin or mends, before the enemy moves.
 - **Faces:** Attack hurts the enemy, Block stops its next hit, Coin buys things at markets, Mend repairs the caravan by 3.
 - **Health:** the caravan has one health bar. Each wagon adds health and a perk.
-- **Markets:** hire crew, buy wagons, upgrade faces and pay for repairs.
+- **Markets:** buy wagons, upgrade faces and pay for repairs. After each boss, train a face for free or take 12 coin.
 - **Saving:** progress saves after every step, so you can close the page and continue later.
 
 ## Wagons
